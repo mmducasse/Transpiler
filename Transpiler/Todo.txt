@@ -1,0 +1,15 @@
+﻿
+
+TODO:
+
+- Parenthesized func and type expressions
+- Make token indentation more robust
+
+- Match Case Patterns can be replaced with predicates
+  - These take the match argument as a parameter to produce Bool result
+
++ 'Type' concept
+  - Need to keep track of types and TVs with respect to scope
++ Type expression parsing
+- Type inference
+
