@@ -23,7 +23,7 @@ namespace Transpiler
         public static ArgNode Analyze(Scope scope,
                                       ArgNode node)
         {
-            scope.Definitions[node.Name] = node;
+            scope.FuncDefinitions[node.Name] = node;
             scope.TvTable.AddNode(scope, node);
 
             return node;

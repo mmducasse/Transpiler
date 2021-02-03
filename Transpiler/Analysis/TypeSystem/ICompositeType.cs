@@ -2,8 +2,9 @@
 
 namespace Transpiler
 {
-    public interface ICompositeType : INamedType
+    public interface ICompositeType : IType
     {
-        IReadOnlyList<string> Elements { get; }
+        public IType Left { get; }
+        public IType Right { get; }
     }
 }

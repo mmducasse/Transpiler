@@ -18,9 +18,11 @@ namespace Transpiler
 
             // Analyze functions in module.
             var newFns = AnalyzeFunctions(fileScope, module.ParseResult.FuncDefns);
-            SolveFileFunctions(fileScope, newFns);
 
-            // Apply HM type inference alg to functions
+            // Apply HM type inference alg to functions.
+            newFns = TypeSolver.SolveFunctions(fileScope, newFns);
+
+            
         }
 
         #region Analyze Types
@@ -41,13 +43,23 @@ namespace Transpiler
                 {
                     throw Error("Duplicate type definition.", defn);
                 }
-                fileScope.Types[type.Name] = type;
+                fileScope.TypeDefinitions[type.Name] = type;
             }
 
-            foreach (var t in fileScope.Types.Values)
+            foreach (var type in fileScope.TypeDefinitions.Values)
+            {
+                if (type is UnionType union)
+                {
+                    union.Build(fileScope);
+                }
+            }
+
+            foreach (var t in fileScope.TypeDefinitions.Values)
             {
                 Console.WriteLine(t.Print());
             }
+
+            fileScope.PrintTypeHeirarchy();
         }
 
         public static IReadOnlyList<TypeDefnNode> FlattenTypeDefnNode(IScope scope, TypeDefnNode typeDefn)
@@ -83,9 +95,9 @@ namespace Transpiler
             }
         }
 
-        public static ICompositeType AnalyzeTypeDefnNode(TypeDefnNode typeDefn,
-                                                         IReadOnlyList<TypeDefnNode> localTypeDefns,
-                                                         IScope scope)
+        public static INamedType AnalyzeTypeDefnNode(TypeDefnNode typeDefn,
+                                                     IReadOnlyList<TypeDefnNode> localTypeDefns,
+                                                     IScope scope)
         {
             if (typeDefn.Expression is NullTypeNode nullType)
             {
@@ -152,13 +164,13 @@ namespace Transpiler
 
             foreach (var fn in funcDefns)
             {
-                if (scope.Definitions.ContainsKey(fn.Name))
+                if (scope.FuncDefinitions.ContainsKey(fn.Name))
                 {
                     throw Error("Duplicate function definition: " + fn.Name, fn);
                 }
                 else
                 {
-                    scope.Definitions[fn.Name] = fn;
+                    scope.FuncDefinitions[fn.Name] = fn;
                 }
             }
 
@@ -167,7 +179,7 @@ namespace Transpiler
             {
                 var newScopedExpn = ScopedFuncExpnNode.Analyze(scope, fn.ScopedExpression);
                 var newFn = new FuncDefnNode(fn.Name, newScopedExpn);
-                scope.Definitions[fn.Name] = newFn;
+                scope.FuncDefinitions[fn.Name] = newFn;
                 scope.TvTable.AddNode(scope, newFn);
                 newFns.Add(newFn);
             }
@@ -177,62 +189,11 @@ namespace Transpiler
 
         #endregion
 
-        //public static void SolveFunctions(Scope scope,
-        //                                  IReadOnlyList<FuncDefnNode> funcDefns)
-        //{
-        //    var tvTable = scope.TvTable;
-
-        //    scope.TvTable.Print();
-
-        //    for (int i = 0; i < 5; i++)
-        //    {
-        //        for (int j = 0; j < tvTable.Types.Count; j++)
-        //        {
-        //            if (tvTable.Types[j].Node is IFuncExpnNode funcExpn)
-        //            {
-        //                IFuncExpnNode.Solve(tvTable, funcExpn);
-        //            }
-        //        }
-        //    }
-
-        //    scope.TvTable.Print();
-        //}
-
-        private static void SolveFileFunctions(Scope scope,
-                                               IReadOnlyList<FuncDefnNode> funcDefns)
-        {
-            bool progressed = true;
-
-            scope.TvTable.Print();
-
-            while (progressed)
-            {
-                progressed = SolveFunctions(scope, funcDefns);
-            }
-
-            scope.TvTable.Print();
-        }
-
-        public static bool SolveFunctions(Scope scope,
-                                          IReadOnlyList<FuncDefnNode> funcDefns)
-        {
-            var table = scope.TvTable;
-
-            bool progressed = false;
-            foreach (var fn in funcDefns)
-            {
-                progressed |= ScopedFuncExpnNode.Solve(fn.ScopedExpression);
-                progressed |= FuncDefnNode.Solve(table, fn);
-            }
-
-            return progressed;
-        }
-
         public static void Print(Module module)
         {
             var scope = module.Scope as Scope;
 
-            foreach (var fn in scope.Definitions.Values)
+            foreach (var fn in scope.FuncDefinitions.Values)
             {
                 Console.WriteLine(fn.Print(0));
             }

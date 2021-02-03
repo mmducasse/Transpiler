@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Transpiler.Parse;
 
@@ -68,6 +69,34 @@ namespace Transpiler
             }
 
             return false;
+        }
+
+        public bool IsSubtypeOf(INamedType subtype, ITypeSet supertype)
+        {
+            if (CoreTypes.Instance.IsSubtypeOf(subtype, supertype))
+            {
+                return true;
+            }
+
+            foreach (var d in Dependencies)
+            {
+                if (d.Scope.IsSubtypeOf(subtype, supertype))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void PrintTypeHeirarchy()
+        {
+            CoreTypes.Instance.PrintTypeHeirarchy();
+
+            foreach (var dependent in Dependencies)
+            {
+                dependent.Scope.PrintTypeHeirarchy();
+            }
         }
 
         public bool VerifySymbols(params string[] symbols)

@@ -7,8 +7,8 @@ using static Transpiler.Extensions;
 namespace Transpiler
 {
     public record ScopedFuncExpnNode(IFuncExpnNode Expression,
-                                     IReadOnlyList<FuncDefnNode> SubDefinitions,
-                                     Scope scope = null) : IFuncExpnNode
+                                     IReadOnlyList<FuncDefnNode> FuncDefinitions,
+                                     Scope Scope = null) : IFuncExpnNode
     {
         public static ScopedFuncExpnNode Make(IFuncExpnNode expression) =>
             new(expression, new List<FuncDefnNode>());
@@ -53,7 +53,7 @@ namespace Transpiler
         {
             var scope = new Scope(parentScope);
 
-            var newSubDefns = Analyzer.AnalyzeFunctions(scope, scopedExpn.SubDefinitions);
+            var newSubDefns = Analyzer.AnalyzeFunctions(scope, scopedExpn.FuncDefinitions);
 
             var newExpn = IFuncExpnNode.Analyze(scope, scopedExpn.Expression);
             scope.TvTable.AddNode(scope, newExpn);
@@ -61,18 +61,25 @@ namespace Transpiler
             return new(newExpn, newSubDefns, scope);
         }
 
-        public static bool Solve(ScopedFuncExpnNode scopedExpn)
+        public static ConstraintSet Constrain(ScopedFuncExpnNode node)
         {
-            bool p = Analyzer.SolveFunctions(scopedExpn.scope, scopedExpn.SubDefinitions);
-            p |= IFuncExpnNode.Solve(scopedExpn.scope, scopedExpn.Expression);
+            var cs = new ConstraintSet();
 
-            return p;
+            foreach (var fn in node.FuncDefinitions)
+            {
+                var fcs = FuncDefnNode.Constrain(node.Scope, fn);
+                cs = IConstraints.Union(fcs, cs);
+            }
+
+            var cse = IFuncExpnNode.Constrain(node.Scope, node.Expression);
+
+            return IConstraints.Union(cse, cs);
         }
 
         public string Print(int i)
         {
             string s = Expression.Print(i);
-            foreach (var subDefn in SubDefinitions)
+            foreach (var subDefn in FuncDefinitions)
             {
                 s += string.Format("\n{0}{1}", Indent(i + 1), subDefn.Print(i + 1));
             }

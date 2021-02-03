@@ -12,9 +12,12 @@ namespace Transpiler
             node = null;
             var q = queue;
 
-            if (Finds(TokenType.NumberLiteral, ref q, out string value))
+            if (Finds(TokenType.NumberLiteral, ref q, out string whole) &&
+                Finds(".", ref q) &&
+                Finds(TokenType.NumberLiteral, ref q, out string frac))
             {
-                if (double.TryParse(value, out double d))
+                string real = whole + "." + frac;
+                if (double.TryParse(real, out double d))
                 {
                     node = new RealNode(d);
                     queue = q;

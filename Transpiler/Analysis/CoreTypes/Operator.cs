@@ -14,7 +14,7 @@
                                          INamedType arg2,
                                          INamedType ret)
         {
-            var type = LambdaType.Make(arg1, arg2, ret);
+            var type = FunType.Make(arg1, arg2, ret);
             return new Operator(name, type);
         }
     }

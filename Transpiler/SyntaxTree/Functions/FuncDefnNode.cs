@@ -49,7 +49,7 @@ namespace Transpiler
                 var argNode = new ArgNode(arg);
                 var expn = scopedExpn.Expression;
                 var lambda = new LambdaNode(argNode, expn);
-                scopedExpn = new ScopedFuncExpnNode(lambda, scopedExpn.SubDefinitions);
+                scopedExpn = new ScopedFuncExpnNode(lambda, scopedExpn.FuncDefinitions);
             }
 
             node = new(name, scopedExpn);
@@ -58,27 +58,19 @@ namespace Transpiler
             return true;
         }
 
-        public static bool Solve(TvTable tvTable,
-                                 FuncDefnNode node)
+        public static ConstraintSet Constrain(Scope scope,
+                                              FuncDefnNode node)
         {
-            bool p = false;
+            var table = scope.TvTable;
 
-            var td = tvTable.GetTypeOf(node);
-            var te = tvTable.GetTypeOf(node.ScopedExpression.Expression);
+            var tf = table.GetTypeOf(node);
+            var te = table.GetTypeOf(node.ScopedExpression.Expression);
 
-            if (te.IsSolved && !td.IsSolved)
-            {
-                tvTable.SetTypeOf(node, te);
-                p = true;
-            }
+            var c = new Constraint(tf, te, node);
 
-            if (td.IsSolved && !te.IsSolved)
-            {
-                tvTable.SetTypeOf(node, td);
-                p = true;
-            }
+            var cs = ScopedFuncExpnNode.Constrain(node.ScopedExpression);
 
-            return p;
+            return IConstraints.Union(c, cs);
         }
 
         public string Print(int indent)

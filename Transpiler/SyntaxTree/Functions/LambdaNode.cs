@@ -1,9 +1,10 @@
-﻿using Transpiler.Parse;
+﻿using System.Collections.Generic;
+using Transpiler.Parse;
 using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler
 {
-    public record LambdaNode(ArgNode Argument,
+    public record LambdaNode(ArgNode Parameter,
                              IFuncExpnNode Expression) : IFuncExpnNode
     {
         public static bool Parse(ref TokenQueue queue, out LambdaNode node)
@@ -26,7 +27,7 @@ namespace Transpiler
         public static LambdaNode Analyze(Scope scope,
                                          LambdaNode node)
         {
-            var arg = ArgNode.Analyze(scope, node.Argument);
+            var arg = ArgNode.Analyze(scope, node.Parameter);
             var expr = IFuncExpnNode.Analyze(scope, node.Expression);
 
             var newLambdaExpr = new LambdaNode(arg, expr);
@@ -34,66 +35,26 @@ namespace Transpiler
             return newLambdaExpr;
         }
 
-        public static bool Solve(Scope scope,
-                                 LambdaNode node)
+        public static ConstraintSet Constrain(Scope scope,
+                                                 LambdaNode node)
         {
-            bool p = false;
+            var tvTable = scope.TvTable;
 
-            p |= ArgNode.Solve(scope, node.Argument);
-            p |= IFuncExpnNode.Solve(scope, node.Expression);
+            var te = tvTable.GetTypeOf(node.Expression);
+            var tx = tvTable.GetTypeOf(node.Parameter);
+            var tf = tvTable.GetTypeOf(node);
 
-            var table = scope.TvTable;
-            var txy = table.GetTypeOf(node);
-            var tx = table.GetTypeOf(node.Argument);
-            var ty = table.GetTypeOf(node.Expression);
+            var cf = new Constraint(tf, new FunType(tx, te), node);
 
-            if (txy is not LambdaType lamType)
-            {
-                lamType = new LambdaType(TypeVariable.Next, TypeVariable.Next);
-                table.SetTypeOf(node, lamType);
-            }
+            var cse = IFuncExpnNode.Constrain(scope, node.Expression);
 
-            if (tx.IsSolved)
-            {
-                if (!lamType.Input.IsSolved)
-                {
-                    lamType = lamType with { Input = tx };
-                    table.SetTypeOf(node, lamType);
-                    p = true;
-                }
-            }
-
-            if (ty.IsSolved)
-            {
-                if (!lamType.Output.IsSolved)
-                {
-                    lamType = lamType with { Output = ty };
-                    table.SetTypeOf(node, lamType);
-                    p = true;
-                }
-            }
-
-            if (txy.IsSolved)
-            {
-                if (!tx.IsSolved)
-                {
-                    table.SetTypeOf(node.Argument, lamType.Input);
-                    p = true;
-                }
-                if (!ty.IsSolved)
-                {
-                    table.SetTypeOf(node.Expression, lamType.Output);
-                    p = true;
-                }
-            }
-
-            return p;
+            return IConstraints.Union(cf, cse);
         }
 
         public string Print(int indent)
         {
             return string.Format("{0} -> {1}",
-                                 Argument.Print(indent + 1),
+                                 Parameter.Print(indent + 1),
                                  Expression.Print(indent + 1));
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Transpiler.Parse;
 
 namespace Transpiler
@@ -72,14 +73,16 @@ namespace Transpiler
             };
         }
 
-        public static bool Solve(Scope scope,
-                                 IFuncExpnNode node)
+        public static ConstraintSet Constrain(Scope scope,
+                                              IFuncExpnNode node)
         {
             return node switch
             {
-                AppNode appExpn => AppNode.Solve(scope, appExpn),
-                LambdaNode lamExpn => LambdaNode.Solve(scope, lamExpn),
-                _ => false, //throw new NotImplementedException(),
+                ILiteralNode _ => ConstraintSet.Empty,
+                SymbolNode symExpn => SymbolNode.Constrain(scope, symExpn),
+                AppNode appExpn => AppNode.Constrain(scope, appExpn),
+                LambdaNode lamExpn => LambdaNode.Constrain(scope, lamExpn),
+                _ => throw new NotImplementedException(),
             };
         }
     }

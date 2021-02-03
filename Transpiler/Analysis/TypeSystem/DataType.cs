@@ -9,7 +9,7 @@ namespace Transpiler
     /// Named type consisting of zero or more member values.
     /// </summary>
     public record DataType(string Name,
-                           IReadOnlyList<string> Elements) : ICompositeType
+                           IReadOnlyList<string> Elements) : INamedType
     {
         public bool IsSolved => true;
 

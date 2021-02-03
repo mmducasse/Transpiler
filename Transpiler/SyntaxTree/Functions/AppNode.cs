@@ -1,51 +1,25 @@
-﻿namespace Transpiler
+﻿using System.Collections.Generic;
+
+namespace Transpiler
 {
     public record AppNode(IFuncExpnNode Function,
                           IFuncExpnNode Argument) : IFuncExpnNode
     {
-        public static bool Solve(Scope scope,
-                                 AppNode node)
+        public static ConstraintSet Constrain(Scope scope,
+                                                 AppNode node)
         {
-            bool p = false;
+            var tvTable = scope.TvTable;
 
-            p |= IFuncExpnNode.Solve(scope, node.Function);
-            p |= IFuncExpnNode.Solve(scope, node.Argument);
+            var tf = tvTable.GetTypeOf(node.Function);
+            var tx = tvTable.GetTypeOf(node.Argument);
+            var tfx = tvTable.GetTypeOf(node);
 
-            var table = scope.TvTable;
-            var tfx = table.GetTypeOf(node);
-            var tf = table.GetTypeOf(node.Function);
-            var tx = table.GetTypeOf(node.Argument);
+            var cfx = new Constraint(tf, new FunType(tx, tfx), node);
 
-            // If f is solved, solve (f x) and x
-            if (tf.IsSolved)
-            {
-                if (tf is LambdaType lambdaType)
-                {
-                    if (!tfx.IsSolved)
-                    {
-                        table.SetTypeOf(node, lambdaType.Output);
-                        p = true;
-                    }
-                    if (!tx.IsSolved)
-                    {
-                        table.SetTypeOf(node.Argument, lambdaType.Input);
-                        p = true;
-                    }
-                }
-                else
-                {
-                    throw Analyzer.Error("Expected lambda type.", node.Function);
-                }
-            }
+            var csf = IFuncExpnNode.Constrain(scope, node.Function);
+            var csx = IFuncExpnNode.Constrain(scope, node.Argument);
 
-            // If (f x) is solved, solve input of f
-            // If x is solved, solve output of f
-            if (tx.IsSolved)
-            {
-
-            }
-
-            return p;
+            return IConstraints.Union(cfx, csf, csx);
         }
 
         public string Print(int i)

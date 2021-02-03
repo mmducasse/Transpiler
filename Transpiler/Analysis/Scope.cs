@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Transpiler
 {
@@ -8,22 +9,24 @@ namespace Transpiler
 
         bool TryGetTypeForDefnName(string symbol, out IType type);
 
-        //bool TryGetDefinition(string symbol, out IFuncDefnNode node);
-
-        //bool TryGetTypeForDefn(IFuncDefnNode defn, out IType type);
+        bool IsSubtypeOf(INamedType subtype, ITypeSet supertype);
 
         bool VerifySymbols(params string[] symbols);
+
+        void PrintTypeHeirarchy();
     }
 
     public class Scope : IScope
     {
         public IScope ParentScope { get; }
 
-        public Dictionary<string, INamedType> Types { get; } = new();
+        public Dictionary<string, INamedType> TypeDefinitions { get; } = new();
 
-        public Dictionary<string, IFuncDefnNode> Definitions { get; } = new();
+        public Dictionary<INamedType, HashSet<ITypeSet>> SuperTypes { get; } = new();
 
-        public Dictionary<string, IType> DefnTypes { get; } = new();
+        public Dictionary<string, IFuncDefnNode> FuncDefinitions { get; } = new();
+
+        public Dictionary<string, IType> FuncDefnTypes { get; } = new();
 
         public TvTable TvTable { get; }
 
@@ -43,7 +46,7 @@ namespace Transpiler
 
         public bool TryGetType(string typeName, out INamedType type)
         {
-            if (Types.TryGetValue(typeName, out type))
+            if (TypeDefinitions.TryGetValue(typeName, out type))
             {
                 return true;
             }
@@ -58,7 +61,7 @@ namespace Transpiler
 
         public bool TryGetTypeForDefnName(string defnName, out IType type)
         {
-            if (DefnTypes.TryGetValue(defnName, out type))
+            if (FuncDefnTypes.TryGetValue(defnName, out type))
             {
                 return true;
             }
@@ -71,11 +74,70 @@ namespace Transpiler
             return false;
         }
 
+        public void AddSuperType(INamedType subtype, ITypeSet supertype)
+        {
+            if (!IsSubtypeOf(subtype, supertype))
+            {
+                if (!SuperTypes.ContainsKey(subtype))
+                {
+                    SuperTypes[subtype] = new();
+                }
+
+                var currSupertypes = SuperTypes[subtype];
+                
+                foreach (var cst in currSupertypes)
+                {
+                    if (IsSubtypeOf(supertype, cst))
+                    {
+                        currSupertypes.Remove(cst);
+                    }
+                }
+
+                currSupertypes.Add(supertype);
+            }
+        }
+
+        public bool IsSubtypeOf(INamedType subtype, ITypeSet supertype)
+        {
+            if (SuperTypes.TryGetValue(subtype, out var supertypes))
+            {
+                if (supertypes.Contains(supertype))
+                {
+                    return true;
+                }
+                else
+                {
+                    foreach (var st in supertypes)
+                    {
+                        if (IsSubtypeOf(st, supertype))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return ParentScope.IsSubtypeOf(subtype, supertype);
+        }
+
+        public void PrintTypeHeirarchy()
+        {
+            foreach (var subType in SuperTypes.Keys)
+            {
+                foreach (var supertype in SuperTypes[subType])
+                {
+                    Console.WriteLine("{0} : {1}", subType.Name, supertype.Name);
+                }
+            }
+
+            ParentScope.PrintTypeHeirarchy();
+        }
+
         public bool VerifySymbols(params string[] symbols)
         {
             foreach (string s in symbols)
             {
-                if (!Definitions.ContainsKey(s))
+                if (!FuncDefinitions.ContainsKey(s))
                 {
                     return ParentScope.VerifySymbols(s);
                 }

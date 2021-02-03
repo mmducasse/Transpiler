@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using Transpiler.Parse;
 using static Transpiler.Parse.ParserUtils;
 
@@ -38,6 +39,19 @@ namespace Transpiler
                                  SymbolNode node)
         {
 
+        }
+
+        public static ConstraintSet Constrain(Scope scope,
+                                              SymbolNode node)
+        {
+            //var tvTable = scope.TvTable;
+
+            //var ts = tvTable.GetTypeOf(node);
+            //var td = tvTable.GetTypeOf(scope.Definitions[node.Name]);
+
+            //var cf = new Constraint(ts, td);
+
+            return IConstraints.Union();
         }
 
         public string Print(int indent)

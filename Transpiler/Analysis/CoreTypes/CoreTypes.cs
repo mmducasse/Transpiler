@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Transpiler.Analysis;
 using static Transpiler.Analysis.OperatorUtil;
 
@@ -11,18 +12,26 @@ namespace Transpiler
 
         public DataType True { get; } = DataType.Make("True");
         public DataType False { get; } = DataType.Make("False");
-        public UnionType Bool { get; } = UnionType.Make("Bool", "True", "False");
+        public UnionType Bool { get; }
 
         public INamedType[] Types { get; }
 
         public IReadOnlyList<Operator> Operators => mOperators;
         private List<Operator> mOperators { get; } = new();
 
+        public Dictionary<INamedType, HashSet<ITypeSet>> SuperTypes { get; } = new();
+
         public static CoreTypes Instance { get; private set; }
 
         public CoreTypes()
         {
             Instance = this;
+
+            Bool = UnionType.Make("Bool", True, False);
+            SuperTypes[True] = new HashSet<ITypeSet>();
+            SuperTypes[True].Add(Bool);
+            SuperTypes[False] = new HashSet<ITypeSet>();
+            SuperTypes[False].Add(Bool);
 
             Types = new INamedType[]
             {
@@ -69,6 +78,23 @@ namespace Transpiler
             }
 
             return false;
+        }
+
+        public bool IsSubtypeOf(INamedType subtype, ITypeSet supertype)
+        {
+            return SuperTypes.ContainsKey(subtype) &&
+                   SuperTypes[subtype].Contains(supertype);
+        }
+
+        public void PrintTypeHeirarchy()
+        {
+            foreach (var subType in SuperTypes.Keys)
+            {
+                foreach (var supertype in SuperTypes[subType])
+                {
+                    Console.WriteLine("{0} : {1}", subType.Name, supertype.Name);
+                }
+            }
         }
 
         public bool VerifySymbols(params string[] symbols)

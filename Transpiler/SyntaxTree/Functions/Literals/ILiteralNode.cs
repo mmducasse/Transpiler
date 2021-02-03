@@ -11,7 +11,6 @@ namespace Transpiler
             node = null;
             var q = queue;
 
-
             if (RealNode.Parse(ref q, out var realNode)) { node = realNode; }
             else if (IntNode.Parse(ref q, out var intNode)) { node = intNode; }
 
