@@ -52,8 +52,27 @@ namespace Transpiler
             var elseCase = ScopedFuncExpnNode.Analyze(scope, ifExpn.ElseCase);
 
             var newIfExpn = new IfNode(condition, thenCase, elseCase);
-            scope.TvTable.AddNode(scope, newIfExpn);
             return newIfExpn;
+        }
+
+        public static ConstraintSet Constrain(TvTable tvTable,
+                                              Scope scope,
+                                              IfNode node)
+        {
+            var csc = IFuncExpnNode.Constrain(tvTable, scope, node.Condition);
+            var cst = ScopedFuncExpnNode.Constrain(tvTable, node.ThenCase);
+            var cse = ScopedFuncExpnNode.Constrain(tvTable, node.ElseCase);
+
+            var tif = tvTable.GetTypeOf(node);
+            var tc = tvTable.GetTypeOf(node.Condition);
+            var tt = tvTable.GetTypeOf(node.ThenCase.Expression);
+            var te = tvTable.GetTypeOf(node.ElseCase.Expression);
+
+            var cif = new Constraint(tif, tt, node);
+            var cc = new Constraint(tc, CoreTypes.Instance.Bool, node);
+            var cf = new Constraint(tt, te, node);
+
+            return IConstraints.Union(cif, cc, cf, csc, cst, cse);
         }
 
         public string Print(int i)

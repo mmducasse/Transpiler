@@ -5,10 +5,11 @@ using static Transpiler.Analysis.OperatorUtil;
 
 namespace Transpiler
 {
-    public class CoreTypes : IScope
+    public class CoreTypes
     {
-        public PrimitiveType Int { get; } = new("Int");
-        public PrimitiveType Real { get; } = new("Real");
+        //public PrimitiveType Int { get; } = new("Int");
+        //public PrimitiveType Real { get; } = new("Real");
+        public PrimitiveType Num { get; } = new("Num");
 
         public DataType True { get; } = DataType.Make("True");
         public DataType False { get; } = DataType.Make("False");
@@ -21,6 +22,9 @@ namespace Transpiler
 
         public Dictionary<INamedType, HashSet<ITypeSet>> SuperTypes { get; } = new();
 
+        public IScope Scope => mScope;
+        private Scope mScope = new Scope();
+
         public static CoreTypes Instance { get; private set; }
 
         public CoreTypes()
@@ -28,78 +32,31 @@ namespace Transpiler
             Instance = this;
 
             Bool = UnionType.Make("Bool", True, False);
-            SuperTypes[True] = new HashSet<ITypeSet>();
-            SuperTypes[True].Add(Bool);
-            SuperTypes[False] = new HashSet<ITypeSet>();
-            SuperTypes[False].Add(Bool);
 
             Types = new INamedType[]
             {
-                Int, Real, Bool, True, False
+                Num, Bool, True, False
             };
 
+            foreach (var type in Types)
+            {
+                mScope.TypeDefinitions[type.Name] = type;
+            }
+
+            mScope.AddSuperType(True, Bool);
+            mScope.AddSuperType(False, Bool);
+
             // Int functions.
-            Add(Function2("+", Int));
-            Add(Function2("-", Int));
+            Add(Function2("+", Num));
+            Add(Function2("-", Num));
+            Add(Function2("==", Num, Num, Bool));
         }
 
-        private void Add(Operator defn)
+        private void Add(Operator op)
         {
-            mOperators.Add(defn);
-        }
-
-        public bool TryGetType(string typeName, out INamedType type)
-        {
-            type = null;
-
-            foreach (var t in Types)
-            {
-                if (t.Name == typeName)
-                {
-                    type = t;
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public bool TryGetTypeForDefnName(string symbol, out IType type)
-        {
-            type = null;
-
-            foreach (var op in mOperators)
-            {
-                if (op.Name == symbol)
-                {
-                    type = op.Type;
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public bool IsSubtypeOf(INamedType subtype, ITypeSet supertype)
-        {
-            return SuperTypes.ContainsKey(subtype) &&
-                   SuperTypes[subtype].Contains(supertype);
-        }
-
-        public void PrintTypeHeirarchy()
-        {
-            foreach (var subType in SuperTypes.Keys)
-            {
-                foreach (var supertype in SuperTypes[subType])
-                {
-                    Console.WriteLine("{0} : {1}", subType.Name, supertype.Name);
-                }
-            }
-        }
-
-        public bool VerifySymbols(params string[] symbols)
-        {
-            throw new System.NotImplementedException();
+            mOperators.Add(op);
+            mScope.FuncDefinitions[op.Name] = op;
+            mScope.FuncDefnTypes[op.Name] = op.Type;
         }
     }
 }

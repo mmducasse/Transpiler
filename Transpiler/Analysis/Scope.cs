@@ -5,9 +5,11 @@ namespace Transpiler
 {
     public interface IScope
     {
-        bool TryGetType(string typeName, out INamedType type);
+        bool TryGetNamedType(string typeName, out INamedType type);
 
-        bool TryGetTypeForDefnName(string symbol, out IType type);
+        bool TryGetFuncDefn(string symbol, out IFuncDefnNode defn);
+
+        bool TryGetFuncDefnType(string symbol, out IType type);
 
         bool IsSubtypeOf(INamedType subtype, ITypeSet supertype);
 
@@ -18,57 +20,79 @@ namespace Transpiler
 
     public class Scope : IScope
     {
-        public IScope ParentScope { get; }
+        public IEnumerable<IScope> Dependencies { get; } = new List<IScope>();
 
         public Dictionary<string, INamedType> TypeDefinitions { get; } = new();
-
-        public Dictionary<INamedType, HashSet<ITypeSet>> SuperTypes { get; } = new();
 
         public Dictionary<string, IFuncDefnNode> FuncDefinitions { get; } = new();
 
         public Dictionary<string, IType> FuncDefnTypes { get; } = new();
 
-        public TvTable TvTable { get; }
+        private Dictionary<INamedType, HashSet<ITypeSet>> SuperTypes { get; } = new();
 
-        public Scope(IScope parentScope = null,
-                     TvTable tvTable = null)
+        public Scope()
         {
-            ParentScope = parentScope;
-            if ((tvTable == null) && ParentScope is Scope scope)
-            {
-                TvTable = scope.TvTable;
-            }
-            else
-            {
-                TvTable = tvTable;
-            }
         }
 
-        public bool TryGetType(string typeName, out INamedType type)
+        public Scope(IEnumerable<IScope> dependencies)
+        {
+            Dependencies = dependencies;
+        }
+
+        public static Scope FunctionScope(IScope parentScope)
+        {
+            return new Scope(parentScope.ToList());
+        }
+
+        public bool TryGetNamedType(string typeName, out INamedType type)
         {
             if (TypeDefinitions.TryGetValue(typeName, out type))
             {
                 return true;
             }
 
-            if (ParentScope != null)
+            foreach (var d in Dependencies)
             {
-                return ParentScope.TryGetType(typeName, out type);
+                if (d.TryGetNamedType(typeName, out type))
+                {
+                    return true;
+                }
             }
 
             return false;
         }
 
-        public bool TryGetTypeForDefnName(string defnName, out IType type)
+        public bool TryGetFuncDefn(string symbol, out IFuncDefnNode defn)
+        {
+            if (FuncDefinitions.TryGetValue(symbol, out defn))
+            {
+                return true;
+            }
+
+            foreach (var d in Dependencies)
+            {
+                if (d.TryGetFuncDefn(symbol, out defn))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool TryGetFuncDefnType(string defnName, out IType type)
         {
             if (FuncDefnTypes.TryGetValue(defnName, out type))
             {
                 return true;
             }
 
-            if (ParentScope != null)
+            foreach (var d in Dependencies)
             {
-                return ParentScope.TryGetTypeForDefnName(defnName, out type);
+                if (d.TryGetFuncDefnType(defnName, out type))
+                {
+                    return true;
+                }
             }
 
             return false;
@@ -117,7 +141,15 @@ namespace Transpiler
                 }
             }
 
-            return ParentScope.IsSubtypeOf(subtype, supertype);
+            foreach (var d in Dependencies)
+            {
+                if (d.IsSubtypeOf(subtype, supertype))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void PrintTypeHeirarchy()
@@ -130,7 +162,10 @@ namespace Transpiler
                 }
             }
 
-            ParentScope.PrintTypeHeirarchy();
+            foreach (var d in Dependencies)
+            {
+                d.PrintTypeHeirarchy();
+            }
         }
 
         public bool VerifySymbols(params string[] symbols)
@@ -139,7 +174,13 @@ namespace Transpiler
             {
                 if (!FuncDefinitions.ContainsKey(s))
                 {
-                    return ParentScope.VerifySymbols(s);
+                    foreach (var d in Dependencies)
+                    {
+                        if (!d.VerifySymbols(s))
+                        {
+                            return false;
+                        }
+                    }
                 }
             }
 

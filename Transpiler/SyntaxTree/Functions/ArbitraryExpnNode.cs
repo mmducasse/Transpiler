@@ -87,19 +87,31 @@ namespace Transpiler
                     throw Analyzer.Error("Arbitrary expression contains no sub expressions", node);
                 case 1:
                     var expr = IFuncExpnNode.Analyze(scope, node.Children[0]);
-                    scope.TvTable.AddNode(scope, expr);
+                    if (expr is SymbolNode symNode &&
+                        scope.TryGetFuncDefn(symNode.Name, out var funcDefn) &&
+                        funcDefn.Fixity == eFixity.Infix)
+                    {
+                        return symNode with { ForcePrefix = true };
+                    }
                     return expr;
                 default:
                     // Todo: Handle infix operators...
-                    var input = IFuncExpnNode.Analyze(scope, node.Children[0]);
-                    var output = IFuncExpnNode.Analyze(scope, node.Children[1]);
-                    var appExpr = new AppNode(input, output);
-                    scope.TvTable.AddNode(scope, appExpr);
+                    var first = IFuncExpnNode.Analyze(scope, node.Children[0]);
+                    var second = IFuncExpnNode.Analyze(scope, node.Children[1]);
+                    bool infix = false;
+                    if (second is SymbolNode symNode2 &&
+                        !symNode2.ForcePrefix &&
+                        scope.TryGetFuncDefn(symNode2.Name, out var funcDefn2) &&
+                        funcDefn2.Fixity == eFixity.Infix)
+                    {
+                        infix = true;
+                    }
+
+                    var appExpr = infix ? new AppNode(second, first) : new AppNode(first, second);
                     for (int i = 2; i < node.Children.Count; i++)
                     {
-                        output = IFuncExpnNode.Analyze(scope, node.Children[i]);
-                        appExpr = new(appExpr, output);
-                        scope.TvTable.AddNode(scope, appExpr);
+                        second = IFuncExpnNode.Analyze(scope, node.Children[i]);
+                        appExpr = new(appExpr, second);
                     }
 
                     return appExpr;

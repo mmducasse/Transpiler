@@ -68,20 +68,24 @@ namespace Transpiler
                 LambdaNode lamExpn => LambdaNode.Analyze(scope, lamExpn),
                 ArbitraryExpnNode arbExpn => ArbitraryExpnNode.Analyze(scope, arbExpn),
                 SymbolNode symbol => SymbolNode.Analyze(scope, symbol),
-                ILiteralNode literal => ILiteralNode.Analyze(scope, literal),
+                ILiteralNode literal => literal,
                 _ => throw new NotImplementedException()
             };
         }
 
-        public static ConstraintSet Constrain(Scope scope,
+        public static ConstraintSet Constrain(TvTable tvTable,
+                                              Scope scope,
                                               IFuncExpnNode node)
         {
+            tvTable.AddNode(scope, node);
+
             return node switch
             {
                 ILiteralNode _ => ConstraintSet.Empty,
-                SymbolNode symExpn => SymbolNode.Constrain(scope, symExpn),
-                AppNode appExpn => AppNode.Constrain(scope, appExpn),
-                LambdaNode lamExpn => LambdaNode.Constrain(scope, lamExpn),
+                SymbolNode symExpn => SymbolNode.Constrain(tvTable, scope, symExpn),
+                AppNode appExpn => AppNode.Constrain(tvTable, scope, appExpn),
+                LambdaNode lamExpn => LambdaNode.Constrain(tvTable, scope, lamExpn),
+                IfNode ifExpn => IfNode.Constrain(tvTable, scope, ifExpn),
                 _ => throw new NotImplementedException(),
             };
         }

@@ -26,9 +26,9 @@ namespace Transpiler
                                IType.Substitute(type.Output, sub));
         }
 
-        public string Print()
+        public string Print(bool terse = true)
         {
-            return string.Format("{0} -> {1}", Input.Print(), Output.Print());
+            return string.Format("{0} -> {1}", Input.Print(terse), Output.Print(terse));
         }
     }
 }

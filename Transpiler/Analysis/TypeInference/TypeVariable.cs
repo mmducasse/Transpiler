@@ -8,6 +8,6 @@
 
         public static TypeVariable Next => new(mTvIndex++);
 
-        public string Print() => string.Format("T{0}", Id);
+        public string Print(bool terse = true) => string.Format("T{0}", Id);
     }
 }

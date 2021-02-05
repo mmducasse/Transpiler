@@ -5,7 +5,7 @@ namespace Transpiler
 {
     public record IntNode(int Value) : ILiteralNode<int>
     {
-        public IType CertainType => CoreTypes.Instance.Int;
+        public IType CertainType => CoreTypes.Instance.Num;
 
         public static bool Parse(ref TokenQueue queue, out IntNode node)
         {

@@ -4,6 +4,6 @@
     {
         public bool IsSolved => true;
 
-        public string Print() => Name;
+        public string Print(bool terse = true) => Name;
     }
 }

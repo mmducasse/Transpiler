@@ -18,9 +18,14 @@ namespace Transpiler
             }
             else if (node is SymbolNode symbol)
             {
-                if (scope.TryGetTypeForDefnName(symbol.Name, out IType symType))
+                if (scope.TryGetFuncDefnType(symbol.Name, out IType symType))
                 {
                     type = symType;
+                }
+                else if (scope.TryGetFuncDefn(symbol.Name, out IFuncDefnNode funcDefn) &&
+                         NodeTypes.TryGetValue(funcDefn, out IType funcDefnType))
+                {
+                    type = funcDefnType;
                 }
                 else
                 {
@@ -43,16 +48,22 @@ namespace Transpiler
             return mNodeTypes[node];
         }
 
-        public void Print()
+        public void Print(Substitution sub = null)
         {
-            Console.WriteLine("\n === TV TABLE ===");
-            foreach (IAstNode node in mNodeTypes.Keys)
+            sub = sub ?? new Substitution();
+            foreach (var (node, t) in NodeTypes)
             {
-                var tv = mNodeTypes[node];
+                var solvedType = IType.Substitute(t, sub);
+                string typeString = solvedType.Print();
+                if (solvedType is INamedType namedType)
+                {
+                    typeString = namedType.Name;
+                }
+
+                Console.Write("{0, 30} :: ", node.Print(0));
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("{0} :: {1}", node.Abbr(), tv.Print());
+                Console.WriteLine(typeString);
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("{0}\n", node.Print(0));
             }
         }
     }

@@ -8,7 +8,7 @@ namespace Transpiler
         public static void Analyze(Module module)
         {
             // Create the top-level scope.
-            var fileScope = new Scope(module, new TvTable());
+            var fileScope = new Scope(CoreTypes.Instance.Scope.ToList());
             module.Scope = fileScope;
 
             // Find and analyze usings.
@@ -17,10 +17,10 @@ namespace Transpiler
             AnalyzeFileTypes(fileScope, module.ParseResult.TypeDefns);
 
             // Analyze functions in module.
-            var newFns = AnalyzeFunctions(fileScope, module.ParseResult.FuncDefns);
+            AnalyzeFunctions(fileScope, module.ParseResult.FuncDefns);
 
             // Apply HM type inference alg to functions.
-            newFns = TypeSolver.SolveFunctions(fileScope, newFns);
+            TypeSolver.SolveFunctions(fileScope);
 
             
         }
@@ -39,7 +39,7 @@ namespace Transpiler
             foreach (var defn in localTypeDefns)
             {
                 var type = AnalyzeTypeDefnNode(defn, localTypeDefns, fileScope);
-                if (fileScope.TryGetType(type.Name, out _))
+                if (fileScope.TryGetNamedType(type.Name, out _))
                 {
                     throw Error("Duplicate type definition.", defn);
                 }
@@ -77,7 +77,7 @@ namespace Transpiler
                         newSubTypes.Add(new TypeSymbolNode(defn.Name));
                     }
                     else if (t is TypeSymbolNode symbol &&
-                             !scope.TryGetType(symbol.Name, out _))
+                             !scope.TryGetNamedType(symbol.Name, out _))
                     {
                         flatList.Add(new TypeDefnNode(symbol.Name, new NullTypeNode()));
                         newSubTypes.Add(new TypeSymbolNode(symbol.Name));
@@ -145,7 +145,7 @@ namespace Transpiler
                     }
                 }
 
-                return scope.TryGetType(typeName, out _);
+                return scope.TryGetNamedType(typeName, out _);
             }
         }
 
@@ -153,8 +153,7 @@ namespace Transpiler
 
         #region Analyze Functions
 
-        public static IReadOnlyList<FuncDefnNode> AnalyzeFunctions(Scope scope,
-                                                                   IReadOnlyList<FuncDefnNode> funcDefns)
+        public static IReadOnlyList<FuncDefnNode> AnalyzeFunctions(Scope scope, IReadOnlyList<FuncDefnNode> funcDefns)
         {
             // Register top level fn names
             // Foreach fn
@@ -180,7 +179,6 @@ namespace Transpiler
                 var newScopedExpn = ScopedFuncExpnNode.Analyze(scope, fn.ScopedExpression);
                 var newFn = new FuncDefnNode(fn.Name, newScopedExpn);
                 scope.FuncDefinitions[fn.Name] = newFn;
-                scope.TvTable.AddNode(scope, newFn);
                 newFns.Add(newFn);
             }
 
@@ -198,7 +196,7 @@ namespace Transpiler
                 Console.WriteLine(fn.Print(0));
             }
 
-            scope.TvTable.Print();
+            //scope.TvTable.Print();
         }
 
         public static Exception Error(string reason,

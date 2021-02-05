@@ -1,47 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Transpiler
 {
     public static class TypeSolver
     {
-        public static IReadOnlyList<FuncDefnNode>
-            SolveFunctions(Scope scope, IReadOnlyList<FuncDefnNode> funcDefns)
+        public static void SolveFunctions(Scope scope)
         {
-            List<FuncDefnNode> newFns = new();
-            foreach (var fn in funcDefns)
+            foreach (var fn in scope.FuncDefinitions.Values)
             {
-                var constraints = FuncDefnNode.Constrain(scope, fn);
-                //Console.WriteLine(constraints.Print());
-
-                Console.WriteLine("Before Solve:");
-                foreach (var (node, t) in scope.TvTable.NodeTypes)
-                {
-                    Console.Write("{0, 30} :: ", node.Print(0));
-                    Console.WriteLine(t.Print());
-                }
-
-
+                var tvTable = new TvTable();
+                var constraints = FuncDefnNode.Constrain(tvTable, scope, fn as FuncDefnNode);
                 var substitution = IType.Unify(constraints);
-                Console.WriteLine(substitution.Print());
+
+                //Console.WriteLine("Before Solve:");
+                //tvTable.Print();
 
                 Console.WriteLine("After Solve:");
-                foreach (var (node, t) in scope.TvTable.NodeTypes)
-                {
-                    var solvedType = IType.Substitute(t, substitution);
+                tvTable.Print(substitution);
 
-                    Console.Write("{0, 30} :: ", node.Print(0));
-                    Console.WriteLine(solvedType.Print());
-                }
-
-                var tv = scope.TvTable.GetTypeOf(fn);
+                var tv = tvTable.GetTypeOf(fn);
                 var type = IType.Substitute(tv, substitution);
-            }
 
-            return newFns;
+                scope.FuncDefnTypes[fn.Name] = type;
+            }
+        }
+
+        public static InterpreterException Error(string message, IAstNode node)
+        {
+            return new InterpreterException(eInterpreterStage.Analyzer, message);
         }
     }
 }

@@ -1,11 +1,10 @@
-﻿
-using System.Collections.Generic;
-using Transpiler.Parse;
+﻿using Transpiler.Parse;
 using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler
 {
-    public record SymbolNode(string Name) : IFuncExpnNode, IPatternNode
+    public record SymbolNode(string Name,
+                             bool ForcePrefix = false) : IFuncExpnNode, IPatternNode
     {
         public static bool Parse(ref TokenQueue queue, out SymbolNode node)
         {
@@ -30,8 +29,6 @@ namespace Transpiler
                 throw Analyzer.Error("Undefined symbol: " + node.Name, node);
             }
 
-            scope.TvTable.AddNode(scope, node);
-
             return node;
         }
 
@@ -41,7 +38,8 @@ namespace Transpiler
 
         }
 
-        public static ConstraintSet Constrain(Scope scope,
+        public static ConstraintSet Constrain(TvTable tvTable,
+                                              Scope scope,
                                               SymbolNode node)
         {
             //var tvTable = scope.TvTable;

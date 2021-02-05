@@ -5,7 +5,7 @@ using Transpiler.Parse;
 
 namespace Transpiler
 {
-    public class Module : IScope
+    public class Module
     {
         public string Code { get; }
         public string Name { get; }
@@ -15,7 +15,7 @@ namespace Transpiler
 
         public ParseResult ParseResult { get; set; }
 
-        public IScope Scope { get; set; }
+        public Scope Scope { get; set; }
 
         //public IReadOnlyList<Command> Commands { get; set; }
 
@@ -33,83 +33,6 @@ namespace Transpiler
             string name = Path.GetFileNameWithoutExtension(filePath);
 
             return new Module(code, name);
-        }
-
-        public bool TryGetType(string typeName, out INamedType type)
-        {
-            if (CoreTypes.Instance.TryGetType(typeName, out type))
-            {
-                return true;
-            }
-
-            foreach (var d in Dependencies)
-            {
-                if (d.Scope.TryGetType(typeName, out type))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public bool TryGetTypeForDefnName(string symbol, out IType type)
-        {
-            if (CoreTypes.Instance.TryGetTypeForDefnName(symbol, out type))
-            {
-                return true;
-            }
-
-            foreach (var d in Dependencies)
-            {
-                if (d.Scope.TryGetTypeForDefnName(symbol, out type))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public bool IsSubtypeOf(INamedType subtype, ITypeSet supertype)
-        {
-            if (CoreTypes.Instance.IsSubtypeOf(subtype, supertype))
-            {
-                return true;
-            }
-
-            foreach (var d in Dependencies)
-            {
-                if (d.Scope.IsSubtypeOf(subtype, supertype))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public void PrintTypeHeirarchy()
-        {
-            CoreTypes.Instance.PrintTypeHeirarchy();
-
-            foreach (var dependent in Dependencies)
-            {
-                dependent.Scope.PrintTypeHeirarchy();
-            }
-        }
-
-        public bool VerifySymbols(params string[] symbols)
-        {
-            foreach (string s in symbols)
-            {
-                if (!TryGetTypeForDefnName(s, out _))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }

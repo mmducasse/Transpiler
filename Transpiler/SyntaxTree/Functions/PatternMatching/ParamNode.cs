@@ -3,16 +3,18 @@ using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler
 {
-    public record ArgNode(string Name) : IPatternNode, IFuncDefnNode
+    public record ParamNode(string Name) : IPatternNode, IFuncDefnNode
     {
-        public static bool Parse(ref TokenQueue queue, out ArgNode node)
+        public eFixity Fixity => eFixity.Prefix;
+
+        public static bool Parse(ref TokenQueue queue, out ParamNode node)
         {
             node = null;
             var q = queue;
 
             if (Finds(TokenType.Lowercase, ref q, out string symbol))
             {
-                node = new ArgNode(symbol);
+                node = new ParamNode(symbol);
                 queue = q;
                 return true;
             }
@@ -20,17 +22,16 @@ namespace Transpiler
             return false;
         }
 
-        public static ArgNode Analyze(Scope scope,
-                                      ArgNode node)
+        public static ParamNode Analyze(Scope scope,
+                                      ParamNode node)
         {
             scope.FuncDefinitions[node.Name] = node;
-            scope.TvTable.AddNode(scope, node);
 
             return node;
         }
 
         public static bool Solve(Scope scope,
-                                 ArgNode node)
+                                 ParamNode node)
         {
             //var tfx = table.GetTypeOf(node);
             //var tf = table.GetTypeOf(node.Function);

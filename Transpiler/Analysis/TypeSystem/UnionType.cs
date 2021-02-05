@@ -47,7 +47,7 @@ namespace Transpiler
             List<INamedType> subtypes = new();
             foreach (var name in FutureSubtypes)
             {
-                if (!scope.TryGetType(name, out var st))
+                if (!scope.TryGetNamedType(name, out var st))
                 {
                     throw Analyzer.Error("Unknown type: " + name, null);
                 }
@@ -60,12 +60,16 @@ namespace Transpiler
             Built = true;
         }
 
-        public string Print()
+        public string Print(bool terse = true)
         {
-            string s = Name + " =\n";
-            foreach (var st in Subtypes)
+            string s = Name;
+            if (!terse)
             {
-                s += string.Format("{0}| {1}\n", Indent(1), st.Name);
+                s += " =\n";
+                foreach (var st in Subtypes)
+                {
+                    s += string.Format("{0}| {1}\n", Indent(1), st.Name);
+                }
             }
 
             return s;

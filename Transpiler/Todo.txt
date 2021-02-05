@@ -2,14 +2,23 @@
 
 TODO:
 
-- Parenthesized func and type expressions
+
+Short Term:
+- Generate Data Type ctor functions
+- Private functions
++ Infix operators
 - Make token indentation more robust
+- Better code locations for errors
+- Multiple modules
+- Tuples
+- Patterns
+- Generate JavaScript
 
-- Match Case Patterns can be replaced with predicates
+Long Term:
+- Type parameters on Data Types
+- Type Classes (definitions and implementations)
+- Monomorphic operations for each primitive data type.
+- Match Case Patterns can be replaced with predicates and values
   - These take the match argument as a parameter to produce Bool result
-
-+ 'Type' concept
-  - Need to keep track of types and TVs with respect to scope
-+ Type expression parsing
-- Type inference
+- List literals
 

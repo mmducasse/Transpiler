@@ -11,14 +11,14 @@
         {
             return node switch
             {
-                ArgNode => "arg",
+                ParamNode => node.Print(0),
                 AppNode => "app",
-                FuncDefnNode => "def",
+                FuncDefnNode fnDefnNode => fnDefnNode.Name + " =",
                 IfNode => "if ",
                 LambdaNode => "lam",
-                ILiteralNode => "lit",
+                ILiteralNode => node.Print(0),
                 MatchNode => "mat",
-                SymbolNode => "sym",
+                SymbolNode symNode => node.Print(0),
                 ScopedFuncExpnNode => "scp",
                 _ => "???"
             };

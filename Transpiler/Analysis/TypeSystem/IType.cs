@@ -6,7 +6,7 @@ namespace Transpiler
     {
         bool IsSolved { get; }
 
-        string Print();
+        string Print(bool terse = true);
 
         public static Substitution Unify(ConstraintSet set)
         {
@@ -55,7 +55,7 @@ namespace Transpiler
             // Add case for Tuple
             // Ad case for Type ctor.
 
-            throw new InvalidOperationException();
+            throw TypeSolver.Error("Type inference failed.", c.TEMP_Node);
         }
 
         private static bool Contains(IType t, TypeVariable tv)

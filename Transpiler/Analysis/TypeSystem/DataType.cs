@@ -16,7 +16,7 @@ namespace Transpiler
         public static DataType Make(string name, params string[] elements) =>
             new(name, elements);
 
-        public string Print()
+        public string Print(bool terse = true)
         {
             var elements = (Elements.Count > 0)
                 ? Elements.Separate(", ")

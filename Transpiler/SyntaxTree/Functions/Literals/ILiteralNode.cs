@@ -22,14 +22,6 @@ namespace Transpiler
 
             return false;
         }
-
-        public static ILiteralNode Analyze(Scope scope,
-                                           ILiteralNode node)
-        {
-            scope.TvTable.AddNode(scope, node);
-
-            return node;
-        }
     }
 
     public interface ILiteralNode<T> : ILiteralNode

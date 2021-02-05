@@ -5,14 +5,23 @@ using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler
 {
+    public enum eFixity
+    {
+        Prefix,
+        Infix,
+    }
+
     public interface IFuncDefnNode : IDefnNode
     {
         string Name { get; }
+
+        eFixity Fixity { get; }
     }
 
     // Todo: Add optional Type constraint property.
     public record FuncDefnNode(string Name,
-                               ScopedFuncExpnNode ScopedExpression) : IFuncDefnNode
+                               ScopedFuncExpnNode ScopedExpression,
+                               eFixity Fixity = eFixity.Prefix) : IFuncDefnNode
     {
         public static bool Parse(ref TokenQueue queue, out FuncDefnNode node)
         {
@@ -46,7 +55,7 @@ namespace Transpiler
             // Turn args into lambdas.
             while (args.TryPop(out string arg))
             {
-                var argNode = new ArgNode(arg);
+                var argNode = new ParamNode(arg);
                 var expn = scopedExpn.Expression;
                 var lambda = new LambdaNode(argNode, expn);
                 scopedExpn = new ScopedFuncExpnNode(lambda, scopedExpn.FuncDefinitions);
@@ -58,17 +67,18 @@ namespace Transpiler
             return true;
         }
 
-        public static ConstraintSet Constrain(Scope scope,
+        public static ConstraintSet Constrain(TvTable tvTable,
+                                              Scope scope,
                                               FuncDefnNode node)
         {
-            var table = scope.TvTable;
+            tvTable.AddNode(scope, node);
 
-            var tf = table.GetTypeOf(node);
-            var te = table.GetTypeOf(node.ScopedExpression.Expression);
+            var cs = ScopedFuncExpnNode.Constrain(tvTable, node.ScopedExpression);
+
+            var tf = tvTable.GetTypeOf(node);
+            var te = tvTable.GetTypeOf(node.ScopedExpression.Expression);
 
             var c = new Constraint(tf, te, node);
-
-            var cs = ScopedFuncExpnNode.Constrain(node.ScopedExpression);
 
             return IConstraints.Union(c, cs);
         }

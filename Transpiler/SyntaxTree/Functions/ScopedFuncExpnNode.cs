@@ -51,27 +51,27 @@ namespace Transpiler
         public static ScopedFuncExpnNode Analyze(Scope parentScope,
                                                  ScopedFuncExpnNode scopedExpn)
         {
-            var scope = new Scope(parentScope);
+            var scope = Scope.FunctionScope(parentScope);
 
             var newSubDefns = Analyzer.AnalyzeFunctions(scope, scopedExpn.FuncDefinitions);
 
             var newExpn = IFuncExpnNode.Analyze(scope, scopedExpn.Expression);
-            scope.TvTable.AddNode(scope, newExpn);
 
             return new(newExpn, newSubDefns, scope);
         }
 
-        public static ConstraintSet Constrain(ScopedFuncExpnNode node)
+        public static ConstraintSet Constrain(TvTable tvTable,
+                                              ScopedFuncExpnNode node)
         {
             var cs = new ConstraintSet();
 
             foreach (var fn in node.FuncDefinitions)
             {
-                var fcs = FuncDefnNode.Constrain(node.Scope, fn);
+                var fcs = FuncDefnNode.Constrain(tvTable, node.Scope, fn);
                 cs = IConstraints.Union(fcs, cs);
             }
 
-            var cse = IFuncExpnNode.Constrain(node.Scope, node.Expression);
+            var cse = IFuncExpnNode.Constrain(tvTable, node.Scope, node.Expression);
 
             return IConstraints.Union(cse, cs);
         }
