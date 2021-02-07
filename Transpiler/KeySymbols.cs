@@ -27,15 +27,15 @@
 
         public const string Equal = "=";
         public const string Colon = ":";
-        public const string Arrow = "->";
-        public const string BigArrow = "=>";
+        public const string IReadOnlyListow = "->";
+        public const string BigIReadOnlyListow = "=>";
 
         public static readonly string[] ReservedSymbols = new[]
         {
             Equal,
             Colon,
-            Arrow,
-            BigArrow,
+            IReadOnlyListow,
+            BigIReadOnlyListow,
         };
     }
 }

@@ -22,13 +22,16 @@ namespace Transpiler
     {
         public IEnumerable<IScope> Dependencies { get; } = new List<IScope>();
 
-        public Dictionary<string, INamedType> TypeDefinitions { get; } = new();
-
         public Dictionary<string, IFuncDefnNode> FuncDefinitions { get; } = new();
 
         public Dictionary<string, IType> FuncDefnTypes { get; } = new();
 
+        public IReadOnlyDictionary<string, INamedType> TypeDefinitions => mTypeDefinitions;
+        private Dictionary<string, INamedType> mTypeDefinitions { get; } = new();
+
         private Dictionary<INamedType, HashSet<ITypeSet>> SuperTypes { get; } = new();
+
+        private List<ClassInstance> ClassInstances { get; } = new();
 
         public Scope()
         {
@@ -39,14 +42,42 @@ namespace Transpiler
             Dependencies = dependencies;
         }
 
-        public static Scope FunctionScope(IScope parentScope)
+        public static Scope FunctionScope(IScope parentScope) =>
+            new Scope(parentScope.ToArr());
+
+        public void AddType(INamedType type)
         {
-            return new Scope(parentScope.ToList());
+            mTypeDefinitions[type.Name] = type;
+            if (type is ClassType classType)
+            {
+                foreach (var superclass in classType.Superclasses)
+                {
+                    AddSuperType(classType, superclass);
+                }
+
+                foreach (var fn in classType.Functions)
+                {
+                    FuncDefinitions[fn.Name] = fn;
+                    FuncDefnTypes[fn.Name] = fn.Type;
+                }
+            }
+            else if (type is UnionType unionType)
+            {
+                foreach (var subtype in unionType.Subtypes)
+                {
+                    AddSuperType(subtype, unionType);
+                }
+            }
+        }
+
+        public void AddClassInstance(ClassInstance instance)
+        {
+            AddSuperType(instance.Implementor, instance.Class);
         }
 
         public bool TryGetNamedType(string typeName, out INamedType type)
         {
-            if (TypeDefinitions.TryGetValue(typeName, out type))
+            if (mTypeDefinitions.TryGetValue(typeName, out type))
             {
                 return true;
             }

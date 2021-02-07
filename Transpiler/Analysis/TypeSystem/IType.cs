@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Transpiler
 {
@@ -8,7 +9,7 @@ namespace Transpiler
 
         string Print(bool terse = true);
 
-        public static Substitution Unify(ConstraintSet set)
+        public static Substitution Unify(IScope scope, ConstraintSet set)
         {
             if (set.IsEmpty)
             {
@@ -20,25 +21,71 @@ namespace Transpiler
             // Equal types.
             if (c.A == c.B)
             {
-                return Unify(cs);
+                return Unify(scope, cs);
+            }
+
+            // A and B are both Type Variables.
+            if (c.A is TypeVariable tva &&
+                c.B is TypeVariable tvb)
+            {
+                var tvc = TvUtils.Unify(scope, tva, tvb);
+                var sa = new Substitution(tva, tvc);
+                var sb = new Substitution(tvb, tvc);
+                var s = new Substitution(sa, sb);
+                var s2 = Unify(scope, cs.Substitute(s));
+
+                return new Substitution(s2, s);
             }
 
             // A is a Type Variable.
-            if (c.A is TypeVariable tva && !Contains(c.B, tva))
+            if (c.A is TypeVariable tvaa && !Contains(c.B, tvaa))
             {
-                var s = new Substitution(tva, c.B);
-                var s2 = Unify(cs.Substitute(s));
+                bool doUnify = true;
+                if (tvaa.HasRefinements &&
+                    c.B is INamedType namedType)
+                {
+                    foreach (var r in tvaa.Refinements)
+                    {
+                        if (!scope.IsSubtypeOf(namedType, r))
+                        {
+                            doUnify = false;
+                        }
+                    }
+                }
 
-                return new Substitution(s2, s);
+                if (doUnify)
+                {
+                    var s = new Substitution(tvaa, c.B);
+                    var s2 = Unify(scope, cs.Substitute(s));
+
+                    return new Substitution(s2, s);
+                }
             }
 
             // B is a Type Variable.
-            if (c.B is TypeVariable tvb && !Contains(c.A, tvb))
+            if (c.B is TypeVariable tvbb && !Contains(c.A, tvbb))
             {
-                var s = new Substitution(tvb, c.A);
-                var s2 = Unify(cs.Substitute(s));
 
-                return new Substitution(s2, s);
+                bool doUnify = true;
+                if (tvbb.HasRefinements &&
+                    c.A is INamedType namedType)
+                {
+                    foreach (var r in tvbb.Refinements)
+                    {
+                        if (!scope.IsSubtypeOf(namedType, r))
+                        {
+                            doUnify = false;
+                        }
+                    }
+                }
+
+                if (doUnify)
+                {
+                    var s = new Substitution(tvbb, c.A);
+                    var s2 = Unify(scope, cs.Substitute(s));
+
+                    return new Substitution(s2, s);
+                }
             }
 
             // They are Function Types.
@@ -49,7 +96,7 @@ namespace Transpiler
 
                 var cs2 = IConstraints.Union(c1, c2, cs);
 
-                return Unify(cs2);
+                return Unify(scope, cs2);
             }
 
             // Add case for Tuple

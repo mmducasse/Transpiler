@@ -114,7 +114,7 @@ namespace Transpiler
         {
             while (Match(ref q, LexerSymbols.Space, out _)
                    || Match(ref q, LexerSymbols.Tab, out _)
-                   || Match(ref q, LexerSymbols.ReturnCarriage, out _))
+                   || Match(ref q, LexerSymbols.ReturnCIReadOnlyListiage, out _))
             { }
         }
 

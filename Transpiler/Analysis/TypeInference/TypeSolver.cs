@@ -11,10 +11,10 @@ namespace Transpiler
             {
                 var tvTable = new TvTable();
                 var constraints = FuncDefnNode.Constrain(tvTable, scope, fn as FuncDefnNode);
-                var substitution = IType.Unify(constraints);
+                var substitution = IType.Unify(scope, constraints);
 
-                //Console.WriteLine("Before Solve:");
-                //tvTable.Print();
+                Console.WriteLine("Before Solve:");
+                tvTable.Print();
 
                 Console.WriteLine("After Solve:");
                 tvTable.Print(substitution);

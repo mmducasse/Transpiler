@@ -78,9 +78,14 @@ namespace Transpiler
             return false;
         }
 
-        public static IReadOnlyList<T> ToList<T>(this T item)
+        public static IReadOnlyList<T> ToArr<T>(this T item)
         {
-            return new List<T> { item };
+            return new T[] { item };
+        }
+
+        public static IReadOnlyList<T> RList<T>(params T[] items)
+        {
+            return items;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Transpiler
 {
@@ -20,7 +21,7 @@ namespace Transpiler
             {
                 if (scope.TryGetFuncDefnType(symbol.Name, out IType symType))
                 {
-                    type = symType;
+                    type = TvUtils.MadeUnique(symType);
                 }
                 else if (scope.TryGetFuncDefn(symbol.Name, out IFuncDefnNode funcDefn) &&
                          NodeTypes.TryGetValue(funcDefn, out IType funcDefnType))
@@ -60,9 +61,23 @@ namespace Transpiler
                     typeString = namedType.Name;
                 }
 
+                var tvs = TvUtils.GetTvs(solvedType);
+                var refs = new List<(IClassType, TypeVariable)>();
+                foreach (var tv in tvs)
+                {
+                    foreach (var r in tv.Refinements)
+                    {
+                        refs.Add((r, tv));
+                    }
+                }
+
+                string refinements =
+                    refs.Select(r => string.Format("{0} {1}", r.Item1.Name, r.Item2.Print())).Separate(", ");
+                string IReadOnlyListow = (refinements.Count() > 0) ? " => " : " ";
+
                 Console.Write("{0, 30} :: ", node.Print(0));
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(typeString);
+                Console.WriteLine(string.Format("{0}{1}{2}", refinements, IReadOnlyListow, typeString));
                 Console.ForegroundColor = ConsoleColor.White;
             }
         }

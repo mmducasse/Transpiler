@@ -8,7 +8,7 @@ namespace Transpiler
         public static void Analyze(Module module)
         {
             // Create the top-level scope.
-            var fileScope = new Scope(CoreTypes.Instance.Scope.ToList());
+            var fileScope = new Scope(CoreTypes.Instance.Scope.ToArr());
             module.Scope = fileScope;
 
             // Find and analyze usings.
@@ -43,7 +43,7 @@ namespace Transpiler
                 {
                     throw Error("Duplicate type definition.", defn);
                 }
-                fileScope.TypeDefinitions[type.Name] = type;
+                fileScope.AddType(type);
             }
 
             foreach (var type in fileScope.TypeDefinitions.Values)
@@ -91,7 +91,7 @@ namespace Transpiler
             }
             else
             {
-                return new List<TypeDefnNode> { typeDefn };
+                return typeDefn.ToArr();
             }
         }
 

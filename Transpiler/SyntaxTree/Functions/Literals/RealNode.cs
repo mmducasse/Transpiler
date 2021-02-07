@@ -5,7 +5,7 @@ namespace Transpiler
 {
     public record RealNode(double Value) : ILiteralNode<double>
     {
-        public IType CertainType => CoreTypes.Instance.Num;
+        public IType CertainType => CoreTypes.Instance.Real;
 
         public static bool Parse(ref TokenQueue queue, out RealNode node)
         {

@@ -5,7 +5,7 @@
         public static char Space = ' ';
         public static char Newline = '\n';
         public static char Tab = '\t';
-        public static char ReturnCarriage = '\r';
+        public static char ReturnCIReadOnlyListiage = '\r';
 
         public static char Underscore = '_';
         public static char SingleQuote = '\'';

@@ -21,4 +21,5 @@ Long Term:
 - Match Case Patterns can be replaced with predicates and values
   - These take the match argument as a parameter to produce Bool result
 - List literals
+-$0, $1, etc to represent lambda inputs
 
