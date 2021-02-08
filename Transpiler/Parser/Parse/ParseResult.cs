@@ -7,8 +7,10 @@ namespace Transpiler.Parse
     {
         public string ModuleName { get; set; } = null;
         public List<string> ImportedModules { get; } = new();
-        public List<FuncDefnNode> FuncDefns { get; } = new();
-        public List<TypeDefnNode> TypeDefns { get; } = new();
+        public List<PsFuncDefn> FuncDefns { get; } = new();
+        public List<PsTypeDefn> TypeDefns { get; } = new();
+        public List<PsClassTypeDefn> ClassDefns { get; } = new();
+        public List<PsClassInst> InstDefns { get; } = new();
 
         public ParseResult()
         {
@@ -24,11 +26,11 @@ namespace Transpiler.Parse
                 Console.WriteLine("use {0}", import);
             }
 
-            List<TypeDefnNode> typeDefns = new();
+            List<PsTypeDefn> typeDefns = new();
 
             foreach (var type in TypeDefns)
             {
-                typeDefns.AddRange(Analyzer.FlattenTypeDefnNode(new Scope(), type));
+                //typeDefns.AddRange(Analyzer.FlattenTypeDefnNode(new Scope(), type));
             }
             foreach (var type in typeDefns)
             {

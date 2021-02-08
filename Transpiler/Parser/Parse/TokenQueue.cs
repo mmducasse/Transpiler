@@ -38,6 +38,7 @@ namespace Transpiler.Parse
         }
 
         public LexerToken Current => Tokens[Index];
+        public CodePosition Position => Current.Position;
 
         public bool HasNext => (Index + 1) < Tokens.Count;
         public TokenQueue Next

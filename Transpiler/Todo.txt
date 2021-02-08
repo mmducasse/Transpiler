@@ -1,20 +1,19 @@
 ﻿
 
-TODO:
+QUESTIONS:
 
+What types can't implement a class?
+
+TODO:
 
 Short Term:
 - Generate Data Type ctor functions
-- Private functions
 + Infix operators
 - Make token indentation more robust
 - Better code locations for errors
 - Multiple modules
-- Tuples
 - Patterns
 - Generate JavaScript
-
-Long Term:
 - Type parameters on Data Types
 - Type Classes (definitions and implementations)
 - Monomorphic operations for each primitive data type.

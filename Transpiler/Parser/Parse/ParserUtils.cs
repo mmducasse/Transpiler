@@ -41,6 +41,25 @@ namespace Transpiler.Parse
             q = q.Next;
         }
 
+        public static void ExpectsIndents(ref TokenQueue queue, int indent)
+        {
+            var q = queue;
+
+            int i = 0;
+            while (q.Current.Type == TokenType.Indent)
+            {
+                q = q.Next;
+                i++;
+            }
+
+            if (i != indent)
+            {
+                Error("Expected " + indent + " indents.", queue);
+            }
+
+            queue = q;
+        }
+
         public static bool Finds(char c, ref TokenQueue q)
         {
             return Finds(c.ToString(), ref q);
@@ -84,6 +103,26 @@ namespace Transpiler.Parse
         //    q = queue;
         //    return true;
         //}
+
+        public static bool FindsIndents(ref TokenQueue queue, int indent)
+        {
+            var q = queue;
+
+            int i = 0;
+            while (q.Current.Type == TokenType.Indent)
+            {
+                q = q.Next;
+                i++;
+            }
+
+            if (i == indent)
+            {
+                queue = q;
+                return true;
+            }
+
+            return false;
+        }
 
         public static bool ParseInteger(ref TokenQueue q, out int result, bool force = false)
         {

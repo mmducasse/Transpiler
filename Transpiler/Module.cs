@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Transpiler.Analysis;
 using Transpiler.Parse;
 
 namespace Transpiler

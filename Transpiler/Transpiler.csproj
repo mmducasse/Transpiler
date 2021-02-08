@@ -5,4 +5,21 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Analyzer\SyntaxTree\Types\**" />
+    <EmbeddedResource Remove="Analyzer\SyntaxTree\Types\**" />
+    <None Remove="Analyzer\SyntaxTree\Types\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Analyzer\SyntaxTree\Functions\AzMatchExpn.cs" />
+    <Compile Remove="Analyzer\SyntaxTree\Functions\PatternMatching\DeconstructPatternNode.cs" />
+    <Compile Remove="Analyzer\SyntaxTree\Functions\PatternMatching\MatchCaseNode.cs" />
+    <Compile Remove="Analyzer\SyntaxTree\Functions\PatternMatching\PatternTupleNode.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Generator\" />
+  </ItemGroup>
+
 </Project>

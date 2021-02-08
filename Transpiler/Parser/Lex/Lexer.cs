@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Transpiler.Parse;
 
-namespace Transpiler
+namespace Transpiler.Parse
 {
     public static class Lexer
     {

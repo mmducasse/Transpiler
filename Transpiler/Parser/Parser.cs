@@ -1,12 +1,14 @@
-﻿using Transpiler.Parse;
-using static Transpiler.Parse.ParserUtils;
+﻿using static Transpiler.Parse.ParserUtils;
 
-namespace Transpiler
+namespace Transpiler.Parse
 {
     public static class Parser
     {
         public static void Parse(Module module)
         {
+            Lexer.Tokenize(module);
+            //Lexer.Print(module);
+
             var r = new ParseResult();
             var q = TokenQueue.New(module.Tokens);
             bool doContinue = true;
@@ -31,13 +33,25 @@ namespace Transpiler
             if (ParseModuleDefinition(ref q, r)) { return true; }
             else if (ParseImport(ref q, r)) { return true; }
 
-            if (FuncDefnNode.Parse(ref q, out var funcNode))
+            if (PsClassTypeDefn.Parse(ref q, out var classNode))
+            {
+                System.Console.WriteLine(classNode.Print(0));
+                r.ClassDefns.Add(classNode);
+                return true;
+            }
+            if (PsClassInst.Parse(ref q, out var instNode))
+            {
+                System.Console.WriteLine(instNode.Print(0));
+                r.InstDefns.Add(instNode);
+                return true;
+            }
+            if (PsFuncDefn.ParseDefn(ref q, out var funcNode))
             {
                 System.Console.WriteLine(funcNode.Print(0));
                 r.FuncDefns.Add(funcNode);
                 return true;
             }
-            if (TypeDefnNode.Parse(ref q, out var typeNode))
+            if (PsTypeDefn.Parse(ref q, out var typeNode))
             {
                 System.Console.WriteLine(typeNode.Print(0));
                 r.TypeDefns.Add(typeNode);
@@ -100,45 +114,6 @@ namespace Transpiler
 
             queue = q;
             return true;
-        }
-
-        public static void ExpectsIndents(ref TokenQueue queue, int indent)
-        {
-            var q = queue;
-
-            int i = 0;
-            while (q.Current.Type == TokenType.Indent)
-            {
-                q = q.Next;
-                i++;
-            }
-
-            if (i != indent)
-            {
-                Error("Expected " + indent + " indents.", queue);
-            }
-
-            queue = q;
-        }
-
-        public static bool FindsIndents(ref TokenQueue queue, int indent)
-        {
-            var q = queue;
-
-            int i = 0;
-            while (q.Current.Type == TokenType.Indent)
-            {
-                q = q.Next;
-                i++;
-            }
-
-            if (i == indent)
-            {
-                queue = q;
-                return true;
-            }
-
-            return false;
         }
     }
 }

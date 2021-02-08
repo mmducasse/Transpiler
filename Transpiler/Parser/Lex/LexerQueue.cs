@@ -21,7 +21,7 @@ namespace Transpiler.Parse
 
         private LexerQueue(IList<string> lines,
                            bool @continue,
-                           CodePosition position)
+                           CodePosition position = null)
         {
             mLines = lines;
             Continue = @continue;
