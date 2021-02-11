@@ -13,9 +13,9 @@ namespace Transpiler.Parse
 
     */
     public record PsClassTypeDefn(string Name,
-                              string TypeVar,
-                              IReadOnlyList<IPsFuncDefn> Functions,
-                              CodePosition Position) : IPsDefn
+                                  string TypeVar,
+                                  IReadOnlyList<IPsFuncDefn> Functions,
+                                  CodePosition Position) : IPsTypeDefn
     {
         public static bool Parse(ref TokenQueue queue, out PsClassTypeDefn node)
         {

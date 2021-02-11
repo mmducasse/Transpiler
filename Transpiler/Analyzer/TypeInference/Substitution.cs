@@ -4,10 +4,10 @@ namespace Transpiler.Analysis
 {
     public class Substitution
     {
-        public IReadOnlyDictionary<TypeVariable, IType> TypeSubstitutions => mTypeSubstitutions;
-        private Dictionary<TypeVariable, IType> mTypeSubstitutions = new();
+        public IReadOnlyDictionary<TypeVariable, IAzTypeExpn> TypeSubstitutions => mTypeSubstitutions;
+        private Dictionary<TypeVariable, IAzTypeExpn> mTypeSubstitutions = new();
 
-        public Substitution(TypeVariable tv, IType newType)
+        public Substitution(TypeVariable tv, IAzTypeExpn newType)
         {
             mTypeSubstitutions[tv] = newType;
         }
@@ -28,7 +28,7 @@ namespace Transpiler.Analysis
             string s = "";
             foreach (var kvp in TypeSubstitutions)
             {
-                s += string.Format("{0} / {1}\n", kvp.Value.Print(), kvp.Key.Print());
+                s += string.Format("{0} / {1}\n", kvp.Value.Print(0), kvp.Key.Print());
             }
 
             return s;

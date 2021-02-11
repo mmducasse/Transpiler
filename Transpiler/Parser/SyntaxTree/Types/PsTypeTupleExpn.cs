@@ -4,17 +4,19 @@ using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
-    public record PsTypeTupleExpn(IReadOnlyList<PsTypeSymbol> Members,
+    public record PsTypeTupleExpn(IReadOnlyList<IPsTypeExpn> Elements,
                                   CodePosition Position) : IPsTypeExpn
     {
+        public static PsTypeTupleExpn Empty => new(new List<IPsTypeSymbolExpn>(), CodePosition.Null);
+
         public static bool Parse(ref TokenQueue queue, out IPsTypeExpn node)
         {
             node = null;
             var q = queue;
             var p = q.Position;
-            List<PsTypeSymbol> members = new();
+            List<IPsTypeExpn> members = new();
 
-            if (!IPsTypeSymbol.Parse(ref q, out var first)) { return false; }
+            if (!PsTypeArbExpn.Parse(ref q, out var first)) { return false; }
 
             var q2 = q;
             if (!Finds(",", ref q2))
@@ -27,7 +29,7 @@ namespace Transpiler.Parse
             members.Add(first);
             while (Finds(",", ref q))
             {
-                if (!IPsTypeSymbol.Parse(ref q, out var next))
+                if (!PsTypeArbExpn.Parse(ref q, out var next))
                 {
                     throw Error("Expected simple type expression after ','.", q);
                 }
@@ -41,7 +43,12 @@ namespace Transpiler.Parse
 
         public string Print(int i)
         {
-            string members = Members.Select(m => m.Print(i)).Separate(", ");
+            if (Elements.Count == 0)
+            {
+                return "()";
+            }
+
+            string members = Elements.Select(m => m.Print(i)).Separate(", ");
             return string.Format("{0}", members);
         }
     }

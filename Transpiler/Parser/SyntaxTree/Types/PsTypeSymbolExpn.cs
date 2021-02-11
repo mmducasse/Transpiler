@@ -2,16 +2,16 @@
 
 namespace Transpiler.Parse
 {
-    public interface IPsTypeSymbol : IPsTypeExpn
+    public interface IPsTypeSymbolExpn : IPsTypeExpn
     {
         string Name { get; }
 
-        public static bool Parse(ref TokenQueue queue, out PsTypeSymbol node)
+        public static bool Parse(ref TokenQueue queue, out PsTypeSymbolExpn node)
         {
             node = null;
             var q = queue;
 
-            if (PsTypeSymbol.Parse(ref q, out var typeSym)) { node = typeSym; }
+            if (PsTypeSymbolExpn.Parse(ref q, out var typeSym)) { node = typeSym; }
             else if (PsTypeVarSymbol.Parse(ref q, out var typeVar)) { node = typeVar; }
 
             if (node != null)
@@ -24,10 +24,10 @@ namespace Transpiler.Parse
         }
     }
 
-    public record PsTypeSymbol(string Name,
-                               CodePosition Position) : IPsTypeSymbol
+    public record PsTypeSymbolExpn(string Name,
+                               CodePosition Position) : IPsTypeSymbolExpn
     {
-        public static bool Parse(ref TokenQueue queue, out PsTypeSymbol node)
+        public static bool Parse(ref TokenQueue queue, out PsTypeSymbolExpn node)
         {
             node = null;
             var q = queue;
@@ -48,9 +48,9 @@ namespace Transpiler.Parse
 
 
     public record PsTypeVarSymbol(string Name,
-                                  CodePosition Position) : IPsTypeSymbol
+                                  CodePosition Position) : IPsTypeSymbolExpn
     {
-        public static bool Parse(ref TokenQueue queue, out PsTypeSymbol node)
+        public static bool Parse(ref TokenQueue queue, out PsTypeSymbolExpn node)
         {
             node = null;
             var q = queue;

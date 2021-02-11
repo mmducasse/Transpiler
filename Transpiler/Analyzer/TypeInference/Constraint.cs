@@ -25,12 +25,12 @@ namespace Transpiler.Analysis
         }
     }
 
-    public record Constraint(IType A, IType B, IAzNode TEMP_Node) : IConstraints
+    public record Constraint(IAzTypeExpn A, IAzTypeExpn B, IAzNode TEMP_Node) : IConstraints
     {
         public Constraint Substitute(Substitution sub)
         {
-            return new Constraint(IType.Substitute(A, sub),
-                                  IType.Substitute(B, sub),
+            return new Constraint(IAzTypeExpn.Substitute(A, sub),
+                                  IAzTypeExpn.Substitute(B, sub),
                                   TEMP_Node);
         }
     }
@@ -97,7 +97,7 @@ namespace Transpiler.Analysis
 
             foreach (var c in mHashSet)
             {
-                s += string.Format("{0} = {1}\n", c.A.Print(), c.B.Print());
+                s += string.Format("{0} = {1}\n", c.A.Print(0), c.B.Print(0));
                 s += string.Format("{0}\n\n", c.TEMP_Node.Print(0));
             }
 
@@ -110,7 +110,7 @@ namespace Transpiler.Analysis
 
             foreach (var c in mHashSet)
             {
-                s += string.Format("{0} = {1}    ", c.A.Print(), c.B.Print());
+                s += string.Format("{0} = {1}    ", c.A.Print(0), c.B.Print(0));
             }
 
             return s;

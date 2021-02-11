@@ -15,7 +15,7 @@ namespace Transpiler.Analysis
         public static AzScopedFuncExpn Analyze(Scope parentScope,
                                                PsScopedFuncExpn scopedExpn)
         {
-            var scope = Scope.FunctionScope(parentScope);
+            var scope = new Scope(parentScope);
 
             var newSubDefns = Analyzer.AnalyzeFunctions(scope, scopedExpn.FuncDefinitions);
 

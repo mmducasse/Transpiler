@@ -27,7 +27,7 @@ namespace Transpiler.Analysis
             var tx = tvTable.GetTypeOf(node.Parameter);
             var tf = tvTable.GetTypeOf(node);
 
-            var cf = new Constraint(tf, new FunType(tx, te), node);
+            var cf = new Constraint(tf, new AzTypeLambdaExpn(tx, te, CodePosition.Null), node);
 
             return IConstraints.Union(cf, cse);
         }

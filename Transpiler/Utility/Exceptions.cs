@@ -8,7 +8,7 @@ namespace Transpiler
         Lexer,
         Parser,
         Analyzer,
-        Runtime
+        Generator
     }
 
     public class InterpreterException : Exception
@@ -59,7 +59,7 @@ namespace Transpiler
                 case eInterpreterStage.Lexer: return "Lexer";
                 case eInterpreterStage.Parser: return "Parser";
                 case eInterpreterStage.Analyzer: return "Analyzer";
-                case eInterpreterStage.Runtime: return "Runtime";
+                case eInterpreterStage.Generator: return "Generator";
             }
             return "";
         }

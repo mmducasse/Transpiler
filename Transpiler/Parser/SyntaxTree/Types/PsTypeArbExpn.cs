@@ -4,15 +4,35 @@ using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
-    public record PsTypeArbExpn(IReadOnlyList<IPsTypeExpn> Children,
-                                CodePosition Position) : IPsFuncExpn
+    public record PsTypeArbExpn(string TypeName,
+                                IReadOnlyList<IPsTypeExpn> Children,
+                                CodePosition Position) : IPsTypeExpn
     {
-        public static bool Parse(ref TokenQueue queue, out PsTypeArbExpn node)
+        public static bool Parse(ref TokenQueue queue, out IPsTypeExpn node)
+        {
+            node = null;
+            var q = queue;
+
+            if (ParseArb(ref q, out var arbNode)) { node = arbNode; }
+            else if (IPsTypeSymbolExpn.Parse(ref q, out var symNode)) { node = symNode; }
+
+            if (node != null)
+            {
+                queue = q;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool ParseArb(ref TokenQueue queue, out PsTypeArbExpn node)
         {
             node = null;
             var q = queue;
             var p = q.Position;
             bool doContinue = true;
+
+            if (!Finds(TokenType.Uppercase, ref q, out string typeName)) { return false; }
 
             List<IPsTypeExpn> subExpns = new();
             while (doContinue)
@@ -33,7 +53,7 @@ namespace Transpiler.Parse
                     doContinue = false;
                     break;
                 }
-                else if (IPsTypeSymbol.Parse(ref q2, out var typeSym))
+                else if (IPsTypeSymbolExpn.Parse(ref q2, out var typeSym))
                 {
                     subExpns.Add(typeSym);
                 }
@@ -52,29 +72,13 @@ namespace Transpiler.Parse
 
             if (subExpns.Count > 0)
             {
-                node = new PsTypeArbExpn(subExpns, p);
+                node = new PsTypeArbExpn(typeName, subExpns, p);
                 queue = q;
                 return true;
             }
 
             return false;
         }
-
-        //public static bool ParseSimple(ref TokenQueue queue, out IPsTypeExpn node)
-        //{
-        //    node = null;
-        //    var q = queue;
-
-        //    if (IPsTypeSymbol.Parse(ref q, out var typeSym)) { node = typeSym; }
-
-        //    if (node != null)
-        //    {
-        //        queue = q;
-        //        return true;
-        //    }
-
-        //    return false;
-        //}
 
         public string Print(int i)
         {

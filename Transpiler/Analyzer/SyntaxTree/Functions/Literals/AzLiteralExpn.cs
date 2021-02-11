@@ -5,7 +5,7 @@ namespace Transpiler.Analysis
 {
     public interface IAzLiteralExpn : IAzFuncExpn, IAzPattern
     {
-        IType CertainType { get; }
+        IAzTypeDefn CertainType { get; }
 
         public static IAzLiteralExpn Analyze(Scope scope,
                                              IPsLiteralExpn node)

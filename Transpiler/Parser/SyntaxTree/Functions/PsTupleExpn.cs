@@ -4,7 +4,7 @@ using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
-    public record PsTupleExpn(IReadOnlyList<IPsFuncExpn> Members,
+    public record PsTupleExpn(IReadOnlyList<IPsFuncExpn> Elements,
                               CodePosition Position) : IPsFuncExpn
     {
         public static bool Parse(ref TokenQueue queue, out PsTupleExpn node)
@@ -36,7 +36,7 @@ namespace Transpiler.Parse
 
         public string Print(int i)
         {
-            return Members.Select(m => m.Print(i)).Separate(", ");
+            return Elements.Select(m => m.Print(i)).Separate(", ");
         }
     }
 }

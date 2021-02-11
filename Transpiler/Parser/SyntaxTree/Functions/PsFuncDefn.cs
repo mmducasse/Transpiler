@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
@@ -9,6 +10,7 @@ namespace Transpiler.Parse
 
     // Todo: Add optional Type constraint property.
     public record PsFuncDefn(IReadOnlyList<string> Names,
+                             IReadOnlyList<PsParam> Parameters,
                              bool IsPrivate,
                              IPsTypeExpn TypeExpression,
                              PsScopedFuncExpn ScopedExpression,
@@ -48,19 +50,22 @@ namespace Transpiler.Parse
 
             // Names
             var names = new List<string>();
-            if (!Finds(TokenType.Name, ref q, out string name)) { return false; }
+            if (!Finds(TokenType.Lowercase | TokenType.Symbol, ref q, out string name)) { return false; }
             names.Add(name);
             while (Finds(",", ref q))
             {
-                Expects(TokenType.Name, ref q, out string nextName);
+                Expects(TokenType.Lowercase | TokenType.Symbol, ref q, out string nextName);
                 names.Add(nextName);
             }
 
             // Arguments
-            Stack<string> args = new();
-            while (Finds(TokenType.Lowercase, ref q, out string arg))
+            List<PsParam> parameters = new();
+            var pp = q.Position;
+            while (Finds(TokenType.Lowercase, ref q, out string paramName))
             {
-                args.Push(arg);
+                var param = new PsParam(paramName, pp);
+                parameters.Add(param);
+                pp = q.Position;
             }
 
             // Optional Type Specification
@@ -92,16 +97,16 @@ namespace Transpiler.Parse
             }
 
 
-            // Turn args into lambdas.
-            while (args.TryPop(out string arg))
-            {
-                var argNode = new PsParam(arg);
-                var expn = scopedExpn.Expression;
-                var lambda = new PsLambdaExpn(argNode, expn, p);
-                scopedExpn = new PsScopedFuncExpn(lambda, scopedExpn.FuncDefinitions, p);
-            }
+            //// Turn args into lambdas.
+            //while (parameters.TryPop(out string arg))
+            //{
+            //    var argNode = new PsParam(arg);
+            //    var expn = scopedExpn.Expression;
+            //    var lambda = new PsLambdaExpn(argNode, expn, p);
+            //    scopedExpn = new PsScopedFuncExpn(lambda, scopedExpn.FuncDefinitions, p);
+            //}
 
-            node = new(names, isPrivate, typeExpn, scopedExpn, p);
+            node = new(names, parameters, isPrivate, typeExpn, scopedExpn, p);
             queue = q;
 
             return true;
@@ -111,15 +116,17 @@ namespace Transpiler.Parse
         {
             string accessMod = IsPrivate ? "_ " : "";
             string names = Names.Separate(", ");
-            return string.Format("{0}{1}", accessMod, names);
+            string parameters = Parameters.Select(p => p.Print(0)).Separate(" ", prepend: " ");
+            return string.Format("{0}{1}{2}", accessMod, names, parameters);
         }
 
         public string Print(int i)
         {
             string accessMod = IsPrivate ? "_ " : "";
             string names = Names.Separate(", ");
+            string parameters = Parameters.Select(p => p.Print(0)).Separate(" ", prepend: " ");
 
-            string s = string.Format("{0}{1}", accessMod, names);
+            string s = string.Format("{0}{1}{2}", accessMod, names, parameters);
             if (TypeExpression != null)
             {
                 s += string.Format(" : {0}", TypeExpression.Print(i + 1));

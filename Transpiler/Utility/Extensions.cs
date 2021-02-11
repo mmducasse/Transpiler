@@ -45,6 +45,16 @@ namespace Transpiler
             return s.ToString();
         }
 
+        public static string Separate(this IEnumerable elements, string separator, string prepend)
+        {
+            string s = Separate(elements, separator);
+            if (s.Length > 0)
+            {
+                return prepend + s;
+            }
+            return s;
+        }
+
         public static string Indent(int indent)
         {
             return Multiply("  ", indent);

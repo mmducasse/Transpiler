@@ -50,7 +50,7 @@ namespace Transpiler.Parse
                 funcDecls.Add(funcDefn);
             }
 
-            node = new PsClassInst(name, implementor, funcDecls, p);
+            node = new PsClassInst(name, implementor as PsTypeArbExpn, funcDecls, p);
             queue = q;
             return true;
         }

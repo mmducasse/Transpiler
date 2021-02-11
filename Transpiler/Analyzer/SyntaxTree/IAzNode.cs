@@ -7,6 +7,6 @@
     {
         CodePosition Position { get; }
 
-        string Print(int indent);
+        string Print(int i);
     }
 }

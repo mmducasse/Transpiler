@@ -3,12 +3,12 @@ using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
-    public record PsTypeDefn(string Name,
-                             IReadOnlyList<string> TypeParameters,
-                             IPsTypeExpn Expression,
-                             CodePosition Position) : IPsDefn
+    public record PsDataTypeDefn(string Name,
+                                 IReadOnlyList<string> TypeParameters,
+                                 IPsTypeExpn Expression,
+                                 CodePosition Position) : IPsTypeDefn
     {
-        public static bool Parse(ref TokenQueue queue, out PsTypeDefn node)
+        public static bool Parse(ref TokenQueue queue, out PsDataTypeDefn node)
         {
             node = null;
             var q = queue;
@@ -39,8 +39,8 @@ namespace Transpiler.Parse
 
         public string Print(int i)
         {
-            string ps = TypeParameters.Separate(" ");
-            return string.Format("{0} {1} = {2}", Name, ps, Expression.Print(i));
+            string ps = TypeParameters.Separate(" ", prepend: " ");
+            return string.Format("{0}{1} = {2}", Name, ps, Expression.Print(i));
         }
     }
 }

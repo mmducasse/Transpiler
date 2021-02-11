@@ -2,5 +2,6 @@
 {
     public interface IAzDefn : IAzNode
     {
+        string Name { get; }
     }
 }

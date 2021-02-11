@@ -5,12 +5,9 @@ using static Transpiler.Parse.ParserUtils;
 namespace Transpiler.Parse
 {
     public record PsScopedFuncExpn(IPsFuncExpn Expression,
-                                       IReadOnlyList<PsFuncDefn> FuncDefinitions,
-                                       CodePosition Position) : IPsFuncExpn
+                                   IReadOnlyList<PsFuncDefn> FuncDefinitions,
+                                   CodePosition Position) : IPsFuncExpn
     {
-        //public static PsScopedFuncExpnNode Make(IPsFuncExpn expression) =>
-        //    new(expression, new List<PsFuncDefn>());
-
         public static bool Parse(ref TokenQueue queue, out PsScopedFuncExpn node)
         {
             node = null;

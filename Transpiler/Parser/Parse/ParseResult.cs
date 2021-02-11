@@ -8,8 +8,7 @@ namespace Transpiler.Parse
         public string ModuleName { get; set; } = null;
         public List<string> ImportedModules { get; } = new();
         public List<PsFuncDefn> FuncDefns { get; } = new();
-        public List<PsTypeDefn> TypeDefns { get; } = new();
-        public List<PsClassTypeDefn> ClassDefns { get; } = new();
+        public List<IPsTypeDefn> TypeDefns { get; } = new();
         public List<PsClassInst> InstDefns { get; } = new();
 
         public ParseResult()
@@ -26,7 +25,7 @@ namespace Transpiler.Parse
                 Console.WriteLine("use {0}", import);
             }
 
-            List<PsTypeDefn> typeDefns = new();
+            List<PsDataTypeDefn> typeDefns = new();
 
             foreach (var type in TypeDefns)
             {

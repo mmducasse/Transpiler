@@ -2,24 +2,24 @@
 
 namespace Transpiler.Parse
 {
-    public record PsTypeFunExpn(IPsTypeExpn Input,
+    public record PsTypeLambdaExpn(IPsTypeExpn Input,
                                 IPsTypeExpn Output,
                                 CodePosition Position) : IPsTypeExpn
     {
-        public static bool Parse(ref TokenQueue queue, out PsTypeFunExpn node)
+        public static bool Parse(ref TokenQueue queue, out PsTypeLambdaExpn node)
         {
             node = null;
             var q = queue;
             var p = q.Position;
 
-            if (!IPsTypeSymbol.Parse(ref q, out var inNode)) { return false; }
+            if (!IPsTypeSymbolExpn.Parse(ref q, out var inNode)) { return false; }
             if (!Finds("->", ref q)) { return false; }
             if (!IPsTypeExpn.Parse(ref q, out var outNode))
             {
                 throw Error("Expected type expression after '->' in function type expression.", q);
             }
 
-            node = new PsTypeFunExpn(inNode, outNode, p);
+            node = new PsTypeLambdaExpn(inNode, outNode, p);
             queue = q;
             return true;
         }

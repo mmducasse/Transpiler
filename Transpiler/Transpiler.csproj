@@ -6,16 +6,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Analyzer\SyntaxTree\Types\**" />
-    <EmbeddedResource Remove="Analyzer\SyntaxTree\Types\**" />
-    <None Remove="Analyzer\SyntaxTree\Types\**" />
+    <Compile Remove="Analyzer\SyntaxTree\Functions\PatternMatching\**" />
+    <Compile Remove="Analyzer\TypeSystem\**" />
+    <EmbeddedResource Remove="Analyzer\SyntaxTree\Functions\PatternMatching\**" />
+    <EmbeddedResource Remove="Analyzer\TypeSystem\**" />
+    <None Remove="Analyzer\SyntaxTree\Functions\PatternMatching\**" />
+    <None Remove="Analyzer\TypeSystem\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Analyzer\SyntaxTree\Functions\AzMatchExpn.cs" />
-    <Compile Remove="Analyzer\SyntaxTree\Functions\PatternMatching\DeconstructPatternNode.cs" />
-    <Compile Remove="Analyzer\SyntaxTree\Functions\PatternMatching\MatchCaseNode.cs" />
-    <Compile Remove="Analyzer\SyntaxTree\Functions\PatternMatching\PatternTupleNode.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\AzParam.cs" />
+    <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\IAzPattern.cs" />
   </ItemGroup>
 
   <ItemGroup>

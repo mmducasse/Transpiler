@@ -5,13 +5,17 @@ namespace Transpiler.Analysis
 {
     public interface IScope
     {
-        bool TryGetNamedType(string typeName, out INamedType type);
+        string Name { get; }
+
+        bool TryGetNamedType(string typeName, out IAzTypeDefn type);
 
         bool TryGetFuncDefn(string symbol, out IAzFuncDefn defn);
 
-        bool TryGetFuncDefnType(string symbol, out IType type);
+        bool TryGetFuncDefnType(string symbol, out IAzTypeExpn type);
 
-        bool IsSubtypeOf(INamedType subtype, ITypeSet supertype);
+        bool TryGetTypeVar(string tvName, out TypeVariable tv);
+
+        bool IsSubtypeOf(IAzTypeDefn subtype, IAzTypeSetDefn supertype);
 
         bool VerifySymbols(params string[] symbols);
 
@@ -20,62 +24,72 @@ namespace Transpiler.Analysis
 
     public class Scope : IScope
     {
+        public string Name { get; }
+
         public IEnumerable<IScope> Dependencies { get; } = new List<IScope>();
 
         public Dictionary<string, IAzFuncDefn> FuncDefinitions { get; } = new();
 
-        public Dictionary<string, IType> FuncDefnTypes { get; } = new();
+        public Dictionary<string, IAzTypeExpn> FuncDefnTypes { get; } = new();
 
-        public IReadOnlyDictionary<string, INamedType> TypeDefinitions => mTypeDefinitions;
-        private Dictionary<string, INamedType> mTypeDefinitions { get; } = new();
+        public IReadOnlyDictionary<string, IAzTypeDefn> TypeDefinitions => mTypeDefinitions;
+        private Dictionary<string, IAzTypeDefn> mTypeDefinitions { get; } = new();
 
-        private Dictionary<INamedType, HashSet<ITypeSet>> SuperTypes { get; } = new();
+        private Dictionary<IAzTypeDefn, HashSet<IAzTypeSetDefn>> SuperTypes { get; } = new();
 
-        private List<ClassInstance> ClassInstances { get; } = new();
+        private List<AzClassInstDefn> ClassInstances { get; } = new();
+
+        private Dictionary<string, TypeVariable> TypeVariables { get; } = new();
 
         public Scope()
         {
         }
 
-        public Scope(IEnumerable<IScope> dependencies)
+        public Scope(IEnumerable<IScope> dependencies, string name = "<file>")
         {
+            Name = name;
             Dependencies = dependencies;
         }
 
-        public static Scope FunctionScope(IScope parentScope) =>
-            new Scope(parentScope.ToArr());
-
-        public void AddType(INamedType type)
+        public Scope(IScope parentScope, string name = "<?>")
         {
-            mTypeDefinitions[type.Name] = type;
-            if (type is ClassType classType)
-            {
-                foreach (var superclass in classType.Superclasses)
-                {
-                    AddSuperType(classType, superclass);
-                }
-
-                foreach (var fn in classType.Functions)
-                {
-                    FuncDefinitions[fn.Name] = fn;
-                    FuncDefnTypes[fn.Name] = fn.Type;
-                }
-            }
-            else if (type is UnionType unionType)
-            {
-                foreach (var subtype in unionType.Subtypes)
-                {
-                    AddSuperType(subtype, unionType);
-                }
-            }
+            Name = name;
+            Dependencies = parentScope.ToArr();
         }
 
-        public void AddClassInstance(ClassInstance instance)
+        public void AddFunction(IAzFuncDefn func)
+        {
+            if (FuncDefinitions.ContainsKey(func.Name))
+            {
+                throw Analyzer.Error("Duplicate function definition: " + func.Name, func.Position);
+            }
+            FuncDefinitions[func.Name] = func;
+        }
+
+        public void AddType(IAzTypeDefn type)
+        {
+            mTypeDefinitions[type.Name] = type;
+            //if (type is ClassType classType)
+            //{
+            //    foreach (var superclass in classType.Superclasses)
+            //    {
+            //        AddSuperType(classType, superclass);
+            //    }
+
+                //    foreach (var fn in classType.Functions)
+                //    {
+                //        FuncDefinitions[fn.Name] = fn;
+                //        FuncDefnTypes[fn.Name] = fn.Type;
+                //    }
+                //}
+        }
+
+        public void AddClassInstance(AzClassInstDefn instance)
         {
             AddSuperType(instance.Implementor, instance.Class);
         }
 
-        public bool TryGetNamedType(string typeName, out INamedType type)
+        public bool TryGetNamedType(string typeName, out IAzTypeDefn type)
         {
             if (mTypeDefinitions.TryGetValue(typeName, out type))
             {
@@ -111,7 +125,7 @@ namespace Transpiler.Analysis
             return false;
         }
 
-        public bool TryGetFuncDefnType(string defnName, out IType type)
+        public bool TryGetFuncDefnType(string defnName, out IAzTypeExpn type)
         {
             if (FuncDefnTypes.TryGetValue(defnName, out type))
             {
@@ -129,7 +143,7 @@ namespace Transpiler.Analysis
             return false;
         }
 
-        public void AddSuperType(INamedType subtype, ITypeSet supertype)
+        public void AddSuperType(IAzTypeDefn subtype, IAzTypeSetDefn supertype)
         {
             if (!IsSubtypeOf(subtype, supertype))
             {
@@ -152,7 +166,7 @@ namespace Transpiler.Analysis
             }
         }
 
-        public bool IsSubtypeOf(INamedType subtype, ITypeSet supertype)
+        public bool IsSubtypeOf(IAzTypeDefn subtype, IAzTypeSetDefn supertype)
         {
             if (SuperTypes.TryGetValue(subtype, out var supertypes))
             {
@@ -175,6 +189,46 @@ namespace Transpiler.Analysis
             foreach (var d in Dependencies)
             {
                 if (d.IsSubtypeOf(subtype, supertype))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private TvProvider mTvProvider = new();
+        public IReadOnlyList<TypeVariable> AddTypeVars(IReadOnlyList<string> tvNames)
+        {
+            List<TypeVariable> tvs = new();
+            foreach (string name in tvNames)
+            {
+                var tv = mTvProvider.Next;
+                TypeVariables[name] = tv;
+                tvs.Add(tv);
+            }
+
+            return tvs;
+        }
+
+        public TypeVariable AddTypeVar(string tvName)
+        {
+            var tv = mTvProvider.Next;
+            TypeVariables[tvName] = tv;
+
+            return tv;
+        }
+
+        public bool TryGetTypeVar(string tvName, out TypeVariable tv)
+        {
+            if (TypeVariables.TryGetValue(tvName, out tv))
+            {
+                return true;
+            }
+
+            foreach (var d in Dependencies)
+            {
+                if (d.TryGetTypeVar(tvName, out tv))
                 {
                     return true;
                 }

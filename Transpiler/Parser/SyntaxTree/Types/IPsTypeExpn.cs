@@ -8,8 +8,9 @@
             var q = queue;
 
             //if (PsUnionType.Parse(ref q, out var unionNode)) { node = unionNode; }
-            if (PsTypeFunExpn.Parse(ref q, out var funType)) { node = funType; }
+            if (PsTypeLambdaExpn.Parse(ref q, out var funType)) { node = funType; }
             else if (PsTypeTupleExpn.Parse(ref q, out var tupType)) { node = tupType; }
+            else if (PsTypeArbExpn.Parse(ref q, out var arbType)) { node = arbType; }
 
             if (node != null)
             {

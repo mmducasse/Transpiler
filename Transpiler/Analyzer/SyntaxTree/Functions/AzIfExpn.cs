@@ -33,7 +33,7 @@ namespace Transpiler.Analysis
             var te = tvTable.GetTypeOf(node.ElseCase.Expression);
 
             var cif = new Constraint(tif, tt, node);
-            var cc = new Constraint(tc, CoreTypes.Instance.Bool, node);
+            var cc = new Constraint(tc, CoreTypes.Instance.Bool.ToSym(), node);
             var cf = new Constraint(tt, te, node);
 
             return IConstraints.Union(cif, cc, cf, csc, cst, cse);

@@ -1,10 +1,24 @@
-﻿namespace Transpiler.Analysis
+﻿using System;
+using Transpiler.Parse;
+
+namespace Transpiler.Analysis
 {
-    public interface IType
+    public interface IAzTypeExpn : IAzNode
     {
         bool IsSolved { get; }
 
-        string Print(bool terse = true);
+        public static IAzTypeExpn Analyze(Scope scope,
+                                          IPsTypeExpn node)
+        {
+            return node switch
+            {
+                PsTypeSymbolExpn symExpn => AzTypeSymbolExpn.Analyze(scope, symExpn),
+                PsTypeArbExpn arbExpn => AzTypeCtorExpn.Analyze(scope, arbExpn),
+                PsTypeTupleExpn tupExpn => AzTypeTupleExpn.Analyze(scope, tupExpn),
+                PsTypeLambdaExpn lamExpn => AzTypeLambdaExpn.Analyze(scope, lamExpn),
+                _ => throw new NotImplementedException(),
+            };
+        }
 
         public static Substitution Unify(IScope scope, ConstraintSet set)
         {
@@ -39,11 +53,11 @@
             {
                 bool doUnify = true;
                 if (tvaa.HasRefinements &&
-                    c.B is INamedType namedType)
+                    c.B is AzTypeSymbolExpn namedType)
                 {
                     foreach (var r in tvaa.Refinements)
                     {
-                        if (!scope.IsSubtypeOf(namedType, r))
+                        if (!scope.IsSubtypeOf(namedType.Definition, r))
                         {
                             doUnify = false;
                         }
@@ -65,11 +79,11 @@
 
                 bool doUnify = true;
                 if (tvbb.HasRefinements &&
-                    c.A is INamedType namedType)
+                    c.A is AzTypeSymbolExpn namedType)
                 {
                     foreach (var r in tvbb.Refinements)
                     {
-                        if (!scope.IsSubtypeOf(namedType, r))
+                        if (!scope.IsSubtypeOf(namedType.Definition, r))
                         {
                             doUnify = false;
                         }
@@ -86,7 +100,8 @@
             }
 
             // They are Function Types.
-            if (c.A is FunType fa && c.B is FunType fb)
+            if (c.A is AzTypeLambdaExpn fa &&
+                c.B is AzTypeLambdaExpn fb)
             {
                 var c1 = new Constraint(fa.Input, fb.Input, null);
                 var c2 = new Constraint(fa.Output, fb.Output, null);
@@ -99,21 +114,21 @@
             // Add case for Tuple
             // Ad case for Type ctor.
 
-            throw TypeSolver.Error("Type inference failed.", c.TEMP_Node.Position);
+            throw Analyzer.Error("Type inference failed.", c.TEMP_Node.Position);
         }
 
-        private static bool Contains(IType t, TypeVariable tv)
+        private static bool Contains(IAzTypeExpn t, TypeVariable tv)
         {
             return t switch
             {
                 TypeVariable tv2 => tv.Equals(tv2),
-                FunType ft => Contains(ft.Input, tv) || Contains(ft.Output, tv),
+                AzTypeLambdaExpn lam => Contains(lam.Input, tv) || Contains(lam.Output, tv),
                 // Todo: Add tuple case.
                 _ => false,
             };
         }
 
-        public static IType Substitute(IType type, Substitution sub)
+        public static IAzTypeExpn Substitute(IAzTypeExpn type, Substitution sub)
         {
             if (type.IsSolved) { return type; }
 
@@ -125,14 +140,9 @@
 
             return type switch
             {
-                FunType lamType => FunType.Substitute(lamType, sub),
+                AzTypeLambdaExpn lamType => AzTypeLambdaExpn.Substitute(lamType, sub),
                 _ => type,
             };
         }
-    }
-
-    public interface INamedType : IType
-    {
-        string Name { get; }
     }
 }

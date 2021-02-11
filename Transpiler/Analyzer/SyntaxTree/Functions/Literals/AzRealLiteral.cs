@@ -5,7 +5,7 @@ namespace Transpiler.Analysis
     public record AzRealLiteral(double Value,
                                 CodePosition Position) : IAzLiteralExpn<double>
     {
-        public IType CertainType => CoreTypes.Instance.Real;
+        public IAzTypeDefn CertainType => CoreTypes.Instance.Real;
 
         public static AzRealLiteral Analyze(Scope scope,
                                             PsRealLiteral node)

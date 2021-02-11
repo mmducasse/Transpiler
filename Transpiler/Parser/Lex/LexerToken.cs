@@ -9,7 +9,6 @@ namespace Transpiler.Parse
         Alphabetic    =   Lowercase | Uppercase,
         KeySymbol     =   8,
         Symbol        =  16,
-        Name          =   Symbol | Alphabetic,
         SingleQuoted  =  32,
         DoubleQuoted  =  64,
         Indent        = 128,

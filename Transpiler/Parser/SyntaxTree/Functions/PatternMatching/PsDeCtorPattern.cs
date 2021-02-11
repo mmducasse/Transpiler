@@ -5,7 +5,7 @@ using static Transpiler.Parse.ParserUtils;
 namespace Transpiler.Parse
 {
     public record PsDeCtorPattern(string Constructor,
-                                         IReadOnlyList<IPsPattern> Variables,
+                                  IReadOnlyList<IPsPattern> Variables,
                           CodePosition Position = null) : IPsPattern
     {
         public static bool Parse(ref TokenQueue queue, out PsDeCtorPattern node)
