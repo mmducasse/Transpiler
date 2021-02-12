@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Transpiler.Parse;
 
 namespace Transpiler.Analysis
@@ -24,16 +21,17 @@ namespace Transpiler.Analysis
             return typeDefn;
         }
 
-        public static IAzTypeDefn Analyze(Scope scope,
+        public static IAzTypeDefn Analyze(Scope fileScope,
+                                          Scope scope,
                                           IAzTypeDefn typeDefn,
                                           IPsTypeDefn node)
         {
             return (typeDefn, node) switch
             {
                 (AzDataTypeDefn dataType, PsDataTypeDefn dataNode) =>
-                    AzDataTypeDefn.Analyze(scope, dataType, dataNode),
+                    AzDataTypeDefn.Analyze(fileScope, scope, dataType, dataNode),
                 (AzUnionTypeDefn unionType, PsUnionTypeDefn unionNode) =>
-                    AzUnionTypeDefn.Analyze(scope, unionType, unionNode),
+                    AzUnionTypeDefn.Analyze(fileScope, scope, unionType, unionNode),
                 (AzClassTypeDefn classType, PsClassTypeDefn classNode) =>
                     AzClassTypeDefn.Analyze(scope, classType, classNode),
                 _ => throw new NotImplementedException(),

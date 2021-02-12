@@ -11,7 +11,7 @@ namespace Transpiler.Analysis
 
         bool TryGetFuncDefn(string symbol, out IAzFuncDefn defn);
 
-        bool TryGetFuncDefnType(string symbol, out IAzTypeExpn type);
+        bool TryGetFuncDefnType(IAzFuncDefn funcDefn, out IAzTypeExpn type);
 
         bool TryGetTypeVar(string tvName, out TypeVariable tv);
 
@@ -30,7 +30,7 @@ namespace Transpiler.Analysis
 
         public Dictionary<string, IAzFuncDefn> FuncDefinitions { get; } = new();
 
-        public Dictionary<string, IAzTypeExpn> FuncDefnTypes { get; } = new();
+        public Dictionary<IAzFuncDefn, IAzTypeExpn> FuncDefnTypes { get; } = new();
 
         public IReadOnlyDictionary<string, IAzTypeDefn> TypeDefinitions => mTypeDefinitions;
         private Dictionary<string, IAzTypeDefn> mTypeDefinitions { get; } = new();
@@ -57,13 +57,18 @@ namespace Transpiler.Analysis
             Dependencies = parentScope.ToArr();
         }
 
-        public void AddFunction(IAzFuncDefn func)
+        public void AddFunction(IAzFuncDefn func, IAzTypeExpn funcType = null)
         {
             if (FuncDefinitions.ContainsKey(func.Name))
             {
                 throw Analyzer.Error("Duplicate function definition: " + func.Name, func.Position);
             }
+
             FuncDefinitions[func.Name] = func;
+            if (funcType != null)
+            {
+                FuncDefnTypes[func] = funcType;
+            }
         }
 
         public void AddType(IAzTypeDefn type)
@@ -125,16 +130,16 @@ namespace Transpiler.Analysis
             return false;
         }
 
-        public bool TryGetFuncDefnType(string defnName, out IAzTypeExpn type)
+        public bool TryGetFuncDefnType(IAzFuncDefn funcDefn, out IAzTypeExpn type)
         {
-            if (FuncDefnTypes.TryGetValue(defnName, out type))
+            if (FuncDefnTypes.TryGetValue(funcDefn, out type))
             {
                 return true;
             }
 
             foreach (var d in Dependencies)
             {
-                if (d.TryGetFuncDefnType(defnName, out type))
+                if (d.TryGetFuncDefnType(funcDefn, out type))
                 {
                     return true;
                 }
@@ -235,6 +240,14 @@ namespace Transpiler.Analysis
             }
 
             return false;
+        }
+
+        public void PrintTypes()
+        {
+            foreach (var type in TypeDefinitions.Values)
+            {
+                Console.WriteLine(type.Print(0));
+            }
         }
 
         public void PrintTypeHeirarchy()

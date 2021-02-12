@@ -28,11 +28,13 @@ namespace Transpiler.Analysis
 
             return node switch
             {
-                //IAzLiteralExpn _ => ConstraintSet.Empty,
-                //AzSymbolExpn symExpn => AzSymbolExpn.Constrain(tvTable, scope, symExpn),
-                //AzAppExpn appExpn => AzAppExpn.Constrain(tvTable, scope, appExpn),
-                //AzLambdaExpn lamExpn => AzLambdaExpn.Constrain(tvTable, scope, lamExpn),
-                //AzIfExpn ifExpn => AzIfExpn.Constrain(tvTable, scope, ifExpn),
+                IAzLiteralExpn _ => ConstraintSet.Empty,
+                AzGenDataExpn genExpn => ConstraintSet.Empty,
+                AzSymbolExpn symExpn => AzSymbolExpn.Constrain(tvTable, scope, symExpn),
+                AzAppExpn appExpn => AzAppExpn.Constrain(tvTable, scope, appExpn),
+                AzLambdaExpn lamExpn => AzLambdaExpn.Constrain(tvTable, scope, lamExpn),
+                AzIfExpn ifExpn => AzIfExpn.Constrain(tvTable, scope, ifExpn),
+                AzTupleExpn tupExpn => AzTupleExpn.Constrain(tvTable, scope, tupExpn),
                 _ => throw new NotImplementedException(),
             };
         }

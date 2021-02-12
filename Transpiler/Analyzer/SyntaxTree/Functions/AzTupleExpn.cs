@@ -22,18 +22,27 @@ namespace Transpiler.Analysis
 
         public static ConstraintSet Constrain(TvTable tvTable,
                                               Scope scope,
-                                              AzLambdaExpn node)
+                                              AzTupleExpn node)
         {
-            tvTable.AddNode(scope, node.Parameter);
-            var cse = IAzFuncExpn.Constrain(tvTable, scope, node.Expression);
+            ConstraintSet cs = new();
+            foreach (var e in node.Elements)
+            {
+                var cse = IAzFuncExpn.Constrain(tvTable, scope, e);
+                cs = IConstraints.Union(cs, cse);
+            }
 
-            var te = tvTable.GetTypeOf(node.Expression);
-            var tx = tvTable.GetTypeOf(node.Parameter);
-            var tf = tvTable.GetTypeOf(node);
+            List<IAzTypeExpn> tes = new();
+            foreach (var e in node.Elements)
+            {
+                var te = tvTable.GetTypeOf(e);
+                tes.Add(te);
+            }
 
-            var cf = new Constraint(tf, new AzTypeLambdaExpn(tx, te, CodePosition.Null), node);
+            var tt = tvTable.GetTypeOf(node);
 
-            return IConstraints.Union(cf, cse);
+            var ct = new Constraint(tt, new AzTypeTupleExpn(tes, CodePosition.Null), node);
+
+            return IConstraints.Union(ct, cs);
         }
 
         public string Print(int i)

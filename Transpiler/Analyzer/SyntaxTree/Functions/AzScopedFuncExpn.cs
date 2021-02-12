@@ -42,13 +42,13 @@ namespace Transpiler.Analysis
 
         public string Print(int i)
         {
-            string s = Expression.Print(i);
+            string s = "[" + Expression.Print(i);
             foreach (var subDefn in FuncDefinitions)
             {
                 s += string.Format("\n{0}{1}", Indent(i + 1), subDefn.Print(i + 1));
             }
 
-            return s;
+            return s + "]";
         }
     }
 }

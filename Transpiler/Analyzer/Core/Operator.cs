@@ -6,6 +6,8 @@
     {
         public CodePosition Position => CodePosition.Null;
 
+        public IAzTypeExpn ExplicitType => Type;
+
         public string Print(int i)
         {
             return Name;

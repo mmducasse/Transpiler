@@ -9,6 +9,21 @@ namespace Transpiler.Analysis
     {
         public bool IsSolved => Elements.Where(e => !e.IsSolved).Count() == 0;
 
+        public static bool Equate(AzTypeTupleExpn a, AzTypeTupleExpn b)
+        {
+            if (a.Elements.Count != b.Elements.Count) { return false; }
+
+            for (int i = 0; i < a.Elements.Count; i++)
+            {
+                if (false == IAzTypeExpn.Equate(a.Elements[i], b.Elements[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public static AzTypeTupleExpn Analyze(Scope scope,
                                               PsTypeTupleExpn node)
         {

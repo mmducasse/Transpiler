@@ -15,7 +15,7 @@ namespace Transpiler.Analysis
         public AzDataTypeDefn False { get; }
         public AzDataTypeDefn True { get; }
 
-        //public IClassType Eq { get; }
+        public AzClassTypeDefn Eq { get; }
         //public IClassType Num { get; }
 
         //public IReadOnlyList<Operator> Operators => mOperators;
@@ -40,9 +40,9 @@ namespace Transpiler.Analysis
             Bool = AzUnionTypeDefn.Make(mScope, "Bool", True, False);
 
             var add = Function2("+", Int);
-            mScope.AddFunction(add);
+            mScope.AddFunction(add, add.Type);
 
-            ////Eq = MakeEq();
+            Eq = MakeEq();
             ////Num = MakeNum();
 
             //foreach (var type in Types)
@@ -55,29 +55,26 @@ namespace Transpiler.Analysis
             ////mScope.AddClassInstance(ImplEqReal());
             ////mScope.AddClassInstance(ImplNumReal());
 
-            //foreach (var t in Types)
-            //{
-            //    Console.WriteLine(t.Print(false));
-            //}
-            //mScope.PrintTypeHeirarchy();
+            mScope.PrintTypes();
+            mScope.PrintTypeHeirarchy();
         }
 
-        //private IClassType MakeEq()
-        //{
-        //    var cEq = new ClassType("Eq");
+        private AzClassTypeDefn MakeEq()
+        {
+            var cEq = new AzClassTypeDefn("Eq", mScope, CodePosition.Null);
+            var a = new TypeVariable(0, cEq.ToArr());
+            cEq.TypeVar = a;
 
-        //    var a = new TypeVariable(1, cEq.ToArr());
+            var type = AzTypeLambdaExpn.Make(a, a, Bool.ToSym());
 
-        //    var type = FunType.Make(a, a, Bool);
+            var fEq = new AzFuncDefn("==", type, CodePosition.Null);
+            var fNeq = new AzFuncDefn("!=", type, CodePosition.Null);
 
-        //    var fEq = new FuncSignature("==", type);
-        //    var fNeq = new FuncSignature("!=", type);
+            cEq.Functions = RList(fEq, fNeq);
 
-        //    cEq.TypeVar = a;
-        //    cEq.Functions = RList(fEq, fNeq);
-
-        //    return cEq;
-        //}
+            mScope.AddType(cEq);
+            return cEq;
+        }
 
         //private IClassType MakeNum()
         //{

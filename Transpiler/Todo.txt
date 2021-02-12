@@ -6,6 +6,10 @@ What types can't implement a class?
 
 TODO:
 
+- Add lambda params to TV Table before symbols
+- Make node equality exclude position
+
+
 Short Term:
 - Generate Data Type ctor functions
 + Infix operators

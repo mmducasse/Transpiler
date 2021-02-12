@@ -31,7 +31,14 @@ namespace Transpiler.Analysis
         public static AzUnionTypeDefn Make(Scope scope, string name, params IAzTypeDefn[] subtypes)
         {
             var typeDefn = new AzUnionTypeDefn(name, new List<TypeVariable>(), scope, CodePosition.Null);
+            typeDefn.Subtypes = subtypes;
             scope.AddType(typeDefn);
+
+            foreach (var st in subtypes)
+            {
+                scope.AddSuperType(st, typeDefn);
+            }
+
             return typeDefn;
         }
 
@@ -55,7 +62,8 @@ namespace Transpiler.Analysis
             return typeDefn;
         }
 
-        public static AzUnionTypeDefn Analyze(Scope scope,
+        public static AzUnionTypeDefn Analyze(Scope fileScope,
+                                              Scope scope,
                                               AzUnionTypeDefn unionType,
                                               PsUnionTypeDefn unionNode)
         {
@@ -65,13 +73,13 @@ namespace Transpiler.Analysis
                 var type = unionType.Subtypes[i];
                 var node = unionNode.Subtypes[i];
 
-                IAzTypeDefn.Analyze(unionType.Scope, type, node);
+                IAzTypeDefn.Analyze(fileScope, unionType.Scope, type, node);
             }
 
             // Add the subtypes to the type heirarchy.
             foreach (var subtype in unionType.Subtypes)
             {
-                scope.AddSuperType(subtype, unionType);
+                fileScope.AddSuperType(subtype, unionType);
             }
 
             return unionType;

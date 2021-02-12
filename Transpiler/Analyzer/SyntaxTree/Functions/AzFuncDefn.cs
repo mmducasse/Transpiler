@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Transpiler.Parse;
 
 namespace Transpiler.Analysis
@@ -7,30 +6,43 @@ namespace Transpiler.Analysis
     public interface IAzFuncDefn : IAzDefn, IAzFuncNode
     {
         //eFixity Fixity { get; }
+
+        IAzTypeExpn ExplicitType { get; }
     }
 
     // Todo: Add optional Type constraint property.
     public class AzFuncDefn : IAzFuncDefn
     {
         public string Name { get; }
+
+        public IAzTypeExpn ExplicitType { get; }
         
         public AzScopedFuncExpn ScopedExpression { get; set; }
 
         public CodePosition Position { get; }
 
         public AzFuncDefn(string name,
+                          IAzTypeExpn typeExpression,
                           CodePosition position)
         {
             Name = name;
+            ExplicitType = typeExpression;
             Position = position;
         }
 
         public static IReadOnlyList<AzFuncDefn> Initialize(Scope scope,
                                                            PsFuncDefn node)
         {
+            // Analyze the function's explicit type, if it is provided.
+            IAzTypeExpn explicitType = null;
+            if (node.TypeExpression != null)
+            {
+                explicitType = IAzTypeExpn.Analyze(scope, node.TypeExpression);
+            }
+
             if (node.Names.Count == 1)
             {
-                var funcDefn = new AzFuncDefn(node.Names[0], node.Position);
+                var funcDefn = new AzFuncDefn(node.Names[0], explicitType, node.Position);
                 scope.AddFunction(funcDefn);
                 return funcDefn.ToArr();
             }
@@ -63,7 +75,8 @@ namespace Transpiler.Analysis
             }
 
             var innerScopedExpn = AzScopedFuncExpn.Analyze(scope, node.ScopedExpression);
-            IAzFuncExpn expn = innerScopedExpn;
+            var scopedFuncDefns = innerScopedExpn.FuncDefinitions;
+            IAzFuncExpn expn = innerScopedExpn.Expression;
 
             while (paramStack.TryPop(out var paramDefn))
             {
@@ -79,7 +92,7 @@ namespace Transpiler.Analysis
             //    return funcDefn;
             //}
 
-            funcDefn.ScopedExpression = new AzScopedFuncExpn(expn, new List<AzFuncDefn>(), scope, innerScopedExpn.Position);
+            funcDefn.ScopedExpression = new AzScopedFuncExpn(expn, scopedFuncDefns, scope, innerScopedExpn.Position);
 
             return funcDefn;
         }
@@ -102,7 +115,9 @@ namespace Transpiler.Analysis
 
         public virtual string Print(int i)
         {
-            return string.Format("{0} = {1}", Name, ScopedExpression.Print(i + 1));
+            string type = (ExplicitType == null) ? "" : " : " + ExplicitType.Print(0);
+            var expn = (ScopedExpression == null) ? "" : " = " + ScopedExpression.Print(i + 1);
+            return string.Format("{0}{1}{2}", Name, type, expn);
         }
     }
 
@@ -113,14 +128,15 @@ namespace Transpiler.Analysis
         public AzDectorFuncDefn(string name,
                                 int tupleIndex,
                                 CodePosition position)
-            : base(name, position)
+            : base(name, null, position)
         {
             TupleIndex = tupleIndex;
         }
 
         public override string Print(int i)
         {
-            return string.Format("{0} = GET{1} ({2})", Name, TupleIndex, ScopedExpression.Print(i + 1));
+            string type = (ExplicitType == null) ? "" : " : " + ExplicitType.Print(0);
+            return string.Format("{0}{1} = GET{2} ({3})", Name, type, TupleIndex, ScopedExpression.Print(i + 1));
         }
     }
 }

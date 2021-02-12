@@ -5,6 +5,8 @@ namespace Transpiler.Analysis
     public record AzParam(string Name,
                           CodePosition Position) : IAzPattern, IAzFuncDefn
     {
+        public IAzTypeExpn ExplicitType => null;
+
         public static AzParam Analyze(Scope scope,
                                       PsParam node)
         {

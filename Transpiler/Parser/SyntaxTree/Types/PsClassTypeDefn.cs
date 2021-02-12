@@ -14,7 +14,7 @@ namespace Transpiler.Parse
     */
     public record PsClassTypeDefn(string Name,
                                   string TypeVar,
-                                  IReadOnlyList<IPsFuncDefn> Functions,
+                                  IReadOnlyList<PsFuncDefn> Functions,
                                   CodePosition Position) : IPsTypeDefn
     {
         public static bool Parse(ref TokenQueue queue, out PsClassTypeDefn node)
@@ -38,7 +38,7 @@ namespace Transpiler.Parse
                 throw Error("Expected at least 1 function definition inside type class definition.", q);
             }
 
-            var funcDecls = new List<IPsFuncDefn>();
+            var funcDecls = new List<PsFuncDefn>();
             while (FindsIndents(ref q, i + 1) && 
                    PsFuncDefn.ParseDecl(ref q, out var funcDecl))
             {

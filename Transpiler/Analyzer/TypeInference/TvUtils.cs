@@ -15,32 +15,31 @@ namespace Transpiler.Analysis
             };
         }
 
-        //public static IAzTypeExpn MadeUnique(this IAzTypeExpn type)
-        //{
-        //    var tvs = type.GetTvs().ToList();
-        //    var newTvs = tvs.Select(tv => tv.MadeUnique).ToList();
+        public static IAzTypeExpn WithUniqueTvs(this IAzTypeExpn type, TvProvider tvProvider)
+        {
+            var tvs = type.GetTvs().ToList();
+            var newTvs = tvs.Select(tv => tvProvider.MadeUnique(tv)).ToList();
 
-        //    var subs = new List<Substitution>();
-        //    for (int i = 0; i < tvs.Count; i++)
-        //    {
-        //        var sub = new Substitution(tvs[i], newTvs[i]);
-        //        subs.Add(sub);
-        //    }
-        //    var substitution = new Substitution(subs.ToArray());
+            var subs = new List<Substitution>();
+            for (int i = 0; i < tvs.Count; i++)
+            {
+                var sub = new Substitution(tvs[i], newTvs[i]);
+                subs.Add(sub);
+            }
+            var substitution = new Substitution(subs.ToArray());
 
-        //    return IType.Substitute(type, substitution);
-        //}
+            return IAzTypeExpn.Substitute(type, substitution);
+        }
 
         public static TypeVariable Unify(IScope scope,
                                          TypeVariable tva,
-                                         TypeVariable tvb)
+                                         TypeVariable tvb,
+                                         TvProvider tvProvider)
         {
             var ra = tva.Refinements;
             var rb = tvb.Refinements;
             var rc = ra.Union(rb).ToArray();
-            //return TypeVariable.NextR(rc);
-
-            throw new KeyNotFoundException();
+            return tvProvider.NextR(rc);
         }
     }
 }

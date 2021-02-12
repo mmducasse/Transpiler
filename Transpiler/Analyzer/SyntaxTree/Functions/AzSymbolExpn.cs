@@ -18,12 +18,6 @@ namespace Transpiler.Analysis
             throw Error("Undefined symbol: " + node.Name, node.Position);
         }
 
-        public static void Solve(TvTable tvTable,
-                                 AzSymbolExpn node)
-        {
-
-        }
-
         public static ConstraintSet Constrain(TvTable tvTable,
                                               Scope scope,
                                               AzSymbolExpn node)
