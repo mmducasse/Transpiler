@@ -10,6 +10,6 @@
         public static CodePosition Zero(Module module) => new(module, 0, 0);
         public static CodePosition Null => new(null, 0, 0);
 
-        //public override string ToString() => string.Format("{0} ({1}, {2})", Module.Name, Row, Col);
+        public override string ToString() => string.Format("{0} ({1}, {2})", Module?.Name, Line, Column);
     }
 }

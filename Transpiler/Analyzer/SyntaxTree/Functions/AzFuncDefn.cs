@@ -108,9 +108,9 @@ namespace Transpiler.Analysis
             var tf = tvTable.GetTypeOf(node);
             var te = tvTable.GetTypeOf(node.ScopedExpression.Expression);
 
-            var c = new Constraint(tf, te, node);
+            var c = new EqualConstraint(tf, te, node);
 
-            return IConstraints.Union(c, cs);
+            return IConstraintSet.Union(c, cs);
         }
 
         public virtual string Print(int i)

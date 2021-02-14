@@ -3,12 +3,14 @@
 namespace Transpiler.Parse
 {
     public record PsMatchCase(IPsPattern Pattern,
-                                IPsFuncExpn Expression)
+                              PsScopedFuncExpn Expression,
+                              CodePosition Position) : IPsFuncNode
     {
         public static bool Parse(ref TokenQueue queue, out PsMatchCase node)
         {
             node = null;
             var q = queue;
+            var p = q.Position;
 
             if (!IPsPattern.Parse(ref q, out var pattNode)) { return false; }
             Expects("->", ref q);
@@ -17,7 +19,7 @@ namespace Transpiler.Parse
                 throw Error("Expected expression after '->' in match case.", q);
             }
 
-            node = new PsMatchCase(pattNode, expnNode);
+            node = new PsMatchCase(pattNode, expnNode, p);
             queue = q;
             return true;
         }
@@ -26,5 +28,7 @@ namespace Transpiler.Parse
         {
             return string.Format("{0} -> {1}", Pattern.Print(i), Expression.Print(i + 1));
         }
+
+        public override string ToString() => Print(0);
     }
 }

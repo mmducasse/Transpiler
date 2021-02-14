@@ -14,5 +14,7 @@ namespace Transpiler.Analysis
         {
             return string.Format("NEW {0}", Definition.Name);
         }
+
+        public override string ToString() => Print(0);
     }
 }

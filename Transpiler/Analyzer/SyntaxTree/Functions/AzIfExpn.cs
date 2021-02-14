@@ -32,11 +32,11 @@ namespace Transpiler.Analysis
             var tt = tvTable.GetTypeOf(node.ThenCase.Expression);
             var te = tvTable.GetTypeOf(node.ElseCase.Expression);
 
-            var cif = new Constraint(tif, tt, node);
-            var cc = new Constraint(tc, CoreTypes.Instance.Bool.ToSym(), node);
-            var cf = new Constraint(tt, te, node);
+            var cif = new EqualConstraint(tif, tt, node);
+            var cc = new EqualConstraint(tc, CoreTypes.Instance.Bool.ToCtor(), node);
+            var cf = new EqualConstraint(tt, te, node);
 
-            return IConstraints.Union(cif, cc, cf, csc, cst, cse);
+            return IConstraintSet.Union(cif, cc, cf, csc, cst, cse);
         }
 
         public string Print(int i)
@@ -48,5 +48,7 @@ namespace Transpiler.Analysis
 
             return s;
         }
+
+        public override string ToString() => Print(0);
     }
 }

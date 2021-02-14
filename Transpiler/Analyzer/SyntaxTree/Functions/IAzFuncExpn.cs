@@ -15,6 +15,7 @@ namespace Transpiler.Analysis
                 PsLambdaExpn lamExpn => AzLambdaExpn.Analyze(scope, lamExpn),
                 PsTupleExpn tupExpn => AzTupleExpn.Analyze(scope, tupExpn),
                 PsSymbolExpn symExpn => AzSymbolExpn.Analyze(scope, symExpn),
+                PsMatchExpn matExpn => AzMatchExpn.Analyze(scope, matExpn),
                 IPsLiteralExpn litExpn => IAzLiteralExpn.Analyze(scope, litExpn),
                 _ => throw new NotImplementedException()
             };
@@ -34,6 +35,7 @@ namespace Transpiler.Analysis
                 AzAppExpn appExpn => AzAppExpn.Constrain(tvTable, scope, appExpn),
                 AzLambdaExpn lamExpn => AzLambdaExpn.Constrain(tvTable, scope, lamExpn),
                 AzIfExpn ifExpn => AzIfExpn.Constrain(tvTable, scope, ifExpn),
+                AzMatchExpn matExpn => AzMatchExpn.Constrain(tvTable, scope, matExpn),
                 AzTupleExpn tupExpn => AzTupleExpn.Constrain(tvTable, scope, tupExpn),
                 _ => throw new NotImplementedException(),
             };

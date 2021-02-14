@@ -6,7 +6,7 @@ namespace Transpiler.Parse
 {
     public record PsUnionTypeDefn(string Name,
                                   IReadOnlyList<string> TypeParameters,
-                                  IReadOnlyList<IPsTypeDefn> Subtypes,
+                                  IReadOnlyList<PsDataTypeDefn> Subtypes,
                                   CodePosition Position) : IPsTypeDefn
     {
         public static bool Parse(ref TokenQueue queue, out PsUnionTypeDefn node)
@@ -33,14 +33,14 @@ namespace Transpiler.Parse
             if (!Finds(TokenType.NewLine, ref q2)) { return false; }
             if (!FindsIndents(ref q2, indent + 1)) { return false; }
 
-            List<IPsTypeDefn> subTypes = new();
+            List<PsDataTypeDefn> subTypes = new();
             while (Finds(TokenType.NewLine, ref q) &&
                    FindsIndents(ref q, indent + 1) &&
                    Finds("|", ref q))
             {
-                IPsTypeDefn memberNode = null;
+                PsDataTypeDefn memberNode = null;
 
-                if (IPsTypeDefn.Parse(ref q, allowClasses: false, out var typeDefn)) { memberNode = typeDefn; }
+                if (PsDataTypeDefn.Parse(ref q, out var typeDefn)) { memberNode = typeDefn; }
                 else if (ParseNullaryDataTypeDefn(ref q, out var nullaryDefn)) { memberNode = nullaryDefn; }
                 //else if (PsTypeSymbol.Parse(ref q, out var symbolNode)) { memberNode = symbolNode; }
 
@@ -94,5 +94,7 @@ namespace Transpiler.Parse
 
             return s;
         }
+
+        public override string ToString() => Print(0);
     }
 }

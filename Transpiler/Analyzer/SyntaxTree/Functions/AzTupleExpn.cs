@@ -28,7 +28,7 @@ namespace Transpiler.Analysis
             foreach (var e in node.Elements)
             {
                 var cse = IAzFuncExpn.Constrain(tvTable, scope, e);
-                cs = IConstraints.Union(cs, cse);
+                cs = IConstraintSet.Union(cs, cse);
             }
 
             List<IAzTypeExpn> tes = new();
@@ -40,14 +40,16 @@ namespace Transpiler.Analysis
 
             var tt = tvTable.GetTypeOf(node);
 
-            var ct = new Constraint(tt, new AzTypeTupleExpn(tes, CodePosition.Null), node);
+            var ct = new EqualConstraint(tt, new AzTypeTupleExpn(tes, CodePosition.Null), node);
 
-            return IConstraints.Union(ct, cs);
+            return IConstraintSet.Union(ct, cs);
         }
 
         public string Print(int i)
         {
             return Elements.Select(e => e.Print(i)).Separate(", ");
         }
+
+        public override string ToString() => Print(0);
     }
 }

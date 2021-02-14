@@ -84,5 +84,7 @@ namespace Transpiler.Parse
             var children = Children.Select(c => c.Print(i)).Separate(" ");
             return string.Format("({0})", children);
         }
+
+        public override string ToString() => Print(0);
     }
 }

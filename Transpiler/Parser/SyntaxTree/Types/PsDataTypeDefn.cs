@@ -42,5 +42,7 @@ namespace Transpiler.Parse
             string ps = TypeParameters.Separate(" ", prepend: " ");
             return string.Format("{0}{1} = {2}", Name, ps, Expression.Print(i));
         }
+
+        public override string ToString() => Print(0);
     }
 }

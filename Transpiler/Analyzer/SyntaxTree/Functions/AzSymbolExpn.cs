@@ -29,12 +29,14 @@ namespace Transpiler.Analysis
 
             //var cf = new Constraint(ts, td);
 
-            return IConstraints.Union();
+            return IConstraintSet.Union();
         }
 
         public string Print(int i)
         {
             return Definition.Name;
         }
+
+        public override string ToString() => Print(0);
     }
 }

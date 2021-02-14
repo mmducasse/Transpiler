@@ -1,4 +1,6 @@
-﻿namespace Transpiler.Analysis
+﻿using System.Collections.Generic;
+
+namespace Transpiler.Analysis
 {
     public class TvProvider
     {
@@ -10,6 +12,5 @@
             new(mNextIndex++, refinements);
 
         public TypeVariable MadeUnique(TypeVariable tv) => tv with { Id = mNextIndex++ };
-
     }
 }

@@ -3,7 +3,7 @@
 namespace Transpiler.Parse
 {
     public record PsSymbolExpn(string Name,
-                           CodePosition Position) : IPsFuncExpn, IPsPattern
+                               CodePosition Position) : IPsFuncExpn
     {
         public static bool Parse(ref TokenQueue queue, out PsSymbolExpn node)
         {

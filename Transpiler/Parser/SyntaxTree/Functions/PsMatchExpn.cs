@@ -4,11 +4,11 @@ using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
-    public record PsMatch(IPsFuncExpn Argument,
-                          IReadOnlyList<PsMatchCase> Cases,
-                          CodePosition Position) : IPsFuncExpn
+    public record PsMatchExpn(IPsFuncExpn Argument,
+                              IReadOnlyList<PsMatchCase> Cases,
+                              CodePosition Position) : IPsFuncExpn
     {
-        public static bool Parse(ref TokenQueue queue, out PsMatch node)
+        public static bool Parse(ref TokenQueue queue, out PsMatchExpn node)
         {
             node = null;
             int indent = queue.Indent;
@@ -39,7 +39,7 @@ namespace Transpiler.Parse
                 cases.Add(matchCaseNode);
             }
 
-            node = new PsMatch(conditionNode, cases, p);
+            node = new PsMatchExpn(conditionNode, cases, p);
             queue = q;
             return true;
         }
@@ -55,5 +55,7 @@ namespace Transpiler.Parse
 
             return s;
         }
+
+        public override string ToString() => Print(0);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Transpiler.Parse;
 
 namespace Transpiler.Analysis
@@ -6,6 +7,8 @@ namespace Transpiler.Analysis
     public interface IAzTypeExpn : IAzNode
     {
         bool IsSolved { get; }
+
+        ISet<TypeVariable> GetTypeVars();
 
         public static bool Equate(IAzTypeExpn a, IAzTypeExpn b)
         {
@@ -16,8 +19,8 @@ namespace Transpiler.Analysis
                 (TypeVariable tva, TypeVariable tvb) =>
                     tva.Id == tvb.Id,
 
-                (AzTypeSymbolExpn sa, AzTypeSymbolExpn sb) =>
-                    sa.Definition == sb.Definition,
+                (AzTypeCtorExpn ca, AzTypeCtorExpn cb) =>
+                    AzTypeCtorExpn.Equate(ca, cb),
 
                 (AzTypeLambdaExpn la, AzTypeLambdaExpn lb) =>
                     Equate(la.Input, lb.Input) && Equate(la.Output, lb.Output),
@@ -36,7 +39,7 @@ namespace Transpiler.Analysis
         {
             return node switch
             {
-                PsTypeSymbolExpn symExpn => AzTypeSymbolExpn.Analyze(scope, symExpn),
+                PsTypeSymbolExpn symExpn => AzTypeCtorExpn.Analyze(scope, symExpn),
                 PsTypeArbExpn arbExpn => AzTypeCtorExpn.Analyze(scope, arbExpn),
                 PsTypeTupleExpn tupExpn => AzTypeTupleExpn.Analyze(scope, tupExpn),
                 PsTypeLambdaExpn lamExpn => AzTypeLambdaExpn.Analyze(scope, lamExpn),
@@ -56,8 +59,11 @@ namespace Transpiler.Analysis
 
             return type switch
             {
+                TypeVariable => type,
                 AzTypeLambdaExpn lamType => AzTypeLambdaExpn.Substitute(lamType, sub),
-                _ => type,
+                AzTypeCtorExpn ctorType => AzTypeCtorExpn.Substitute(ctorType, sub),
+                AzTypeTupleExpn tupType => AzTypeTupleExpn.Substitute(tupType, sub),
+                _ => throw new NotImplementedException(),
             };
         }
     }

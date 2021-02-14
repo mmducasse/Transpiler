@@ -44,6 +44,8 @@ namespace Transpiler.Parse
         {
             return string.Format("{0}", Name);
         }
+
+        public override string ToString() => Print(0);
     }
 
 
@@ -67,5 +69,7 @@ namespace Transpiler.Parse
         {
             return string.Format("{0}", Name);
         }
+
+        public override string ToString() => Print(0);
     }
 }

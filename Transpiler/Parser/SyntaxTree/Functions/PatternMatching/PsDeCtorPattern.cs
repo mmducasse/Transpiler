@@ -4,24 +4,25 @@ using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
-    public record PsDeCtorPattern(string Constructor,
-                                  IReadOnlyList<IPsPattern> Variables,
-                          CodePosition Position = null) : IPsPattern
+    public record PsDectorPattern(string TypeName,
+                                  IReadOnlyList<PsParam> Variables,
+                                  CodePosition Position) : IPsPattern
     {
-        public static bool Parse(ref TokenQueue queue, out PsDeCtorPattern node)
+        public static bool Parse(ref TokenQueue queue, out PsDectorPattern node)
         {
             node = null;
             var q = queue;
+            var p = q.Position;
 
             if (!Finds(TokenType.Uppercase, ref q, out string ctor)) { return false; }
 
-            List<IPsPattern> variables = new();
-            while (IPsPattern.Parse(ref q, out var patternNode))
+            List<PsParam> variables = new();
+            while (PsParam.Parse(ref q, out var patternNode))
             {
                 variables.Add(patternNode);
             }
 
-            node = new PsDeCtorPattern(ctor, variables);
+            node = new PsDectorPattern(ctor, variables, p);
             queue = q;
 
             return true;
@@ -30,7 +31,9 @@ namespace Transpiler.Parse
         public string Print(int i)
         {
             var vs = Variables.Select(v => v.Print(i)).Separate(" ");
-            return string.Format("{0} {1}", Constructor, vs);
+            return string.Format("{0} {1}", TypeName, vs);
         }
+
+        public override string ToString() => Print(0);
     }
 }

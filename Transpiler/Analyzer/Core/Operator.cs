@@ -8,28 +8,27 @@
 
         public IAzTypeExpn ExplicitType => Type;
 
-        public string Print(int i)
-        {
-            return Name;
-        }
+        public string Print(int i) => Name;
+
+        public override string ToString() => Print(0);
     }
 
     public static class OperatorUtil
     {
         public static Operator Function2(string name,
-                                         IAzTypeDefn type,
+                                         IAzDataTypeDefn type,
                                          eFixity fixity = eFixity.Infix) =>
             Function2(name, type, type, type, fixity);
 
         public static Operator Function2(string name,
-                                         IAzTypeDefn arg1,
-                                         IAzTypeDefn arg2,
-                                         IAzTypeDefn ret,
+                                         IAzDataTypeDefn arg1,
+                                         IAzDataTypeDefn arg2,
+                                         IAzDataTypeDefn ret,
                                          eFixity fixity = eFixity.Infix)
         {
-            var type = AzTypeLambdaExpn.Make(arg1.ToSym(),
-                                             arg2.ToSym(),
-                                             ret.ToSym());
+            var type = AzTypeLambdaExpn.Make(arg1.ToCtor(),
+                                             arg2.ToCtor(),
+                                             ret.ToCtor());
             return new Operator(name, type, fixity);
         }
     }

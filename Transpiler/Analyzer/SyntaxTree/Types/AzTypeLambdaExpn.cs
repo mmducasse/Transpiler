@@ -12,6 +12,14 @@ namespace Transpiler.Analysis
     {
         public bool IsSolved => Input.IsSolved && Output.IsSolved;
 
+        public ISet<TypeVariable> GetTypeVars()
+        {
+            HashSet<TypeVariable> tvs = new();
+            tvs.UnionWith(Input.GetTypeVars());
+            tvs.UnionWith(Output.GetTypeVars());
+            return tvs;
+        }
+
         public static AzTypeLambdaExpn Make(params IAzTypeExpn[] elements)
         {
             var p = CodePosition.Null;
@@ -39,9 +47,16 @@ namespace Transpiler.Analysis
                                         IAzTypeExpn.Substitute(lamType.Output, sub),
                                         lamType.Position);
         }
+
         public string Print(int i)
         {
+            if (Input is AzTypeLambdaExpn)
+            {
+                return string.Format("({0}) -> {1}", Input.Print(i), Output.Print(i));
+            }
             return string.Format("{0} -> {1}", Input.Print(i), Output.Print(i));
         }
+
+        public override string ToString() => Print(0);
     }
 }

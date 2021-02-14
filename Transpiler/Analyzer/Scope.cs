@@ -17,6 +17,11 @@ namespace Transpiler.Analysis
 
         bool IsSubtypeOf(IAzTypeDefn subtype, IAzTypeSetDefn supertype);
 
+        HashSet<IAzTypeSetDefn> GetSupertypes(IAzTypeDefn subtype);
+
+        bool TryGetCommonSupertypeOf(IReadOnlyList<IAzTypeExpn> subtypes,
+                                     out HashSet<IAzTypeSetDefn> supertypes);
+
         bool VerifySymbols(params string[] symbols);
 
         void PrintTypeHeirarchy();
@@ -74,19 +79,6 @@ namespace Transpiler.Analysis
         public void AddType(IAzTypeDefn type)
         {
             mTypeDefinitions[type.Name] = type;
-            //if (type is ClassType classType)
-            //{
-            //    foreach (var superclass in classType.Superclasses)
-            //    {
-            //        AddSuperType(classType, superclass);
-            //    }
-
-                //    foreach (var fn in classType.Functions)
-                //    {
-                //        FuncDefinitions[fn.Name] = fn;
-                //        FuncDefnTypes[fn.Name] = fn.Type;
-                //    }
-                //}
         }
 
         public void AddClassInstance(AzClassInstDefn instance)
@@ -200,6 +192,58 @@ namespace Transpiler.Analysis
             }
 
             return false;
+        }
+
+        public HashSet<IAzTypeSetDefn> GetSupertypes(IAzTypeDefn subtype)
+        {
+            var supertypes = new HashSet<IAzTypeSetDefn>();
+            if (SuperTypes.TryGetValue(subtype, out var localSupertypes))
+            {
+                supertypes.UnionWith(localSupertypes);
+            }
+
+            foreach (var d in Dependencies)
+            {
+                var externalSupertypes = d.GetSupertypes(subtype);
+                supertypes.UnionWith(externalSupertypes);
+            }
+
+            return supertypes;
+        }
+
+        public bool TryGetCommonSupertypeOf(IReadOnlyList<IAzTypeExpn> subtypes,
+                                            out HashSet<IAzTypeSetDefn> supertypes)
+        {
+            supertypes = null;
+
+            // Gather concrete types from input list.
+            List<IAzTypeDefn> concreteTypes = new();
+            foreach (var t in subtypes)
+            {
+                switch (t)
+                {
+                    case AzTypeCtorExpn ctorExpn:
+                        concreteTypes.Add(ctorExpn.TypeDefn);
+                        break;
+                    case AzLambdaExpn lamExpn:
+                    case AzTupleExpn tupleExpn:
+                        return false;
+                    case TypeVariable:
+                        continue;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+
+            if (concreteTypes.Count == 0) { return false; }
+
+            supertypes = GetSupertypes(concreteTypes[0]);
+            foreach (var t in concreteTypes)
+            {
+                supertypes.IntersectWith(GetSupertypes(t));
+            }
+
+            return true;
         }
 
         private TvProvider mTvProvider = new();

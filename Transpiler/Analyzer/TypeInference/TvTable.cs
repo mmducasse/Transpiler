@@ -19,11 +19,11 @@ namespace Transpiler.Analysis
             {
                 if (defn.ExplicitType != null)
                 {
-                    type = defn.ExplicitType;
+                    type = defn.ExplicitType.WithUniqueTvs(TvProvider);
                 }
                 else if (scope.TryGetFuncDefnType(defn, out var funcType))
                 {
-                    type = funcType;
+                    type = funcType.WithUniqueTvs(TvProvider);
                 }
                 else
                 {
@@ -32,7 +32,7 @@ namespace Transpiler.Analysis
             }
             else if (node is IAzLiteralExpn literal)
             {
-                type = literal.CertainType.ToSym();
+                type = literal.CertainType.ToCtor();
             }
             else if (node is AzSymbolExpn symbol)
             {
@@ -54,6 +54,25 @@ namespace Transpiler.Analysis
                     type = TvProvider.Next;
                     //mNodeTypes[symbol.Definition] = type;
                 }
+            }
+            else if (node is AzMatchCase matchCase)
+            {
+                type = new AzTypeLambdaExpn(TvProvider.Next, TvProvider.Next, CodePosition.Null);
+            }
+            else if (node is AzDectorPattern dectorPattern)
+            {
+                if (dectorPattern.TypeDefn.ParentUnion != null)
+                {
+                    type = dectorPattern.TypeDefn.ParentUnion.ToCtor();
+                }
+                else
+                {
+                    type = dectorPattern.TypeDefn.ToCtor();
+                }
+            }
+            else if (node is AzScopedFuncExpn _)
+            {
+                throw new InvalidOperationException();
             }
             else
             {
@@ -82,7 +101,7 @@ namespace Transpiler.Analysis
                     typeString = namedType.Name;
                 }
 
-                var tvs = TvUtils.GetTvs(solvedType);
+                var tvs = solvedType.GetTypeVars();
                 var refs = new List<(AzClassTypeDefn, TypeVariable)>();
                 foreach (var tv in tvs)
                 {

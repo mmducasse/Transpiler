@@ -47,8 +47,22 @@ namespace Transpiler
             info += string.Format("{0} Error in module {1}\n", StageString(mStage), mModuleName);
             info += string.Format("{0}: {1}\n", mPosition.Line + 1, mCode);
             info += mReason + "\n\n";
+            info += GetAdjacentLines(mCode, mPosition.Line);
 
             return info;
+        }
+
+        private static string GetAdjacentLines(string code, int line)
+        {
+            return string.Format("{0}\n{1}\n{2}", GetLine(code, line - 1),
+                                                  GetLine(code, line),
+                                                  GetLine(code, line + 1));
+        }
+
+        private static string GetLine(string code, int line)
+        {
+            var lines = code.Split("\n");
+            return lines[line];
         }
 
         private string StageString(eInterpreterStage stage)

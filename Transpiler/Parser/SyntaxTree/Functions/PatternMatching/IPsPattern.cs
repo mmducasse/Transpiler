@@ -7,10 +7,10 @@
             node = null;
             var q = queue;
 
-            //if (DeconstructPatternNode.Parse(ref q, out var dctorNode)) { node = dctorNode; }
             // Tuple?
-            if (PsSymbolExpn.Parse(ref q, out var varNode)) { node = varNode; }
+            if (PsParam.Parse(ref q, out var parNode)) { node = parNode; }
             else if (IPsLiteralExpn.Parse(ref q, out var litNode)) { node = litNode; }
+            else if(PsDectorPattern.Parse(ref q, out var dctorNode)) { node = dctorNode; }
 
             if (node != null)
             {

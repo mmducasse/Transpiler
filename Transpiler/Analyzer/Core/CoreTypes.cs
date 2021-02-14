@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Transpiler.Parse;
 using Transpiler.Analysis;
 using static Transpiler.Extensions;
 using static Transpiler.Analysis.OperatorUtil;
@@ -12,11 +13,9 @@ namespace Transpiler.Analysis
         public AzPrimitiveTypeDefn Real { get; }
 
         public AzUnionTypeDefn Bool { get; }
-        public AzDataTypeDefn False { get; }
-        public AzDataTypeDefn True { get; }
 
         public AzClassTypeDefn Eq { get; }
-        //public IClassType Num { get; }
+        public AzClassTypeDefn Num { get; }
 
         //public IReadOnlyList<Operator> Operators => mOperators;
         //private List<Operator> mOperators { get; } = new();
@@ -35,28 +34,29 @@ namespace Transpiler.Analysis
             Int = AzPrimitiveTypeDefn.Make(mScope, "Int");
             Real = AzPrimitiveTypeDefn.Make(mScope, "Real");
 
-            False = AzDataTypeDefn.Make(mScope, "False");
-            True = AzDataTypeDefn.Make(mScope, "True");
-            Bool = AzUnionTypeDefn.Make(mScope, "Bool", True, False);
-
-            var add = Function2("+", Int);
-            mScope.AddFunction(add, add.Type);
+            Bool = AzUnionTypeDefn.Make(mScope, "Bool", "True", "False");
 
             Eq = MakeEq();
-            ////Num = MakeNum();
+            Num = MakeNum();
 
-            //foreach (var type in Types)
-            //{
-            //    mScope.AddType(type);
-            //}
+            mScope.AddClassInstance(ImplEqInt());
+            mScope.AddClassInstance(ImplNumInt());
+            mScope.AddClassInstance(ImplEqReal());
+            mScope.AddClassInstance(ImplNumReal());
 
-            //mScope.AddClassInstance(ImplEqInt());
-            //mScope.AddClassInstance(ImplNumInt());
-            ////mScope.AddClassInstance(ImplEqReal());
-            ////mScope.AddClassInstance(ImplNumReal());
+            MakeMiscFns(mScope);
 
             mScope.PrintTypes();
             mScope.PrintTypeHeirarchy();
+        }
+
+        private static void MakeMiscFns(Scope scope)
+        {
+            var a = TypeVariable.Simple(0);
+
+            var fixType = AzTypeLambdaExpn.Make(AzTypeLambdaExpn.Make(a, a), a);
+            var fix = new Operator("fix", fixType, eFixity.Prefix);
+            scope.AddFunction(fix, fix.Type);
         }
 
         private AzClassTypeDefn MakeEq()
@@ -65,7 +65,7 @@ namespace Transpiler.Analysis
             var a = new TypeVariable(0, cEq.ToArr());
             cEq.TypeVar = a;
 
-            var type = AzTypeLambdaExpn.Make(a, a, Bool.ToSym());
+            var type = AzTypeLambdaExpn.Make(a, a, Bool.ToCtor());
 
             var fEq = new AzFuncDefn("==", type, CodePosition.Null);
             var fNeq = new AzFuncDefn("!=", type, CodePosition.Null);
@@ -73,67 +73,73 @@ namespace Transpiler.Analysis
             cEq.Functions = RList(fEq, fNeq);
 
             mScope.AddType(cEq);
+            mScope.AddFunction(fEq, fEq.ExplicitType);
+            mScope.AddFunction(fNeq, fNeq.ExplicitType);
             return cEq;
         }
 
-        //private IClassType MakeNum()
-        //{
-        //    var cNum = new ClassType("Num");
+        private AzClassTypeDefn MakeNum()
+        {
+            var cNum = new AzClassTypeDefn("Num", mScope, CodePosition.Null);
+            var a = new TypeVariable(0, cNum.ToArr());
+            cNum.TypeVar = a;
 
-        //    var a = new TypeVariable(1, cNum.ToArr());
+            var type = AzTypeLambdaExpn.Make(a, a, a);
 
-        //    var type = FunType.Make(a, a, a);
+            var fAdd = new AzFuncDefn("+", type, CodePosition.Null);
+            var fSub = new AzFuncDefn("-", type, CodePosition.Null);
+            var fMul = new AzFuncDefn("*", type, CodePosition.Null);
+            var fDiv = new AzFuncDefn("/", type, CodePosition.Null);
 
-        //    var fAdd = new FuncSignature("+", type);
-        //    var fSub = new FuncSignature("-", type);
-        //    var fMul = new FuncSignature("*", type);
-        //    var fDiv = new FuncSignature("/", type);
+            cNum.Functions = RList(fAdd, fSub, fMul, fDiv);
 
-        //    cNum.TypeVar = a;
-        //    cNum.Functions = RList(fAdd, fSub, fMul, fDiv);
+            mScope.AddType(cNum);
+            mScope.AddFunction(fAdd, fAdd.ExplicitType);
+            mScope.AddFunction(fSub, fSub.ExplicitType);
+            mScope.AddFunction(fMul, fMul.ExplicitType);
+            mScope.AddFunction(fDiv, fDiv.ExplicitType);
+            return cNum;
+        }
 
-        //    return cNum;
-        //}
+        private AzClassInstDefn ImplEqInt()
+        {
+            var fIntEq = Function2("eqInt", Int, Int, Bool);
+            var fIntNeq = Function2("neqInt", Int, Int, Bool);
+            var fns = RList(fIntEq, fIntNeq);
 
-        //private ClassInstance ImplEqInt()
-        //{
-        //    var fIntEq = Function2("==", Int, Int, Bool);
-        //    var fIntNeq = Function2("!=", Int, Int, Bool);
-        //    var fns = RList(fIntEq, fIntNeq);
+            return new AzClassInstDefn(Eq, Int, fns, CodePosition.Null);
+        }
 
-        //    return new ClassInstance(Eq, Int, fns);
-        //}
+        private AzClassInstDefn ImplNumInt()
+        {
+            var fIntAdd = Function2("addInt", Int);
+            var fIntSub = Function2("subInt", Int);
+            var fIntMul = Function2("mulInt", Int);
+            var fIntDiv = Function2("divInt", Int);
+            var fns = RList(fIntAdd, fIntSub, fIntMul, fIntDiv);
 
-        //private ClassInstance ImplNumInt()
-        //{
-        //    var fIntAdd = Function2("+", Int, Int, Int);
-        //    var fIntSub = Function2("-", Int, Int, Int);
-        //    var fIntMul = Function2("*", Int, Int, Int);
-        //    var fIntDiv = Function2("/", Int, Int, Int);
-        //    var fns = RList(fIntAdd, fIntSub, fIntMul, fIntDiv);
+            return new AzClassInstDefn(Num, Int, fns, CodePosition.Null);
+        }
 
-        //    return new ClassInstance(Num, Int, fns);
-        //}
+        private AzClassInstDefn ImplEqReal()
+        {
+            var fRealEq = Function2("eqReal", Real, Real, Bool);
+            var fRealNeq = Function2("neqReal", Real, Real, Bool);
+            var fns = RList(fRealEq, fRealNeq);
 
-        //private ClassInstance ImplEqReal()
-        //{
-        //    var fRealEq = Function2("==", Real, Real, Bool);
-        //    var fRealNeq = Function2("!=", Real, Real, Bool);
-        //    var fns = RList(fRealEq, fRealNeq);
+            return new AzClassInstDefn(Eq, Real, fns, CodePosition.Null);
+        }
 
-        //    return new ClassInstance(Eq, Real, fns);
-        //}
+        private AzClassInstDefn ImplNumReal()
+        {
+            var fRealAdd = Function2("addReal", Real);
+            var fRealSub = Function2("subReal", Real);
+            var fRealMul = Function2("mulReal", Real);
+            var fRealDiv = Function2("divReal", Real);
+            var fns = RList(fRealAdd, fRealSub, fRealMul, fRealDiv);
 
-        //private ClassInstance ImplNumReal()
-        //{
-        //    var fRealAdd = Function2("+", Real, Real, Real);
-        //    var fRealSub = Function2("-", Real, Real, Real);
-        //    var fRealMul = Function2("*", Real, Real, Real);
-        //    var fRealDiv = Function2("/", Real, Real, Real);
-        //    var fns = RList(fRealAdd, fRealSub, fRealMul, fRealDiv);
-
-        //    return new ClassInstance(Num, Real, fns);
-        //}
+            return new AzClassInstDefn(Num, Real, fns, CodePosition.Null);
+        }
 
         //private void Add(Operator op)
         //{

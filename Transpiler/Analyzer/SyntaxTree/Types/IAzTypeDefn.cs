@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Transpiler.Parse;
 
 namespace Transpiler.Analysis
@@ -22,26 +23,25 @@ namespace Transpiler.Analysis
         }
 
         public static IAzTypeDefn Analyze(Scope fileScope,
-                                          Scope scope,
                                           IAzTypeDefn typeDefn,
                                           IPsTypeDefn node)
         {
             return (typeDefn, node) switch
             {
                 (AzDataTypeDefn dataType, PsDataTypeDefn dataNode) =>
-                    AzDataTypeDefn.Analyze(fileScope, scope, dataType, dataNode),
+                    AzDataTypeDefn.Analyze(fileScope, dataType, dataNode),
                 (AzUnionTypeDefn unionType, PsUnionTypeDefn unionNode) =>
-                    AzUnionTypeDefn.Analyze(fileScope, scope, unionType, unionNode),
+                    AzUnionTypeDefn.Analyze(fileScope, unionType, unionNode),
                 (AzClassTypeDefn classType, PsClassTypeDefn classNode) =>
-                    AzClassTypeDefn.Analyze(scope, classType, classNode),
+                    AzClassTypeDefn.Analyze(fileScope, classType, classNode),
                 _ => throw new NotImplementedException(),
             };
         }
     }
 
-    public static class IAzTypeDefnUtil
-    {
-        public static AzTypeSymbolExpn ToSym(this IAzTypeDefn typeDefn) =>
-            new(typeDefn, CodePosition.Null);
-    }
+    //public static class IAzTypeDefnUtil
+    //{
+    //    public static AzTypeSymbolExpn ToSym(this IAzTypeDefn typeDefn) =>
+    //        new(typeDefn, CodePosition.Null);
+    //}
 }

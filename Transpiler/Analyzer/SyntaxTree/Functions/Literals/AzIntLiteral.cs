@@ -5,7 +5,7 @@ namespace Transpiler.Analysis
     public record AzIntLiteral(int Value,
                                CodePosition Position) : IAzLiteralExpn<int>
     {
-        public IAzTypeDefn CertainType => CoreTypes.Instance.Int;
+        public IAzDataTypeDefn CertainType => CoreTypes.Instance.Int;
 
         public static AzIntLiteral Analyze(Scope scope,
                                            PsIntLiteral node)

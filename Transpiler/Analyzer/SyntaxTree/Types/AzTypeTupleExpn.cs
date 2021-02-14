@@ -9,6 +9,16 @@ namespace Transpiler.Analysis
     {
         public bool IsSolved => Elements.Where(e => !e.IsSolved).Count() == 0;
 
+        public ISet<TypeVariable> GetTypeVars()
+        {
+            HashSet<TypeVariable> tvs = new();
+            foreach (var e in Elements)
+            {
+                tvs.UnionWith(e.GetTypeVars());
+            }
+            return tvs;
+        }
+
         public static bool Equate(AzTypeTupleExpn a, AzTypeTupleExpn b)
         {
             if (a.Elements.Count != b.Elements.Count) { return false; }
@@ -32,6 +42,12 @@ namespace Transpiler.Analysis
             return new(elements, node.Position);
         }
 
+        public static IAzTypeExpn Substitute(AzTypeTupleExpn tupType, Substitution sub)
+        {
+            var newElements = tupType.Elements.Select(e => IAzTypeExpn.Substitute(e, sub)).ToList();
+            return tupType with { Elements = newElements };
+        }
+
         public string Print(int i)
         {
             if (Elements.Count == 0)
@@ -40,7 +56,9 @@ namespace Transpiler.Analysis
             }
 
             string elements = Elements.Select(m => m.Print(i)).Separate(", ");
-            return string.Format("{0}", elements);
+            return string.Format("({0})", elements);
         }
+
+        public override string ToString() => Print(0);
     }
 }

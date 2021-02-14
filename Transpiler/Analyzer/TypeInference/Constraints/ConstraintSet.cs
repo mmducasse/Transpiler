@@ -4,44 +4,13 @@ using System.Linq;
 
 namespace Transpiler.Analysis
 {
-    public interface IConstraints
+    public class ConstraintSet : IConstraintSet
     {
-        public static ConstraintSet Union(params IConstraints[] cs)
-        {
-            var set = new ConstraintSet();
-            foreach (var c in cs)
-            {
-                if (c is Constraint constraint)
-                {
-                    set.Add(constraint);
-                }
-                else if (c is ConstraintSet constraintSet)
-                {
-                    set.UnionWith(constraintSet);
-                }
-            }
-
-            return set;
-        }
-    }
-
-    public record Constraint(IAzTypeExpn A, IAzTypeExpn B, IAzNode TEMP_Node) : IConstraints
-    {
-        public Constraint Substitute(Substitution sub)
-        {
-            return new Constraint(IAzTypeExpn.Substitute(A, sub),
-                                  IAzTypeExpn.Substitute(B, sub),
-                                  TEMP_Node);
-        }
-    }
-
-    public class ConstraintSet : IConstraints
-    {
-        private HashSet<Constraint> mHashSet = new();
+        private HashSet<IConstraint> mHashSet = new();
 
         public bool IsEmpty => mHashSet.Count == 0;
 
-        public (Constraint, ConstraintSet) Next
+        public (IConstraint, ConstraintSet) Next
         {
             get
             {
@@ -62,7 +31,7 @@ namespace Transpiler.Analysis
         {
         }
 
-        public ConstraintSet(HashSet<Constraint> hashSet)
+        public ConstraintSet(HashSet<IConstraint> hashSet)
         {
             mHashSet = hashSet;
         }
@@ -81,7 +50,7 @@ namespace Transpiler.Analysis
             return newCs;
         }
 
-        public void Add(Constraint c)
+        public void Add(IConstraint c)
         {
             mHashSet.Add(c);
         }
@@ -97,7 +66,7 @@ namespace Transpiler.Analysis
 
             foreach (var c in mHashSet)
             {
-                s += string.Format("{0} = {1}\n", c.A.Print(0), c.B.Print(0));
+                s += string.Format("{0}\n", c.ToString());
                 s += string.Format("{0}\n\n", c.TEMP_Node.Print(0));
             }
 
@@ -106,14 +75,7 @@ namespace Transpiler.Analysis
 
         public override string ToString()
         {
-            string s = "";
-
-            foreach (var c in mHashSet)
-            {
-                s += string.Format("{0} = {1}    ", c.A.Print(0), c.B.Print(0));
-            }
-
-            return s;
+            return mHashSet.Select(c => c).Separate(", ");
         }
     }
 }

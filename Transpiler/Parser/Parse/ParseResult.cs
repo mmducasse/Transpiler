@@ -9,7 +9,8 @@ namespace Transpiler.Parse
         public List<string> ImportedModules { get; } = new();
         public List<PsFuncDefn> FuncDefns { get; } = new();
         public List<IPsTypeDefn> TypeDefns { get; } = new();
-        public List<PsClassInst> InstDefns { get; } = new();
+        public List<PsClassTypeDefn> ClassDefns { get; } = new();
+        public List<PsClassInstDefn> InstDefns { get; } = new();
 
         public ParseResult()
         {

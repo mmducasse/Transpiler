@@ -61,5 +61,7 @@ namespace Transpiler.Parse
 
             return s;
         }
+
+        public override string ToString() => Print(0);
     }
 }

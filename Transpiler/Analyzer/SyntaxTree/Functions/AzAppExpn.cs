@@ -30,16 +30,19 @@ namespace Transpiler.Analysis
             var tf = tvTable.GetTypeOf(node.Function);
             var tx = tvTable.GetTypeOf(node.Argument);
             var tfx = tvTable.GetTypeOf(node);
+            var ta = tvTable.TvProvider.Next;
 
             var p = CodePosition.Null;
-            var cfx = new Constraint(tf, new AzTypeLambdaExpn(tx, tfx, p), node);
+            var cfx = new EqualConstraint(tf, new AzTypeLambdaExpn(tx, tfx, p), node);
 
-            return IConstraints.Union(cfx, csf, csx);
+            return IConstraintSet.Union(cfx, csf, csx);
         }
 
         public string Print(int i)
         {
             return string.Format("({0} {1})", Function.Print(i), Argument.Print(i));
         }
+
+        public override string ToString() => Print(0);
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Transpiler.Analysis
 {
-    public class AzUnionTypeDefn : IAzTypeSetDefn
+    public class AzUnionTypeDefn : IAzTypeSetDefn, IAzDataTypeDefn
     {
         public string Name { get; }
 
@@ -13,7 +13,7 @@ namespace Transpiler.Analysis
 
         public IReadOnlyList<TypeVariable> Parameters { get; }
 
-        public IReadOnlyList<IAzTypeDefn> Subtypes { get; set; }
+        public IReadOnlyList<AzDataTypeDefn> Subtypes { get; set; }
 
         public CodePosition Position { get; }
 
@@ -28,16 +28,25 @@ namespace Transpiler.Analysis
             Position = position;
         }
 
-        public static AzUnionTypeDefn Make(Scope scope, string name, params IAzTypeDefn[] subtypes)
+        public static AzUnionTypeDefn Make(Scope scope, string name, params string[] subtypeNames)
         {
-            var typeDefn = new AzUnionTypeDefn(name, new List<TypeVariable>(), scope, CodePosition.Null);
+            var typeVars = new List<TypeVariable>();
+            var typeDefn = new AzUnionTypeDefn(name, typeVars, scope, CodePosition.Null);
+
+            List<AzDataTypeDefn> subtypes = new();
+            foreach (string sn in subtypeNames)
+            {
+                var data = AzDataTypeDefn.Make(scope, sn, typeDefn);
+                subtypes.Add(data);
+            }
+
             typeDefn.Subtypes = subtypes;
             scope.AddType(typeDefn);
 
-            foreach (var st in subtypes)
-            {
-                scope.AddSuperType(st, typeDefn);
-            }
+            //foreach (var st in subtypeNames)
+            //{
+            //    scope.AddSuperType(st, typeDefn);
+            //}
 
             return typeDefn;
         }
@@ -46,15 +55,15 @@ namespace Transpiler.Analysis
                                                  PsUnionTypeDefn node)
         {
             var scope = new Scope(parentScope, "Union Defn");
-            var tvs = scope.AddTypeVars(node.TypeParameters);
+            var typeVars = scope.AddTypeVars(node.TypeParameters);
 
-            var typeDefn = new AzUnionTypeDefn(node.Name, tvs, scope, node.Position);
+            var typeDefn = new AzUnionTypeDefn(node.Name, typeVars, scope, node.Position);
             parentScope.AddType(typeDefn);
 
-            List<IAzTypeDefn> subtypes = new();
+            List<AzDataTypeDefn> subtypes = new();
             foreach (var subnode in node.Subtypes)
             {
-                subtypes.Add(IAzTypeDefn.Initialize(scope, subnode));
+                subtypes.Add(AzDataTypeDefn.Initialize(parentScope, typeDefn, subnode));
             }
 
             typeDefn.Subtypes = subtypes;
@@ -63,7 +72,6 @@ namespace Transpiler.Analysis
         }
 
         public static AzUnionTypeDefn Analyze(Scope fileScope,
-                                              Scope scope,
                                               AzUnionTypeDefn unionType,
                                               PsUnionTypeDefn unionNode)
         {
@@ -73,7 +81,7 @@ namespace Transpiler.Analysis
                 var type = unionType.Subtypes[i];
                 var node = unionNode.Subtypes[i];
 
-                IAzTypeDefn.Analyze(fileScope, unionType.Scope, type, node);
+                IAzTypeDefn.Analyze(fileScope, type, node);
             }
 
             // Add the subtypes to the type heirarchy.
@@ -98,5 +106,7 @@ namespace Transpiler.Analysis
 
             return s;
         }
+
+        public override string ToString() => Name;
     }
 }

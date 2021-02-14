@@ -5,19 +5,9 @@ namespace Transpiler.Analysis
 {
     public static class TvUtils
     {
-        public static ISet<TypeVariable> GetTvs(this IAzTypeExpn type)
-        {
-            return type switch
-            {
-                TypeVariable typeVar => new HashSet<TypeVariable> { typeVar },
-                AzTypeLambdaExpn funType => GetTvs(funType.Input).Union(GetTvs(funType.Output)).ToHashSet(),
-                _ => new HashSet<TypeVariable>(),
-            };
-        }
-
         public static IAzTypeExpn WithUniqueTvs(this IAzTypeExpn type, TvProvider tvProvider)
         {
-            var tvs = type.GetTvs().ToList();
+            var tvs = type.GetTypeVars().ToList();
             var newTvs = tvs.Select(tv => tvProvider.MadeUnique(tv)).ToList();
 
             var subs = new List<Substitution>();
@@ -40,6 +30,30 @@ namespace Transpiler.Analysis
             var rb = tvb.Refinements;
             var rc = ra.Union(rb).ToArray();
             return tvProvider.NextR(rc);
+        }
+
+        public static string PrintWithRefinements(this IAzTypeExpn type)
+        {
+            var tvs = type.GetTypeVars();
+
+            List<string> refinements = new();
+            foreach (var tv in tvs)
+            {
+                if (tv.HasRefinements)
+                {
+                    foreach (var r in tv.Refinements)
+                    {
+                        refinements.Add(string.Format("{0} {1}", r.Name, tv.Print()));
+                    }
+                }
+            }
+
+            if (refinements.Count == 0)
+            {
+                return type.Print(0);
+            }
+
+            return string.Format("{0} => {1}", refinements.Separate(", "), type.Print(0));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Transpiler.Analysis
 {
@@ -9,7 +10,10 @@ namespace Transpiler.Analysis
 
         public Substitution(TypeVariable tv, IAzTypeExpn newType)
         {
-            mTypeSubstitutions[tv] = newType;
+            if (!IAzTypeExpn.Equate(tv, newType))
+            {
+                mTypeSubstitutions[tv] = newType;
+            }
         }
 
         public Substitution(params Substitution[] substitutions)
@@ -25,13 +29,10 @@ namespace Transpiler.Analysis
 
         public string Print()
         {
-            string s = "";
-            foreach (var kvp in TypeSubstitutions)
-            {
-                s += string.Format("{0} / {1}\n", kvp.Value.Print(0), kvp.Key.Print());
-            }
-
-            return s;
+            return TypeSubstitutions.
+                Select(kvp => string.Format("{{{0} / {1}}}\n", kvp.Value.Print(0), kvp.Key.Print())).Separate(", ");
         }
+
+        public override string ToString() => Print();
     }
 }

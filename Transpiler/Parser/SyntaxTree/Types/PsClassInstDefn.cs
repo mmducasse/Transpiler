@@ -11,12 +11,12 @@ namespace Transpiler.Parse
 	    p1 (!=) p2 = not (p1 == p2)
 
     */
-    public record PsClassInst(string ClassName,
-                              PsTypeArbExpn Implementor,
+    public record PsClassInstDefn(string ClassName,
+                              IPsTypeExpn Implementor,
                               IReadOnlyList<PsFuncDefn> Functions,
                               CodePosition Position) : IPsDefn
     {
-        public static bool Parse(ref TokenQueue queue, out PsClassInst node)
+        public static bool Parse(ref TokenQueue queue, out PsClassInstDefn node)
         {
             node = null;
             var q = queue;
@@ -50,7 +50,7 @@ namespace Transpiler.Parse
                 funcDecls.Add(funcDefn);
             }
 
-            node = new PsClassInst(name, implementor as PsTypeArbExpn, funcDecls, p);
+            node = new PsClassInstDefn(name, implementor, funcDecls, p);
             queue = q;
             return true;
         }
@@ -65,5 +65,7 @@ namespace Transpiler.Parse
 
             return s;
         }
+
+        public override string ToString() => Print(0);
     }
 }

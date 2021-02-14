@@ -38,5 +38,7 @@ namespace Transpiler.Parse
         {
             return Elements.Select(m => m.Print(i)).Separate(", ");
         }
+
+        public override string ToString() => Print(0);
     }
 }

@@ -63,7 +63,7 @@ namespace Transpiler.Parse
             var pp = q.Position;
             while (Finds(TokenType.Lowercase, ref q, out string paramName))
             {
-                var param = new PsParam(paramName, pp);
+                var param = new PsParam(paramName, Position: pp);
                 parameters.Add(param);
                 pp = q.Position;
             }
@@ -138,5 +138,7 @@ namespace Transpiler.Parse
 
             return s;
         }
+
+        public override string ToString() => Print(0);
     }
 }

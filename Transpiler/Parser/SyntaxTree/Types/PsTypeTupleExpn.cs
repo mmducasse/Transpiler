@@ -51,5 +51,7 @@ namespace Transpiler.Parse
             string members = Elements.Select(m => m.Print(i)).Separate(", ");
             return string.Format("{0}", members);
         }
+
+        public override string ToString() => Print(0);
     }
 }

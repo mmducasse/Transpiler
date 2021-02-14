@@ -32,12 +32,12 @@ namespace Transpiler.Analysis
             foreach (var fn in node.FuncDefinitions)
             {
                 var fcs = AzFuncDefn.Constrain(tvTable, node.Scope, fn);
-                cs = IConstraints.Union(fcs, cs);
+                cs = IConstraintSet.Union(fcs, cs);
             }
 
             var cse = IAzFuncExpn.Constrain(tvTable, node.Scope, node.Expression);
 
-            return IConstraints.Union(cse, cs);
+            return IConstraintSet.Union(cse, cs);
         }
 
         public string Print(int i)
@@ -50,5 +50,7 @@ namespace Transpiler.Analysis
 
             return s + "]";
         }
+
+        public override string ToString() => Print(0);
     }
 }

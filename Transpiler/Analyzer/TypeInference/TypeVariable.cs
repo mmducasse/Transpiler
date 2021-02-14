@@ -16,6 +16,11 @@ namespace Transpiler.Analysis
 
         public static TypeVariable Simple(int id) => new(id, new List<AzClassTypeDefn>());
 
+        public ISet<TypeVariable> GetTypeVars()
+        {
+            return new HashSet<TypeVariable> { this };
+        }
+
         public string Print(bool terse = true) => string.Format("t{0}", Id);
 
         public string Print(int indent)
@@ -32,5 +37,7 @@ namespace Transpiler.Analysis
 
             return string.Empty;
         }
+
+        public override string ToString() => Print(0);
     }
 }

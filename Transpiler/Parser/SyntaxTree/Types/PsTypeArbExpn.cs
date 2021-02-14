@@ -25,12 +25,23 @@ namespace Transpiler.Parse
             return false;
         }
 
-        private static bool ParseArb(ref TokenQueue queue, out PsTypeArbExpn node)
+        private static bool ParseArb(ref TokenQueue queue, out IPsTypeExpn node)
         {
             node = null;
             var q = queue;
             var p = q.Position;
             bool doContinue = true;
+
+            if (Finds("(", ref q))
+            {
+                if (!IPsTypeExpn.Parse(ref q, out node))
+                {
+                    throw Error("Expected inline expression after '('", q);
+                }
+                Expects(")", ref q);
+                queue = q;
+                return true;
+            }
 
             if (!Finds(TokenType.Uppercase, ref q, out string typeName)) { return false; }
 
@@ -82,8 +93,10 @@ namespace Transpiler.Parse
 
         public string Print(int i)
         {
-            var children = Children.Select(c => c.Print(i)).Separate(" ");
-            return string.Format("({0})", children);
+            var children = Children.Select(c => c.Print(i)).Separate(" ", prepend: " ");
+            return string.Format("({0}{1})", TypeName, children);
         }
+
+        public override string ToString() => Print(0);
     }
 }

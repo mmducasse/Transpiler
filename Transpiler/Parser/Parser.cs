@@ -33,13 +33,19 @@ namespace Transpiler.Parse
             if (ParseModuleDefinition(ref q, r)) { return true; }
             else if (ParseImport(ref q, r)) { return true; }
 
-            if (PsClassInst.Parse(ref q, out var instNode))
+            if (PsClassInstDefn.Parse(ref q, out var instNode))
             {
                 System.Console.WriteLine(instNode.Print(0));
                 r.InstDefns.Add(instNode);
                 return true;
             }
-            if (IPsTypeDefn.Parse(ref q, allowClasses: true, out var typeNode))
+            if (PsClassTypeDefn.Parse(ref q, out var classNode))
+            {
+                System.Console.WriteLine(classNode.Print(0));
+                r.ClassDefns.Add(classNode);
+                return true;
+            }
+            if (IPsTypeDefn.Parse(ref q, allowClasses: false, out var typeNode))
             {
                 System.Console.WriteLine(typeNode.Print(0));
                 r.TypeDefns.Add(typeNode);

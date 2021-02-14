@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace Transpiler.Analysis
 {
-    public record AzPrimitiveTypeDefn(string Name) : IAzTypeDefn
+    public record AzPrimitiveTypeDefn(string Name) : IAzDataTypeDefn
     {
         public CodePosition Position => CodePosition.Null;
+
+        public IReadOnlyList<TypeVariable> Parameters => new List<TypeVariable>();
 
         public static AzPrimitiveTypeDefn Make(Scope scope, string name)
         {
@@ -18,5 +20,7 @@ namespace Transpiler.Analysis
         }
 
         public string Print(int i) => Name;
+
+        public override string ToString() => Name;
     }
 }

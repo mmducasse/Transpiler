@@ -27,15 +27,15 @@ namespace Transpiler.Analysis
             Position = position;
         }
 
-        public static AzClassTypeDefn Initialize(Scope parentScope,
+        public static AzClassTypeDefn Initialize(Scope fileScope,
                                                  PsClassTypeDefn node)
         {
-            var scope = new Scope(parentScope, "Class Defn");
+            var scope = new Scope(fileScope, "Class Defn");
             var tv = scope.AddTypeVar(node.TypeVar);
 
             var classDefn = new AzClassTypeDefn(node.Name, scope, node.Position);
             classDefn.TypeVar = tv with { Refinements = classDefn.ToArr() };
-            parentScope.AddType(classDefn);
+            fileScope.AddType(classDefn);
 
             // Analyze the class's functions.
             List<AzFuncDefn> funcDefns = new();
@@ -44,6 +44,11 @@ namespace Transpiler.Analysis
                 var funcDefn = AzFuncDefn.Initialize(scope, funcNode);
                 funcDefns.AddRange(funcDefn);
             }
+            foreach (var funcDefn in funcDefns)
+            {
+                fileScope.AddFunction(funcDefn, funcDefn.ExplicitType);
+            }
+
             classDefn.Functions = funcDefns;
 
             return classDefn;
@@ -74,5 +79,7 @@ namespace Transpiler.Analysis
 
             return s;
         }
+
+        public override string ToString() => Name;
     }
 }
