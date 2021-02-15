@@ -12,7 +12,7 @@
         public const string LBrace = "[";
         public const string RBrace = "]";
         public const string Comma = ",";
-        public const string Dot = ".";
+        //public const string Dot = ".";
 
         public static readonly string[] All = new[]
         {
@@ -22,7 +22,7 @@
             LBrace,
             RBrace,
             Comma,
-            Dot,
+            //Dot,
         };
 
         public const string Equal = "=";

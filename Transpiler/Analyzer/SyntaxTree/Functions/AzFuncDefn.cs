@@ -112,7 +112,7 @@ namespace Transpiler.Analysis
             var tf = tvTable.GetTypeOf(node);
             var te = tvTable.GetTypeOf(node.ScopedExpression.Expression);
 
-            var c = new EqualConstraint(tf, te, node);
+            var c = new Constraint(tf, te, node);
 
             return IConstraintSet.Union(c, cs);
         }

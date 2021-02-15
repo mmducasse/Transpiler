@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Transpiler.Parse;
 using static Transpiler.Extensions;
 
@@ -6,7 +7,8 @@ namespace Transpiler.Analysis
 {
     public class AzClassTypeDefn : IAzTypeSetDefn
     {
-        public IReadOnlyList<AzClassTypeDefn> Superclasses => TypeVar.Refinements;
+        public IReadOnlyList<AzClassTypeDefn> Superclasses =>
+            TypeVar.Refinements.Where(s => s != this).ToList();
 
         public TypeVariable TypeVar { get; set; }
 
@@ -70,7 +72,8 @@ namespace Transpiler.Analysis
 
         public string Print(int i)
         {
-            string s = string.Format("type {0} {1} {{\n", Name, TypeVar.Print());
+            var supers = Superclasses.Select(s => string.Format("{0} {1}", s.Name, TypeVar.Print())).Separate(", ", append: " => ");
+            string s = string.Format("type {0}{1} {2} {{\n", supers, Name, TypeVar.Print());
 
             foreach (var funcDecl in Functions)
             {

@@ -42,8 +42,8 @@ namespace Transpiler.Analysis
 
                 var tcase = tvTable.GetTypeOf(@case) as AzTypeLambdaExpn;
 
-                var cinput = new EqualConstraint(targ, tcase.Input, node);
-                var coutput = new EqualConstraint(tmatch, tcase.Output, node);
+                var cinput = new Constraint(targ, tcase.Input, node);
+                var coutput = new Constraint(tmatch, tcase.Output, node);
 
                 cs = IConstraintSet.Union(cs, c, cinput, coutput);
             }

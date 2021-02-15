@@ -31,7 +31,7 @@ namespace Transpiler.Analysis
             var tpatt = tvTable.GetTypeOf(node.Pattern);
             var texpn = tvTable.GetTypeOf(node.ScopedExpression.Expression);
 
-            var cs = new EqualConstraint(tcase, new AzTypeLambdaExpn(tpatt, texpn, CodePosition.Null), node);
+            var cs = new Constraint(tcase, new AzTypeLambdaExpn(tpatt, texpn, CodePosition.Null), node);
 
             return IConstraintSet.Union(cs, cspatt, csexpn);
         }

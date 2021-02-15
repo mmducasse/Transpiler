@@ -3,7 +3,7 @@
 namespace Transpiler.Parse
 {
     public record PsIntLiteral(int Value,
-                               CodePosition Position) : IPsLiteralExpn<int>
+                               CodePosition Position) : IPsLiteralExpn
     {
         public static bool Parse(ref TokenQueue queue, out PsIntLiteral node)
         {

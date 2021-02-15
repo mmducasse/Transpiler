@@ -9,6 +9,7 @@
 
             if (PsRealLiteral.Parse(ref q, out var realNode)) { node = realNode; }
             else if (PsIntLiteral.Parse(ref q, out var intNode)) { node = intNode; }
+            else if (PsListLiteral.Parse(ref q, out var listNode)) { node = listNode; }
 
             if (node != null)
             {
@@ -18,10 +19,5 @@
 
             return false;
         }
-    }
-
-    public interface IPsLiteralExpn<T> : IPsLiteralExpn
-    {
-        T Value { get; }
     }
 }

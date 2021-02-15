@@ -40,7 +40,7 @@ namespace Transpiler.Analysis
 
             var tt = tvTable.GetTypeOf(node);
 
-            var ct = new EqualConstraint(tt, new AzTypeTupleExpn(tes, CodePosition.Null), node);
+            var ct = new Constraint(tt, new AzTypeTupleExpn(tes, CodePosition.Null), node);
 
             return IConstraintSet.Union(ct, cs);
         }

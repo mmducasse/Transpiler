@@ -7,13 +7,14 @@ namespace Transpiler.Analysis
     {
         IAzDataTypeDefn CertainType { get; }
 
-        public static IAzLiteralExpn Analyze(Scope scope,
+        public static IAzFuncExpn Analyze(Scope scope,
                                              IPsLiteralExpn node)
         {
             return node switch
             {
                 PsIntLiteral intLit => AzIntLiteral.Analyze(scope, intLit),
                 PsRealLiteral realLit => AzRealLiteral.Analyze(scope, realLit),
+                PsListLiteral listLit => AzListLiteral.Analyze(scope, listLit),
                 _ => throw new ArgumentException(),
             };
         }

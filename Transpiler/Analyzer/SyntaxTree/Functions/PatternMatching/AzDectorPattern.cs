@@ -38,7 +38,7 @@ namespace Transpiler.Analysis
             for (int i = 0; i < node.Variables.Count; i++)
             {
                 var tv = tvTable.AddNode(scope, node.Variables[i]);
-                var c = new EqualConstraint(tv, typeExpn.Elements[i], node);
+                var c = new Constraint(tv, typeExpn.Elements[i], node);
 
                 cs = IConstraintSet.Union(cs, c);
             }

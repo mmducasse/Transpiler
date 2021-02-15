@@ -48,7 +48,7 @@ namespace Transpiler.Analysis
             var ta = tvTable.TvProvider.Next;
 
             var p = CodePosition.Null;
-            var cfx = new EqualConstraint(tf, new AzTypeLambdaExpn(tx, tfx, p), node);
+            var cfx = new Constraint(tf, new AzTypeLambdaExpn(tx, tfx, p), node);
 
             return IConstraintSet.Union(cfx, csf, csx);
         }

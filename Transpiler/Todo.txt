@@ -1,12 +1,10 @@
 ﻿
-
-QUESTIONS:
-
 TODO:
 
 - GetN methon that extracts element from tuple
 - Instance Implementors need to introduce type variables.
 
+- Char and string
 - Implicit match syntax
 - Make recursion, mutual recursion type checkable
 - Make CodePosition.Null point to some predefined module.
@@ -19,4 +17,8 @@ TODO:
   - These take the match argument as a parameter to produce Bool result
 - List literals
 -$0, $1, etc to represent lambda inputs
+- Type aliases
+- Pattern aliases
+- Nested unions
+- Arbitrary unions
 

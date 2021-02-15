@@ -33,7 +33,7 @@ namespace Transpiler.Analysis
 
             var tupleType = new AzTypeTupleExpn(elementTypes, CodePosition.Null);
             var pattType = tvTable.GetTypeOf(node);
-            var ctup = new EqualConstraint(pattType, tupleType, node);
+            var ctup = new Constraint(pattType, tupleType, node);
 
             return IConstraintSet.Union(cs, ctup);
         }

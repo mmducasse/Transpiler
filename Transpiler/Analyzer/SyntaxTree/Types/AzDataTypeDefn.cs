@@ -100,9 +100,9 @@ namespace Transpiler.Analysis
             return dataType;
         }
 
-        private static void CreateConstructor(Scope fileScope,
-                                              AzDataTypeDefn dataType,
-                                              IAzDataTypeDefn returnType)
+        public static void CreateConstructor(Scope fileScope,
+                                             AzDataTypeDefn dataType,
+                                             IAzDataTypeDefn returnType)
         {
             Stack<IAzTypeExpn> argStack;
             if (dataType.Expression is AzTypeTupleExpn tupleType)

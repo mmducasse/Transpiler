@@ -7,19 +7,19 @@ namespace Transpiler.Analysis
     /// <summary>
     /// Constraint indicating that two types must be the same.
     /// </summary>
-    public record EqualConstraint(IAzTypeExpn A,
-                                  IAzTypeExpn B,
-                                  IAzNode TEMP_Node) : IConstraint
+    public record Constraint(IAzTypeExpn A,
+                             IAzTypeExpn B,
+                             IAzNode TEMP_Node) : IConstraint
     {
         public IConstraint Substitute(Substitution sub)
         {
-            return new EqualConstraint(IAzTypeExpn.Substitute(A, sub),
+            return new Constraint(IAzTypeExpn.Substitute(A, sub),
                                        IAzTypeExpn.Substitute(B, sub),
                                        TEMP_Node);
         }
 
         public static Substitution Unify(IScope scope,
-                                         EqualConstraint c,
+                                         Constraint c,
                                          ConstraintSet cs,
                                          TvProvider tvProvider)
         {
@@ -97,8 +97,8 @@ namespace Transpiler.Analysis
             if (c.A is AzTypeLambdaExpn fa &&
                 c.B is AzTypeLambdaExpn fb)
             {
-                var c1 = new EqualConstraint(fa.Input, fb.Input, c.TEMP_Node);
-                var c2 = new EqualConstraint(fa.Output, fb.Output, c.TEMP_Node);
+                var c1 = new Constraint(fa.Input, fb.Input, c.TEMP_Node);
+                var c2 = new Constraint(fa.Output, fb.Output, c.TEMP_Node);
 
                 var cs2 = IConstraintSet.Union(c1, c2, cs);
 
@@ -113,7 +113,7 @@ namespace Transpiler.Analysis
                 ConstraintSet cargs = new();
                 for (int i = 0; i < tupa.Elements.Count; i++)
                 {
-                    var carg = new EqualConstraint(tupa.Elements[i], tupb.Elements[i], c.TEMP_Node);
+                    var carg = new Constraint(tupa.Elements[i], tupb.Elements[i], c.TEMP_Node);
                     cargs.Add(carg);
                 }
                 var cs2 = IConstraintSet.Union(cs, cargs);
@@ -130,7 +130,7 @@ namespace Transpiler.Analysis
                 ConstraintSet cargs = new();
                 for (int i = 0; i < ctora.Arguments.Count; i++)
                 {
-                    var carg = new EqualConstraint(ctora.Arguments[i], ctorb.Arguments[i], c.TEMP_Node);
+                    var carg = new Constraint(ctora.Arguments[i], ctorb.Arguments[i], c.TEMP_Node);
                     cargs.Add(carg);
                 }
                 var cs2 = IConstraintSet.Union(cs, cargs);

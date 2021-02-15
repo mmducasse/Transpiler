@@ -46,7 +46,7 @@ namespace Transpiler.Analysis
 
             return c switch
             {
-                EqualConstraint eqc => EqualConstraint.Unify(scope, eqc, cs, tvProvider),
+                Constraint eqc => Constraint.Unify(scope, eqc, cs, tvProvider),
                 _ => throw Analyzer.Error("Type inference failed.", c.TEMP_Node.Position),
             };
         }

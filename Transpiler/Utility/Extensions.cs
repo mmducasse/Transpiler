@@ -45,12 +45,12 @@ namespace Transpiler
             return s.ToString();
         }
 
-        public static string Separate(this IEnumerable elements, string separator, string prepend)
+        public static string Separate(this IEnumerable elements, string separator, string prepend = "", string append = "")
         {
             string s = Separate(elements, separator);
             if (s.Length > 0)
             {
-                return prepend + s;
+                return prepend + s + append;
             }
             return s;
         }
