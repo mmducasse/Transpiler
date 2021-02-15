@@ -2,14 +2,14 @@
 
 QUESTIONS:
 
-What types can't implement a class?
-
 TODO:
 
-- Make recursion, mutual recursion work
+- GetN methon that extracts element from tuple
 - Instance Implementors need to introduce type variables.
+
+- Implicit match syntax
+- Make recursion, mutual recursion type checkable
 - Make CodePosition.Null point to some predefined module.
-- Infix operators
 - Make token indentation more robust
 - Better code locations for errors
 - Multiple modules

@@ -7,6 +7,8 @@ namespace Transpiler.Analysis
     {
         public IAzTypeExpn ExplicitType => null;
 
+        public eFixity Fixity => eFixity.Prefix;
+
         public static AzParam Analyze(Scope scope,
                                       PsParam node)
         {

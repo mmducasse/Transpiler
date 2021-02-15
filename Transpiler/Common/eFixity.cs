@@ -10,5 +10,6 @@ namespace Transpiler
     {
         Prefix,
         Infix,
+        Postfix,
     }
 }

@@ -16,7 +16,7 @@ namespace Transpiler.Parse
             var p = q.Position;
 
             if (!Finds("match", ref q)) { return false; }
-            if (!PsArbExpn.Parse(ref q, out var conditionNode))
+            if (!IPsFuncExpn.ParseInline(ref q, out var conditionNode))
             {
                 throw Error("Expected inline expression after 'match'", q);
             }

@@ -2,7 +2,7 @@
 {
     public record Operator(string Name,
                            IAzTypeExpn Type,
-                           eFixity Fixity) : IAzFuncDefn
+                           eFixity Fixity = eFixity.Infix) : IAzFuncDefn
     {
         public CodePosition Position => CodePosition.Null;
 

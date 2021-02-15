@@ -1,4 +1,6 @@
-﻿using Transpiler.Parse;
+﻿using System;
+using System.Linq;
+using Transpiler.Parse;
 
 namespace Transpiler.Analysis
 {
@@ -9,15 +11,28 @@ namespace Transpiler.Analysis
         public static IAzFuncExpn Analyze(Scope scope,
                                           PsArbExpn node)
         {
-            var first = IAzFuncExpn.Analyze(scope, node.Children[0]);
+            var subexpns = node.Children.Select(c => IAzFuncExpn.Analyze(scope, c)).ToList();
 
-            for (int i = 1; i < node.Children.Count; i++)
+            if ((subexpns.Count == 3) &&
+                subexpns[1] is AzSymbolExpn symExpn &&
+                symExpn.Definition.Fixity == eFixity.Infix)
             {
-                var second = IAzFuncExpn.Analyze(scope, node.Children[i]);
-                first = new AzAppExpn(first, second, first.Position);
+                var op = subexpns[1];
+                var app = new AzAppExpn(op, subexpns[0], op.Position);
+                app = new AzAppExpn(app, subexpns[2], op.Position);
+                return app;
             }
+            else
+            {
+                IAzFuncExpn app = subexpns[0];
+                var p = app.Position;
+                for (int i = 1; i < subexpns.Count; i++)
+                {
+                    app = new AzAppExpn(app, subexpns[i], p);
+                }
 
-            return first;
+                return app;
+            }
         }
 
         public static ConstraintSet Constrain(TvTable tvTable,

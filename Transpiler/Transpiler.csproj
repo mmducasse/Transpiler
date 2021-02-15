@@ -15,10 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\AzElsePattern.cs" />
     <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\AzParam.cs" />
     <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\AzDectorPattern.cs" />
     <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\IAzPattern.cs" />
     <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\AzMatchCase.cs" />
+    <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\AzTuplePattern.cs" />
   </ItemGroup>
 
   <ItemGroup>

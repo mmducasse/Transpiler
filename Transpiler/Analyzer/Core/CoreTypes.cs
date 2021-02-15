@@ -67,8 +67,8 @@ namespace Transpiler.Analysis
 
             var type = AzTypeLambdaExpn.Make(a, a, Bool.ToCtor());
 
-            var fEq = new AzFuncDefn("==", type, CodePosition.Null);
-            var fNeq = new AzFuncDefn("!=", type, CodePosition.Null);
+            var fEq = new AzFuncDefn("==", type, eFixity.Infix, CodePosition.Null);
+            var fNeq = new AzFuncDefn("!=", type, eFixity.Infix, CodePosition.Null);
 
             cEq.Functions = RList(fEq, fNeq);
 
@@ -86,10 +86,10 @@ namespace Transpiler.Analysis
 
             var type = AzTypeLambdaExpn.Make(a, a, a);
 
-            var fAdd = new AzFuncDefn("+", type, CodePosition.Null);
-            var fSub = new AzFuncDefn("-", type, CodePosition.Null);
-            var fMul = new AzFuncDefn("*", type, CodePosition.Null);
-            var fDiv = new AzFuncDefn("/", type, CodePosition.Null);
+            var fAdd = new AzFuncDefn("+", type, eFixity.Infix, CodePosition.Null);
+            var fSub = new AzFuncDefn("-", type, eFixity.Infix, CodePosition.Null);
+            var fMul = new AzFuncDefn("*", type, eFixity.Infix, CodePosition.Null);
+            var fDiv = new AzFuncDefn("/", type, eFixity.Infix, CodePosition.Null);
 
             cNum.Functions = RList(fAdd, fSub, fMul, fDiv);
 

@@ -5,7 +5,7 @@ namespace Transpiler.Analysis
 {
     public interface IAzFuncDefn : IAzDefn, IAzFuncNode
     {
-        //eFixity Fixity { get; }
+        eFixity Fixity { get; }
 
         IAzTypeExpn ExplicitType { get; }
     }
@@ -19,14 +19,18 @@ namespace Transpiler.Analysis
         
         public AzScopedFuncExpn ScopedExpression { get; set; }
 
+        public eFixity Fixity { get; }
+
         public CodePosition Position { get; }
 
         public AzFuncDefn(string name,
                           IAzTypeExpn typeExpression,
+                          eFixity fixity,
                           CodePosition position)
         {
             Name = name;
             ExplicitType = typeExpression;
+            Fixity = fixity;
             Position = position;
         }
 
@@ -42,7 +46,7 @@ namespace Transpiler.Analysis
 
             if (node.Names.Count == 1)
             {
-                var funcDefn = new AzFuncDefn(node.Names[0], explicitType, node.Position);
+                var funcDefn = new AzFuncDefn(node.Names[0], explicitType, node.Fixity, node.Position);
                 scope.AddFunction(funcDefn);
                 return funcDefn.ToArr();
             }
@@ -128,7 +132,7 @@ namespace Transpiler.Analysis
         public AzDectorFuncDefn(string name,
                                 int tupleIndex,
                                 CodePosition position)
-            : base(name, null, position)
+            : base(name, null, eFixity.Prefix, position)
         {
             TupleIndex = tupleIndex;
         }

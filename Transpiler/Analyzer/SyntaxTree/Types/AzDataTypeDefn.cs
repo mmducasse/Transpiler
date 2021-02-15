@@ -38,7 +38,7 @@ namespace Transpiler.Analysis
 
         public static AzDataTypeDefn Make(Scope fileScope, string name, AzUnionTypeDefn parentUnion)
         {
-            var ctorFunc = new AzFuncDefn(name, null, CodePosition.Null);
+            var ctorFunc = new AzFuncDefn(name, null, eFixity.Prefix, CodePosition.Null);
             var typeDefn = new AzDataTypeDefn(name, new List<TypeVariable>(), ctorFunc, parentUnion, fileScope, CodePosition.Null);
             typeDefn.Expression = new AzTypeTupleExpn(new List<IAzTypeExpn>(), CodePosition.Null);
             CreateConstructor(fileScope, typeDefn, parentUnion);
@@ -73,7 +73,7 @@ namespace Transpiler.Analysis
                 throw Analyzer.Error("Nested data types may not have explicit type parameters", node.Position);
             }
 
-            var ctorFunc = new AzFuncDefn(node.Name, null, node.Position);
+            var ctorFunc = new AzFuncDefn(node.Name, null, eFixity.Prefix, node.Position);
             var typeDefn = new AzDataTypeDefn(node.Name, typeVars, ctorFunc, parentUnion, scope, node.Position);
             fileScope.AddType(typeDefn);
 

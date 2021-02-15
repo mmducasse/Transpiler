@@ -10,7 +10,9 @@ namespace Transpiler.Analysis
         {
             return node switch
             {
+                PsElsePattern @else => AzElsePattern.Analyze(scope, @else),
                 PsDectorPattern dector => AzDectorPattern.Analyze(scope, dector),
+                PsTuplePattern tuple => AzTuplePattern.Analyze(scope, tuple),
                 _ => throw new NotImplementedException(),
             };
         }
@@ -21,7 +23,9 @@ namespace Transpiler.Analysis
         {
             return node switch
             {
+                AzElsePattern => ConstraintSet.Empty,
                 AzDectorPattern dector => AzDectorPattern.Constrain(tvTable, scope, dector),
+                AzTuplePattern tuple => AzTuplePattern.Constrain(tvTable, scope, tuple),
                 _ => throw new NotImplementedException(),
             };
         }
