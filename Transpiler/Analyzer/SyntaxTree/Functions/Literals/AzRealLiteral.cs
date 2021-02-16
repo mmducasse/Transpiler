@@ -2,8 +2,8 @@
 
 namespace Transpiler.Analysis
 {
-    public record AzRealLiteral(double Value,
-                                CodePosition Position) : IAzLiteralExpn<double>
+    public record AzRealLiteral(string Value,
+                                CodePosition Position) : IAzLiteralExpn
     {
         public IAzDataTypeDefn CertainType => CoreTypes.Instance.Real;
 
@@ -15,9 +15,10 @@ namespace Transpiler.Analysis
 
         public string Print(int indent)
         {
-            return ((int)Value == Value)
-                ? string.Format("{0:0.0}", Value)
-                : Value.ToString();
+            //return ((int)Value == Value)
+            //    ? string.Format("{0:0.0}", Value)
+            //    : Value.ToString();
+            return Value;
         }
     }
 }

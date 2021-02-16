@@ -2,7 +2,7 @@
 
 namespace Transpiler.Parse
 {
-    public record PsRealLiteral(double Value,
+    public record PsRealLiteral(string Value,
                                 CodePosition Position) : IPsLiteralExpn
     {
         public static bool Parse(ref TokenQueue queue, out PsRealLiteral node)
@@ -16,12 +16,11 @@ namespace Transpiler.Parse
                 Finds(TokenType.NumberLiteral, ref q, out string frac))
             {
                 string real = whole + "." + frac;
-                if (double.TryParse(real, out double d))
-                {
-                    node = new PsRealLiteral(d, p);
-                    queue = q;
-                    return true;
-                }
+                real = real.Replace("_", "");
+
+                node = new PsRealLiteral(real, p);
+                queue = q;
+                return true;
             }
 
             return false;
@@ -29,9 +28,10 @@ namespace Transpiler.Parse
 
         public string Print(int indent)
         {
-            return ((int)Value == Value)
-                ? string.Format("{0:0.0}", Value)
-                : Value.ToString();
+            //return ((int)Value == Value)
+            //    ? string.Format("{0:0.0}", Value)
+            //    : Value.ToString();
+            return Value;
         }
     }
 }

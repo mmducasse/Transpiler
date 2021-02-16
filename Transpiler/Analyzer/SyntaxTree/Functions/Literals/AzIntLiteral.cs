@@ -2,8 +2,8 @@
 
 namespace Transpiler.Analysis
 {
-    public record AzIntLiteral(int Value,
-                               CodePosition Position) : IAzLiteralExpn<int>
+    public record AzIntLiteral(string Value,
+                               CodePosition Position) : IAzLiteralExpn
     {
         public IAzDataTypeDefn CertainType => CoreTypes.Instance.Int;
 

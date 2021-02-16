@@ -9,6 +9,7 @@ namespace Transpiler.Analysis
     {
         public AzPrimitiveTypeDefn Int { get; }
         public AzPrimitiveTypeDefn Real { get; }
+        public AzPrimitiveTypeDefn Char { get; }
 
         public AzUnionTypeDefn Bool { get; }
         public AzUnionTypeDefn List { get; }
@@ -33,6 +34,7 @@ namespace Transpiler.Analysis
 
             Int = AzPrimitiveTypeDefn.Make(mScope, "Int");
             Real = AzPrimitiveTypeDefn.Make(mScope, "Real");
+            Char = AzPrimitiveTypeDefn.Make(mScope, "Char");
 
             Bool = AzUnionTypeDefn.Make(mScope, "Bool", "True", "False");
 

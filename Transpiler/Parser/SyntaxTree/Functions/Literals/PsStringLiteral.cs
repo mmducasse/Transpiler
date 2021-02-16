@@ -2,20 +2,18 @@
 
 namespace Transpiler.Parse
 {
-    public record PsIntLiteral(string Value,
-                               CodePosition Position) : IPsLiteralExpn
+    public record PsStringLiteral(string Value,
+                                  CodePosition Position) : IPsLiteralExpn
     {
-        public static bool Parse(ref TokenQueue queue, out PsIntLiteral node)
+        public static bool Parse(ref TokenQueue queue, out PsStringLiteral node)
         {
             node = null;
             var q = queue;
             var p = q.Position;
 
-            if (Finds(TokenType.NumberLiteral, ref q, out string value))
+            if (Finds(TokenType.DoubleQuoted, ref q, out string value))
             {
-                value = value.Replace("_", "");
-
-                node = new PsIntLiteral(value, p);
+                node = new(value, p);
                 queue = q;
                 return true;
             }
