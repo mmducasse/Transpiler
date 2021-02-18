@@ -4,8 +4,8 @@ using static Transpiler.Parse.ParserUtils;
 namespace Transpiler.Parse
 {
     public record PsIfExpn(IPsFuncExpn Condition,
-                           PsScopedFuncExpn ThenCase,
-                           PsScopedFuncExpn ElseCase,
+                           IPsFuncExpn ThenCase,
+                           IPsFuncExpn ElseCase,
                            CodePosition Position) : IPsFuncExpn
     {
         public static bool Parse(ref TokenQueue queue, out PsIfExpn node)

@@ -4,16 +4,16 @@ using static Transpiler.Extensions;
 namespace Transpiler.Analysis
 {
     public record AzIfExpn(IAzFuncExpn Condition,
-                           AzScopedFuncExpn ThenCase,
-                           AzScopedFuncExpn ElseCase,
+                           IAzFuncExpn ThenCase,
+                           IAzFuncExpn ElseCase,
                            CodePosition Position) : IAzFuncExpn
     {
         public static AzIfExpn Analyze(Scope scope,
                                        PsIfExpn ifExpn)
         {
             var condition = IAzFuncExpn.Analyze(scope, ifExpn.Condition);
-            var thenCase = AzScopedFuncExpn.Analyze(scope, ifExpn.ThenCase);
-            var elseCase = AzScopedFuncExpn.Analyze(scope, ifExpn.ElseCase);
+            var thenCase = IAzFuncExpn.Analyze(scope, ifExpn.ThenCase);
+            var elseCase = IAzFuncExpn.Analyze(scope, ifExpn.ElseCase);
 
             var newIfExpn = new AzIfExpn(condition, thenCase, elseCase, ifExpn.Position);
             return newIfExpn;
@@ -24,13 +24,13 @@ namespace Transpiler.Analysis
                                               AzIfExpn node)
         {
             var csc = IAzFuncExpn.Constrain(tvTable, scope, node.Condition);
-            var cst = AzScopedFuncExpn.Constrain(tvTable, node.ThenCase);
-            var cse = AzScopedFuncExpn.Constrain(tvTable, node.ElseCase);
+            var cst = IAzFuncExpn.Constrain(tvTable, scope, node.ThenCase);
+            var cse = IAzFuncExpn.Constrain(tvTable, scope, node.ElseCase);
 
             var tif = tvTable.GetTypeOf(node);
             var tc = tvTable.GetTypeOf(node.Condition);
-            var tt = tvTable.GetTypeOf(node.ThenCase.Expression);
-            var te = tvTable.GetTypeOf(node.ElseCase.Expression);
+            var tt = tvTable.GetTypeOf(node.ThenCase);
+            var te = tvTable.GetTypeOf(node.ElseCase);
 
             var cif = new Constraint(tif, tt, node);
             var cc = new Constraint(tc, CoreTypes.Instance.Bool.ToCtor(), node);

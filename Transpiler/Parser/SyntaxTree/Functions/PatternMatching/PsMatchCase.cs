@@ -3,7 +3,7 @@
 namespace Transpiler.Parse
 {
     public record PsMatchCase(IPsPattern Pattern,
-                              PsScopedFuncExpn Expression,
+                              IPsFuncExpn Expression,
                               CodePosition Position) : IPsFuncNode
     {
         public static bool Parse(ref TokenQueue queue, out PsMatchCase node)

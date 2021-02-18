@@ -18,9 +18,7 @@ namespace Transpiler
 
         public Scope Scope { get; set; }
 
-        //public IReadOnlyList<Command> Commands { get; set; }
-
-        //public IDebugInfo DebugInfo { get; set; }
+        public string Output { get; set; }
 
         public Module(string code, string name)
         {

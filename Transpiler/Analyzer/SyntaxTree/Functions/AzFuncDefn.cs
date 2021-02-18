@@ -17,7 +17,7 @@ namespace Transpiler.Analysis
 
         public IAzTypeExpn ExplicitType { get; }
         
-        public AzScopedFuncExpn ScopedExpression { get; set; }
+        public IAzFuncExpn Expression { get; set; }
 
         public eFixity Fixity { get; }
 
@@ -78,9 +78,7 @@ namespace Transpiler.Analysis
                 paramStack.Push(paramDefn);
             }
 
-            var innerScopedExpn = AzScopedFuncExpn.Analyze(scope, node.ScopedExpression);
-            var scopedFuncDefns = innerScopedExpn.FuncDefinitions;
-            IAzFuncExpn expn = innerScopedExpn.Expression;
+            var expn = IAzFuncExpn.Analyze(scope, node.Expression);
 
             while (paramStack.TryPop(out var paramDefn))
             {
@@ -96,7 +94,8 @@ namespace Transpiler.Analysis
             //    return funcDefn;
             //}
 
-            funcDefn.ScopedExpression = new AzScopedFuncExpn(expn, scopedFuncDefns, scope, innerScopedExpn.Position);
+            //funcDefn.ScopedExpression = new AzScopedFuncExpn(expn, scopedFuncDefns, scope, innerScopedExpn.Position);
+            funcDefn.Expression = expn;
 
             return funcDefn;
         }
@@ -107,10 +106,10 @@ namespace Transpiler.Analysis
         {
             tvTable.AddNode(scope, node);
 
-            var cs = AzScopedFuncExpn.Constrain(tvTable, node.ScopedExpression);
+            var cs = IAzFuncExpn.Constrain(tvTable, scope, node.Expression);
 
             var tf = tvTable.GetTypeOf(node);
-            var te = tvTable.GetTypeOf(node.ScopedExpression.Expression);
+            var te = tvTable.GetTypeOf(node.Expression);
 
             var c = new Constraint(tf, te, node);
 
@@ -120,7 +119,7 @@ namespace Transpiler.Analysis
         public virtual string Print(int i)
         {
             string type = (ExplicitType == null) ? "" : " : " + ExplicitType.Print(0);
-            var expn = (ScopedExpression == null) ? "" : " = " + ScopedExpression.Print(i + 1);
+            var expn = (Expression == null) ? "" : " = " + Expression.Print(i + 1);
             return string.Format("{0}{1}{2}", Name, type, expn);
         }
     }
@@ -140,7 +139,7 @@ namespace Transpiler.Analysis
         public override string Print(int i)
         {
             string type = (ExplicitType == null) ? "" : " : " + ExplicitType.Print(0);
-            return string.Format("{0}{1} = GET{2} ({3})", Name, type, TupleIndex, ScopedExpression.Print(i + 1));
+            return string.Format("{0}{1} = GET{2} ({3})", Name, type, TupleIndex, Expression.Print(i + 1));
         }
     }
 }

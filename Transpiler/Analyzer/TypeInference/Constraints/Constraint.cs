@@ -14,8 +14,8 @@ namespace Transpiler.Analysis
         public IConstraint Substitute(Substitution sub)
         {
             return new Constraint(IAzTypeExpn.Substitute(A, sub),
-                                       IAzTypeExpn.Substitute(B, sub),
-                                       TEMP_Node);
+                                  IAzTypeExpn.Substitute(B, sub),
+                                  TEMP_Node);
         }
 
         public static Substitution Unify(IScope scope,

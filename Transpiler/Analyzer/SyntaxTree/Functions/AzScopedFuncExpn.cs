@@ -37,7 +37,11 @@ namespace Transpiler.Analysis
 
             var cse = IAzFuncExpn.Constrain(tvTable, node.Scope, node.Expression);
 
-            return IConstraintSet.Union(cse, cs);
+            var tc = tvTable.GetTypeOf(node);
+            var te = tvTable.GetTypeOf(node.Expression);
+            var ccc = new Constraint(tc, te, node);
+
+            return IConstraintSet.Union(cse, cs, ccc);
         }
 
         public string Print(int i)

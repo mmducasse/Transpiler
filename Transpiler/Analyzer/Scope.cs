@@ -7,6 +7,8 @@ namespace Transpiler.Analysis
     {
         string Name { get; }
 
+        IReadOnlyDictionary<string, IAzFuncDefn> FuncDefinitions { get; }
+
         bool TryGetNamedType(string typeName, out IAzTypeDefn type);
 
         bool TryGetFuncDefn(string symbol, out IAzFuncDefn defn);
@@ -33,6 +35,7 @@ namespace Transpiler.Analysis
 
         public IEnumerable<IScope> Dependencies { get; } = new List<IScope>();
 
+        IReadOnlyDictionary<string, IAzFuncDefn> IScope.FuncDefinitions => FuncDefinitions;
         public Dictionary<string, IAzFuncDefn> FuncDefinitions { get; } = new();
 
         public Dictionary<IAzFuncDefn, IAzTypeExpn> FuncDefnTypes { get; } = new();

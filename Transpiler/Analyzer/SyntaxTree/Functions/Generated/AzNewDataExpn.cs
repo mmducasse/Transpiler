@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Transpiler.Analysis
 {
-    public record AzGenDataExpn(AzDataTypeDefn Definition) : IAzFuncExpn
+    public record AzNewDataExpn(AzDataTypeDefn Definition) : IAzFuncExpn
     {
+        public IReadOnlyList<AzSymbolExpn> Arguments { get; set; }
+
         public CodePosition Position => CodePosition.Null;
 
         public string Print(int i)

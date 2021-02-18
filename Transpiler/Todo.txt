@@ -11,10 +11,10 @@ TODO:
 - Make token indentation more robust
 - Better code locations for errors
 - Multiple modules
-- Generate JavaScript
 - Monomorphic operations for each primitive data type.
 - Match Case Patterns can be replaced with predicates and values
   - These take the match argument as a parameter to produce Bool result
+- Nested patterns
 -$0, $1, etc to represent lambda inputs
 - Type aliases
 - Pattern aliases

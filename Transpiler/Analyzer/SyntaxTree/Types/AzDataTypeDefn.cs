@@ -118,20 +118,23 @@ namespace Transpiler.Analysis
             //var retType = new AzTypeSymbolExpn(dataType, CodePosition.Null);
             var retType = new AzTypeCtorExpn(returnType, returnType.Parameters, CodePosition.Null);
             IAzTypeExpn type = retType;
-            IAzFuncExpn expn = new AzGenDataExpn(dataType);
+            AzNewDataExpn newData = new AzNewDataExpn(dataType);
+            IAzFuncExpn expn = new AzScopedFuncExpn(newData, new List<AzFuncDefn>(), fileScope, CodePosition.Null);
 
             int index = 0;
+            List<AzSymbolExpn> symbols = new();
             while (argStack.TryPop(out var arg))
             {
                 type = new AzTypeLambdaExpn(arg, type, CodePosition.Null);
 
                 var argExpn = new AzParam("$" + index++, CodePosition.Null);
+                symbols.Add(new AzSymbolExpn(argExpn, CodePosition.Null));
                 expn = new AzLambdaExpn(argExpn, expn, CodePosition.Null);
             }
 
-            var scopedExpn = new AzScopedFuncExpn(expn, new List<AzFuncDefn>(), fileScope, CodePosition.Null);
+            newData.Arguments = symbols.ToArray().Reverse().ToList();
 
-            dataType.Constructor.ScopedExpression = scopedExpn;
+            dataType.Constructor.Expression = expn;
 
             Console.WriteLine("CTOR {0} :: {1}", dataType.Constructor.Print(0), type.Print(0));
             fileScope.AddFunction(dataType.Constructor, type);

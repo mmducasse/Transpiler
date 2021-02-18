@@ -10,6 +10,7 @@ namespace Transpiler.Analysis
         {
             return node switch
             {
+                PsScopedFuncExpn scopedExpn => AzScopedFuncExpn.Analyze(scope, scopedExpn),
                 PsArbExpn arbExpn => AzAppExpn.Analyze(scope, arbExpn),
                 PsIfExpn ifExpn => AzIfExpn.Analyze(scope, ifExpn),
                 PsLambdaExpn lamExpn => AzLambdaExpn.Analyze(scope, lamExpn),
@@ -29,8 +30,9 @@ namespace Transpiler.Analysis
 
             return node switch
             {
+                AzScopedFuncExpn scopedExpn => AzScopedFuncExpn.Constrain(tvTable, scopedExpn),
                 IAzLiteralExpn _ => ConstraintSet.Empty,
-                AzGenDataExpn genExpn => ConstraintSet.Empty,
+                AzNewDataExpn genExpn => ConstraintSet.Empty,
                 AzSymbolExpn symExpn => AzSymbolExpn.Constrain(tvTable, scope, symExpn),
                 AzAppExpn appExpn => AzAppExpn.Constrain(tvTable, scope, appExpn),
                 AzLambdaExpn lamExpn => AzLambdaExpn.Constrain(tvTable, scope, lamExpn),

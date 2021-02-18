@@ -2,6 +2,7 @@
 using Transpiler;
 using Transpiler.Analysis;
 using Transpiler.Parse;
+using Transpiler.Generate;
 
 Console.WriteLine("Transpiler\n");
 
@@ -17,3 +18,6 @@ Parser.Print(module);
 Console.WriteLine(" === ANALYZER ===");
 Analyzer.Analyze(module);
 Analyzer.Print(module);
+
+Console.WriteLine(" === GENERATOR ===");
+Generator.Generate(module);

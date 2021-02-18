@@ -13,7 +13,7 @@ namespace Transpiler.Parse
                              IReadOnlyList<PsParam> Parameters,
                              bool IsPrivate,
                              IPsTypeExpn TypeExpression,
-                             PsScopedFuncExpn ScopedExpression,
+                             IPsFuncExpn Expression,
                              eFixity Fixity,
                              CodePosition Position) : IPsFuncDefn
     {
@@ -68,10 +68,10 @@ namespace Transpiler.Parse
                 throw Error("Expected explicit type in function declaration.", q);
             }
 
-            PsScopedFuncExpn scopedExpn = null;
+            IPsFuncExpn expn = null;
             if (Finds("=", ref q))
             {
-                if (!PsScopedFuncExpn.Parse(ref q, out scopedExpn))
+                if (!PsScopedFuncExpn.Parse(ref q, out expn))
                 {
                     throw Error("Expected function expression after '='", q);
                 }
@@ -91,7 +91,7 @@ namespace Transpiler.Parse
             //    scopedExpn = new PsScopedFuncExpn(lambda, scopedExpn.FuncDefinitions, p);
             //}
 
-            node = new(names, parameters, isPrivate, typeExpn, scopedExpn, fixity, p);
+            node = new(names, parameters, isPrivate, typeExpn, expn, fixity, p);
             queue = q;
 
             return true;
@@ -181,9 +181,9 @@ namespace Transpiler.Parse
             {
                 s += string.Format(" : {0}", TypeExpression.Print(i + 1));
             }
-            if (ScopedExpression != null)
+            if (Expression != null)
             {
-                s += string.Format(" = {0}", ScopedExpression.Print(i + 1));
+                s += string.Format(" = {0}", Expression.Print(i + 1));
             }
 
             return s;

@@ -8,7 +8,42 @@ namespace Transpiler.Parse
                                    IReadOnlyList<PsFuncDefn> FuncDefinitions,
                                    CodePosition Position) : IPsFuncExpn
     {
-        public static bool Parse(ref TokenQueue queue, out PsScopedFuncExpn node)
+        public static bool Parse(ref TokenQueue queue, out IPsFuncExpn node)
+        {
+            node = null;
+            var q = queue;
+
+            if (ParseLambda(ref q, out var lambdaNode)) { node = lambdaNode; }
+            else if (ParseScopedExpn(ref q, out var scopedNode)) { node = scopedNode; }
+
+            if (node != null)
+            {
+                queue = q;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool ParseLambda(ref TokenQueue queue, out IPsFuncExpn node)
+        {
+            node = null;
+            var q = queue;
+            var p = q.Position;
+
+            if (!PsParam.Parse(ref q, out var paramNode)) { return false; }
+            if (!Finds("->", ref q)) { return false; }
+            if (!PsScopedFuncExpn.Parse(ref q, out var expnNode))
+            {
+                throw Error("Expected expression after '->' in lambda function.", q);
+            }
+
+            node = new PsLambdaExpn(paramNode, expnNode, p);
+            queue = q;
+            return true;
+        }
+
+        private static bool ParseScopedExpn(ref TokenQueue queue, out IPsFuncExpn node)
         {
             node = null;
             var q = queue;

@@ -70,10 +70,10 @@ namespace Transpiler.Analysis
                     type = dectorPattern.TypeDefn.ToCtor();
                 }
             }
-            else if (node is AzScopedFuncExpn _)
-            {
-                throw new InvalidOperationException();
-            }
+            //else if (node is AzScopedFuncExpn _)
+            //{
+            //    //throw new InvalidOperationException();
+            //}
             else
             {
                 type = TvProvider.Next;
