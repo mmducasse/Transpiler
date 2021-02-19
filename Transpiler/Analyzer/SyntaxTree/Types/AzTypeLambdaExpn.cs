@@ -57,6 +57,6 @@ namespace Transpiler.Analysis
             return string.Format("{0} -> {1}", Input.Print(i), Output.Print(i));
         }
 
-        public override string ToString() => Print(0);
+        public override string ToString() => this.PrintWithRefinements();
     }
 }

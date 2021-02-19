@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Parse;
+using static Transpiler.CodePosition;
 
 namespace Transpiler.Analysis
 {
     public record AzTuplePattern(IReadOnlyList<IAzPattern> Elements,
                                  CodePosition Position) : IAzPattern
     {
+        public IAzTypeExpn Type { get; set; }
+
         public static AzTuplePattern Analyze(Scope scope,
                                               PsTuplePattern node)
         {
@@ -15,27 +18,30 @@ namespace Transpiler.Analysis
             return new(elements, node.Position);
         }
 
-        public static ConstraintSet Constrain(TvTable tvTable,
-                                              Scope scope,
-                                              AzTuplePattern node)
+        public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
+            Type = provider.Next;
+
             var cs = new ConstraintSet();
             List<IAzTypeExpn> elementTypes = new();
-            for (int i = 0; i < node.Elements.Count; i++)
+            for (int i = 0; i < Elements.Count; i++)
             {
-                var c = IAzPattern.Constrain(tvTable, scope, node.Elements[i]);
-
-                var tv = tvTable.AddNode(scope, node.Elements[i]);
-                elementTypes.Add(tv);
+                var c = Elements[i].Constrain(provider, scope);
+                elementTypes.Add(Elements[i].Type);
 
                 cs = IConstraintSet.Union(cs, c);
             }
 
-            var tupleType = new AzTypeTupleExpn(elementTypes, CodePosition.Null);
-            var pattType = tvTable.GetTypeOf(node);
-            var ctup = new Constraint(pattType, tupleType, node);
+            var tupleType = new AzTypeTupleExpn(elementTypes, Null);
+            var ctup = new Constraint(Type, tupleType, this);
 
             return IConstraintSet.Union(cs, ctup);
+        }
+
+        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        {
+            var elementNodes = Elements.SelectMany(e => e.GetSubnodes()).ToList();
+            return this.ToArr().Concat(elementNodes).ToList();
         }
 
         public string Print(int i)

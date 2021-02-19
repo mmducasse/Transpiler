@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Parse;
 
@@ -8,6 +9,8 @@ namespace Transpiler.Analysis
                             IAzFuncExpn Argument,
                             CodePosition Position) : IAzFuncExpn
     {
+        public IAzTypeExpn Type { get; set; }
+
         public static IAzFuncExpn Analyze(Scope scope,
                                           PsArbExpn node)
         {
@@ -35,22 +38,23 @@ namespace Transpiler.Analysis
             }
         }
 
-        public static ConstraintSet Constrain(TvTable tvTable,
-                                              Scope scope,
-                                              AzAppExpn node)
+        public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
-            var csf = IAzFuncExpn.Constrain(tvTable, scope, node.Function);
-            var csx = IAzFuncExpn.Constrain(tvTable, scope, node.Argument);
+            Type = provider.Next;
 
-            var tf = tvTable.GetTypeOf(node.Function);
-            var tx = tvTable.GetTypeOf(node.Argument);
-            var tfx = tvTable.GetTypeOf(node);
-            var ta = tvTable.TvProvider.Next;
+            var csf = Function.Constrain(provider, scope);
+            var csx = Argument.Constrain(provider, scope);
 
             var p = CodePosition.Null;
-            var cfx = new Constraint(tf, new AzTypeLambdaExpn(tx, tfx, p), node);
+            var lamType = new AzTypeLambdaExpn(Argument.Type, Type, p);
+            var cfx = new Constraint(Function.Type, lamType, this);
 
             return IConstraintSet.Union(cfx, csf, csx);
+        }
+
+        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        {
+            return this.ToArr().Concat(Function.GetSubnodes()).Concat(Argument.GetSubnodes()).ToList();
         }
 
         public string Print(int i)

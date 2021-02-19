@@ -1,4 +1,6 @@
-﻿using Transpiler.Parse;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Transpiler.Parse;
 using static Transpiler.Extensions;
 
 namespace Transpiler.Analysis
@@ -8,6 +10,8 @@ namespace Transpiler.Analysis
                            IAzFuncExpn ElseCase,
                            CodePosition Position) : IAzFuncExpn
     {
+        public IAzTypeExpn Type { get; set; }
+
         public static AzIfExpn Analyze(Scope scope,
                                        PsIfExpn ifExpn)
         {
@@ -19,24 +23,26 @@ namespace Transpiler.Analysis
             return newIfExpn;
         }
 
-        public static ConstraintSet Constrain(TvTable tvTable,
-                                              Scope scope,
-                                              AzIfExpn node)
+        public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
-            var csc = IAzFuncExpn.Constrain(tvTable, scope, node.Condition);
-            var cst = IAzFuncExpn.Constrain(tvTable, scope, node.ThenCase);
-            var cse = IAzFuncExpn.Constrain(tvTable, scope, node.ElseCase);
+            Type = provider.Next;
 
-            var tif = tvTable.GetTypeOf(node);
-            var tc = tvTable.GetTypeOf(node.Condition);
-            var tt = tvTable.GetTypeOf(node.ThenCase);
-            var te = tvTable.GetTypeOf(node.ElseCase);
+            var csc = Condition.Constrain(provider, scope);
+            var cst = ThenCase.Constrain(provider, scope);
+            var cse = ElseCase.Constrain(provider, scope);
 
-            var cif = new Constraint(tif, tt, node);
-            var cc = new Constraint(tc, CoreTypes.Instance.Bool.ToCtor(), node);
-            var cf = new Constraint(tt, te, node);
+            var cif = new Constraint(Type, ThenCase.Type, this);
+            var cc = new Constraint(Condition.Type, CoreTypes.Instance.Bool.ToCtor(), this);
+            var cf = new Constraint(ThenCase.Type, ElseCase.Type, this);
 
             return IConstraintSet.Union(cif, cc, cf, csc, cst, cse);
+        }
+
+        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        {
+            return this.ToArr().Concat(Condition.GetSubnodes())
+                               .Concat(ThenCase.GetSubnodes())
+                               .Concat(ElseCase.GetSubnodes()).ToList();
         }
 
         public string Print(int i)

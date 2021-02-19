@@ -15,8 +15,6 @@ namespace Transpiler.Analysis
 
         bool TryGetFuncDefn(string symbol, out IAzFuncDefn defn);
 
-        bool TryGetFuncDefnType(IAzFuncDefn funcDefn, out IAzTypeExpn type);
-
         bool TryGetTypeVar(string tvName, out TypeVariable tv);
 
         bool IsSubtypeOf(IAzTypeDefn subtype, IAzTypeSetDefn supertype);
@@ -25,8 +23,6 @@ namespace Transpiler.Analysis
 
         bool TryGetCommonSupertypeOf(IReadOnlyList<IAzTypeExpn> subtypes,
                                      out HashSet<IAzTypeSetDefn> supertypes);
-
-        bool VerifySymbols(params string[] symbols);
 
         void PrintTypeHeirarchy();
     }
@@ -121,24 +117,6 @@ namespace Transpiler.Analysis
             foreach (var d in Dependencies)
             {
                 if (d.TryGetFuncDefn(symbol, out defn))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public bool TryGetFuncDefnType(IAzFuncDefn funcDefn, out IAzTypeExpn type)
-        {
-            if (FuncDefnTypes.TryGetValue(funcDefn, out type))
-            {
-                return true;
-            }
-
-            foreach (var d in Dependencies)
-            {
-                if (d.TryGetFuncDefnType(funcDefn, out type))
                 {
                     return true;
                 }
@@ -336,25 +314,6 @@ namespace Transpiler.Analysis
             {
                 d.PrintTypeHeirarchy();
             }
-        }
-
-        public bool VerifySymbols(params string[] symbols)
-        {
-            foreach (string s in symbols)
-            {
-                if (!FuncDefinitions.ContainsKey(s))
-                {
-                    foreach (var d in Dependencies)
-                    {
-                        if (!d.VerifySymbols(s))
-                        {
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            return true;
         }
     }
 }

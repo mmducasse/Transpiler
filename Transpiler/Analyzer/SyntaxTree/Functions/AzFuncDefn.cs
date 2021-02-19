@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Transpiler.Parse;
 
 namespace Transpiler.Analysis
@@ -16,7 +17,9 @@ namespace Transpiler.Analysis
         public string Name { get; }
 
         public IAzTypeExpn ExplicitType { get; set; }
-        
+
+        public IAzTypeExpn Type { get; set; }
+
         public IAzFuncExpn Expression { get; set; }
 
         public eFixity Fixity { get; }
@@ -100,25 +103,36 @@ namespace Transpiler.Analysis
             return funcDefn;
         }
 
-        public static ConstraintSet Constrain(TvTable tvTable,
-                                              Scope scope,
-                                              AzFuncDefn node)
+        public ConstraintSet Constrain(TvProvider provider,
+                                       Scope scope)
         {
-            tvTable.AddNode(scope, node);
-
-            if (node.Expression != null)
+            if (ExplicitType != null)
             {
-                var cs = IAzFuncExpn.Constrain(tvTable, scope, node.Expression);
+                Type = ExplicitType.WithUniqueTvs(provider);
+            }
+            else
+            {
+                Type = provider.Next;
+            }
 
-                var tf = tvTable.GetTypeOf(node);
-                var te = tvTable.GetTypeOf(node.Expression);
-
-                var c = new Constraint(tf, te, node);
+            if (Expression != null)
+            {
+                var cs = Expression.Constrain(provider, scope);
+                var c = new Constraint(Type, Expression.Type, this);
 
                 return IConstraintSet.Union(c, cs);
             }
 
             return ConstraintSet.Empty;
+        }
+
+        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        {
+            if (Expression == null)
+            {
+                return this.ToArr();
+            }
+            return this.ToArr().Concat(Expression.GetSubnodes()).ToList();
         }
 
         public virtual string Print(int i)

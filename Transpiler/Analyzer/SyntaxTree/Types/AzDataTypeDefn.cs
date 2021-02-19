@@ -40,6 +40,7 @@ namespace Transpiler.Analysis
         {
             var ctorFunc = new AzFuncDefn(name, null, eFixity.Prefix, CodePosition.Null);
             var typeDefn = new AzDataTypeDefn(name, new List<TypeVariable>(), ctorFunc, parentUnion, fileScope, CodePosition.Null);
+
             typeDefn.Expression = new AzTypeTupleExpn(new List<IAzTypeExpn>(), CodePosition.Null);
             CreateConstructor(fileScope, typeDefn, parentUnion);
             fileScope.AddType(typeDefn);
@@ -135,6 +136,8 @@ namespace Transpiler.Analysis
             newData.Arguments = symbols.ToArray().Reverse().ToList();
 
             dataType.Constructor.Expression = expn;
+            dataType.Constructor.Expression.Type = type;
+            dataType.Constructor.Type = type;
 
             Console.WriteLine("CTOR {0} :: {1}", dataType.Constructor.Print(0), type.Print(0));
             fileScope.AddFunction(dataType.Constructor, type);

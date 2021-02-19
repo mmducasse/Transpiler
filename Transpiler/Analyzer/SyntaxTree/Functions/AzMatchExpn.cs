@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using static Transpiler.Extensions;
 using Transpiler.Parse;
-using System;
+using static Transpiler.CodePosition;
+using System.Linq;
 
 namespace Transpiler.Analysis
 {
@@ -9,6 +10,8 @@ namespace Transpiler.Analysis
                               IReadOnlyList<AzMatchCase> Cases,
                               CodePosition Position) : IAzFuncExpn
     {
+        public IAzTypeExpn Type { get; set; }
+
         public static AzMatchExpn Analyze(Scope parentScope,
                                           PsMatchExpn node)
         {
@@ -25,31 +28,35 @@ namespace Transpiler.Analysis
             return new(arg, cases, node.Position);
         }
 
-        public static ConstraintSet Constrain(TvTable tvTable,
-                                              Scope scope,
-                                              AzMatchExpn node)
+        public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
-            var csa = IAzFuncExpn.Constrain(tvTable, scope, node.Argument);
+            Type = provider.Next;
 
-            var tmatch = tvTable.GetTypeOf(node);
-            var targ = tvTable.GetTypeOf(node.Argument);
+            var csa = Argument.Constrain(provider, scope);
+
+            var tmatch = Type;
+            var targ = Argument.Type;
 
             var cs = new ConstraintSet();
-            foreach (var @case in node.Cases)
+            foreach (var @case in Cases)
             {
-                tvTable.AddNode(scope, @case);
-                var c = AzMatchCase.Constrain(tvTable, scope, @case);
+                var c = @case.Constrain(provider, scope);
 
-                var tcase = tvTable.GetTypeOf(@case) as AzTypeLambdaExpn;
+                var tcase = @case.Type as AzTypeLambdaExpn;
 
-                var cinput = new Constraint(targ, tcase.Input, node);
-                var coutput = new Constraint(tmatch, tcase.Output, node);
+                var cinput = new Constraint(targ, tcase.Input, this);
+                var coutput = new Constraint(tmatch, tcase.Output, this);
 
                 cs = IConstraintSet.Union(cs, c, cinput, coutput);
             }
 
-
             return IConstraintSet.Union(csa, cs);
+        }
+
+        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        {
+            var caseNodes = Cases.SelectMany(c => c.GetSubnodes()).ToList();
+            return this.ToArr().Concat(caseNodes).ToList();
         }
 
         public string Print(int i)

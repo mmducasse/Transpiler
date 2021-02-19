@@ -9,6 +9,18 @@ namespace Transpiler.Analysis
 
         public CodePosition Position => CodePosition.Null;
 
+        public IAzTypeExpn Type { get; set; }
+
+        public ConstraintSet Constrain(TvProvider provider, Scope scope)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        {
+            return this.ToArr();
+        }
+
         public string Print(int i)
         {
             var args = Arguments.Select(a => a.Print(0)).Separate(" ", prepend: " ");

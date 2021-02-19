@@ -1,4 +1,6 @@
-﻿using Transpiler.Parse;
+﻿using System;
+using System.Collections.Generic;
+using Transpiler.Parse;
 
 namespace Transpiler.Analysis
 {
@@ -7,18 +9,18 @@ namespace Transpiler.Analysis
     {
         public IAzDataTypeDefn CertainType => CoreTypes.Instance.Real;
 
+        public IAzTypeExpn Type { get => CertainType.ToCtor(); set => throw new NotImplementedException(); }
+
         public static AzRealLiteral Analyze(Scope scope,
                                             PsRealLiteral node)
         {
             return new(node.Value, node.Position);
         }
 
-        public string Print(int indent)
-        {
-            //return ((int)Value == Value)
-            //    ? string.Format("{0:0.0}", Value)
-            //    : Value.ToString();
-            return Value;
-        }
+        public ConstraintSet Constrain(TvProvider provider, Scope scope) => ConstraintSet.Empty;
+
+        public IReadOnlyList<IAzFuncNode> GetSubnodes() => this.ToArr();
+
+        public string Print(int indent) => Value;
     }
 }

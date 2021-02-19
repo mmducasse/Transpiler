@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 
 namespace Transpiler.Analysis
 {
@@ -10,6 +11,18 @@ namespace Transpiler.Analysis
         public CodePosition Position => CodePosition.Null;
 
         public IAzTypeExpn ExplicitType => Type;
+
+        IAzTypeExpn IAzFuncNode.Type { get => Type; set => throw new NotImplementedException(); }
+
+        public ConstraintSet Constrain(TvProvider provider, Scope scope)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        {
+            return this.ToArr();
+        }
 
         public string Print(int i) => Name;
 

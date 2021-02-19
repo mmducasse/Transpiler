@@ -17,17 +17,17 @@ namespace Transpiler.Analysis
             };
         }
 
-        public static ConstraintSet Constrain(TvTable tvTable,
-                                              Scope scope,
-                                              IAzPattern node)
-        {
-            return node switch
-            {
-                AzElsePattern => ConstraintSet.Empty,
-                AzDectorPattern dector => AzDectorPattern.Constrain(tvTable, scope, dector),
-                AzTuplePattern tuple => AzTuplePattern.Constrain(tvTable, scope, tuple),
-                _ => throw new NotImplementedException(),
-            };
-        }
+        //public static ConstraintSet Constrain(TvTable tvTable,
+        //                                      Scope scope,
+        //                                      IAzPattern node)
+        //{
+        //    return node switch
+        //    {
+        //        AzElsePattern => ConstraintSet.Empty,
+        //        AzDectorPattern dector => AzDectorPattern.Constrain(tvTable, scope, dector),
+        //        AzTuplePattern tuple => AzTuplePattern.Constrain(tvTable, scope, tuple),
+        //        _ => throw new NotImplementedException(),
+        //    };
+        //}
     }
 }

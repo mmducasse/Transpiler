@@ -1,4 +1,5 @@
-﻿using Transpiler.Parse;
+﻿using System.Collections.Generic;
+using Transpiler.Parse;
 
 namespace Transpiler.Analysis
 {
@@ -8,6 +9,8 @@ namespace Transpiler.Analysis
         public IAzTypeExpn ExplicitType => null;
 
         public eFixity Fixity => eFixity.Prefix;
+
+        public IAzTypeExpn Type { get; set; }
 
         public static AzParam Analyze(Scope scope,
                                       PsParam node)
@@ -19,14 +22,16 @@ namespace Transpiler.Analysis
             return azParam;
         }
 
-        public static bool Solve(Scope scope,
-                                 AzParam node)
+        public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
-            //var tfx = table.GetTypeOf(node);
-            //var tf = table.GetTypeOf(node.Function);
-            //var tx = table.GetTypeOf(node.Argument);
+            Type = provider.Next;
 
-            return false;
+            return ConstraintSet.Empty;
+        }
+
+        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        {
+            return this.ToArr();
         }
 
         public string Print(int i) => Name;

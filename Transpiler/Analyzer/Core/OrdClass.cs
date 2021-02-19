@@ -43,20 +43,20 @@ namespace Transpiler.Analysis
         }
 
         private static void InstOrd(Scope scope,
-                                    AzClassTypeDefn num,
+                                    AzClassTypeDefn ord,
                                     IAzDataTypeDefn implementor)
         {
-            //string name = implementor.Name;
+            var type = AzTypeLambdaExpn.Make(implementor.ToCtor(), implementor.ToCtor(), CoreTypes.Instance.Bool.ToCtor());
 
-            //var fLt = Function2("lt" + name, implementor);
-            //var fLte = Function2("lte" + name, implementor);
-            //var fGt = Function2("gt" + name, implementor);
-            //var fGte = Function2("gte" + name, implementor);
-            //var fns = RList(fLt, fLte, fGt, fGte);
+            Dictionary<AzFuncDefn, IAzFuncDefn> fns = new();
+            AddInstFunc2(fns, ord, "<", "lt" + implementor.Name, type);
+            AddInstFunc2(fns, ord, "<=", "lte" + implementor.Name, type);
+            AddInstFunc2(fns, ord, ">", "gt" + implementor.Name, type);
+            AddInstFunc2(fns, ord, ">=", "gte" + implementor.Name, type);
 
-            //var instDefn = new AzClassInstDefn(num, implementor, new List<TypeVariable>(), fns, CodePosition.Null);
+            var instDefn = new AzClassInstDefn(ord, implementor, new List<TypeVariable>(), fns, CodePosition.Null);
 
-            //scope.AddClassInstance(instDefn);
+            scope.AddClassInstance(instDefn);
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿using Transpiler.Parse;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Transpiler.Parse;
+using static Transpiler.CodePosition;
 
 namespace Transpiler.Analysis
 {
@@ -6,6 +9,7 @@ namespace Transpiler.Analysis
                               IAzFuncExpn Expression,
                               CodePosition Position) : IAzFuncNode
     {
+        public IAzTypeExpn Type { get; set; }
 
         public static AzMatchCase Analyze(Scope scope,
                                           PsMatchCase node)
@@ -16,22 +20,19 @@ namespace Transpiler.Analysis
             return new(pattern, expn, node.Position);
         }
 
-        public static ConstraintSet Constrain(TvTable tvTable,
-                                              Scope scope,
-                                              AzMatchCase node)
+        public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
-            tvTable.AddNode(scope, node.Pattern);
+            var cspatt = Pattern.Constrain(provider, scope);
+            var csexpn = Expression.Constrain(provider, scope);
 
-            var cspatt = IAzPattern.Constrain(tvTable, scope, node.Pattern);
-            var csexpn = IAzFuncExpn.Constrain(tvTable, scope, node.Expression);
+            Type = new AzTypeLambdaExpn(Pattern.Type, Expression.Type, Null);
 
-            var tcase = tvTable.GetTypeOf(node);
-            var tpatt = tvTable.GetTypeOf(node.Pattern);
-            var texpn = tvTable.GetTypeOf(node.Expression);
+            return IConstraintSet.Union(cspatt, csexpn);
+        }
 
-            var cs = new Constraint(tcase, new AzTypeLambdaExpn(tpatt, texpn, CodePosition.Null), node);
-
-            return IConstraintSet.Union(cs, cspatt, csexpn);
+        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        {
+            return this.ToArr().Concat(Pattern.GetSubnodes()).Concat(Expression.GetSubnodes()).ToList();
         }
 
         public string Print(int i)

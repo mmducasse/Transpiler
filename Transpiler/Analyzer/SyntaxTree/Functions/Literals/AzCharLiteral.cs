@@ -1,4 +1,6 @@
-﻿using Transpiler.Parse;
+﻿using System;
+using System.Collections.Generic;
+using Transpiler.Parse;
 
 namespace Transpiler.Analysis
 {
@@ -7,11 +9,17 @@ namespace Transpiler.Analysis
     {
         public IAzDataTypeDefn CertainType => CoreTypes.Instance.Char;
 
+        public IAzTypeExpn Type { get => CertainType.ToCtor(); set => throw new NotImplementedException(); }
+
         public static AzCharLiteral Analyze(Scope scope,
                                             PsCharLiteral node)
         {
             return new(node.Value, node.Position);
         }
+
+        public ConstraintSet Constrain(TvProvider provider, Scope scope) => ConstraintSet.Empty;
+
+        public IReadOnlyList<IAzFuncNode> GetSubnodes() => this.ToArr();
 
         public string Print(int indent)
         {

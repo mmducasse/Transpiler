@@ -1,4 +1,5 @@
-﻿using Transpiler.Parse;
+﻿using System.Collections.Generic;
+using Transpiler.Parse;
 using static Transpiler.Analysis.Analyzer;
 
 namespace Transpiler.Analysis
@@ -7,6 +8,8 @@ namespace Transpiler.Analysis
     public record AzSymbolExpn(IAzFuncDefn Definition,
                                CodePosition Position) : IAzFuncExpn, IAzPattern
     {
+        public IAzTypeExpn Type { get; set; }
+
         public static AzSymbolExpn Analyze(Scope scope,
                                            PsSymbolExpn node)
         {
@@ -18,18 +21,28 @@ namespace Transpiler.Analysis
             throw Error("Undefined symbol: " + node.Name, node.Position);
         }
 
-        public static ConstraintSet Constrain(TvTable tvTable,
-                                              Scope scope,
-                                              AzSymbolExpn node)
+        public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
-            //var tvTable = scope.TvTable;
+            // Determine the Type.
+            if (Definition.ExplicitType != null)
+            {
+                Type = Definition.ExplicitType.WithUniqueTvs(provider);
+            }
+            else if (Definition.Type != null)
+            {
+                Type = Definition.Type;
+            }
+            else
+            {
+                Type = provider.Next;
+            }
 
-            //var ts = tvTable.GetTypeOf(node);
-            //var td = tvTable.GetTypeOf(scope.Definitions[node.Name]);
+            return ConstraintSet.Empty;
+        }
 
-            //var cf = new Constraint(ts, td);
-
-            return IConstraintSet.Union();
+        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        {
+            return this.ToArr();
         }
 
         public string Print(int i)

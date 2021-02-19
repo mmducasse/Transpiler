@@ -110,17 +110,48 @@ namespace Transpiler.Analysis
             return newFns;
         }
 
+        public static void TEMP_PrintFnTypes(Scope scope)
+        {
+            foreach (var fn in scope.FuncDefinitions.Values)
+            {
+                Console.WriteLine("\n\n {0}\n", fn.Name);
+                foreach (var node in fn.GetSubnodes())
+                {
+                    string nodeStr = node.Print(0).Replace("\n", "").Replace("\t", "");
+                    Console.Write("{0, 50}", nodeStr);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(" :: {0}", node.Type?.Print(0));
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+            }
+        }
+
         public static void SolveFunctions(Scope scope)
         {
             foreach (var fn in scope.FuncDefinitions.Values)
             {
-                var tvTable = new TvTable();
-                var constraints = AzFuncDefn.Constrain(tvTable, scope, fn as AzFuncDefn);
-                var substitution = IConstraint.Unify(scope, constraints, tvTable.TvProvider);
+                IAzTypeExpn type;
 
-                var tv = tvTable.GetTypeOf(fn);
-                var type = IAzTypeExpn.Substitute(tv, substitution);
-                type = TvUtils.WithUniqueTvs(type, new());
+                if (fn.Type == null)
+                {
+                    //var tvTable = new TvTable();
+                    var provider = new TvProvider();
+                    var constraints = fn.Constrain(provider, scope);
+                    var substitution = IConstraint.Unify(scope, constraints, provider);
+
+                    //var tv = tvTable.GetTypeOf(fn);
+                    var tv = fn.Type;
+                    type = IAzTypeExpn.Substitute(tv, substitution);
+                    type = TvUtils.WithUniqueTvs(type, new());
+                    if (fn.ExplicitType == null)
+                    {
+                        (fn as AzFuncDefn).ExplicitType = type;
+                    }
+                }
+                else
+                {
+                    type = fn.Type;
+                }
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("\n\n{0} :: {1}", fn.Name, type.PrintWithRefinements());
@@ -134,11 +165,13 @@ namespace Transpiler.Analysis
             {
                 foreach (var (_, fn) in inst.Functions)
                 {
-                    var tvTable = new TvTable();
-                    var constraints = AzFuncDefn.Constrain(tvTable, scope, fn as AzFuncDefn);
-                    var substitution = IConstraint.Unify(scope, constraints, tvTable.TvProvider);
+                    //var tvTable = new TvTable();
+                    var provider = new TvProvider();
+                    var constraints = fn.Constrain(provider, scope);
+                    var substitution = IConstraint.Unify(scope, constraints, provider);
 
-                    var tv = tvTable.GetTypeOf(fn);
+                    //var tv = tvTable.GetTypeOf(fn);
+                    var tv = fn.Type;
                     var type = IAzTypeExpn.Substitute(tv, substitution);
                     type = TvUtils.WithUniqueTvs(type, new());
 

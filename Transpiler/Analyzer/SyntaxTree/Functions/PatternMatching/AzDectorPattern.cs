@@ -8,6 +8,8 @@ namespace Transpiler.Analysis
                                   IReadOnlyList<AzParam> Variables,
                                   CodePosition Position) : IAzPattern
     {
+        public IAzTypeExpn Type { get; set; }
+
         public static AzDectorPattern Analyze(Scope scope,
                                               PsDectorPattern node)
         {
@@ -29,21 +31,34 @@ namespace Transpiler.Analysis
             return new(dataTypeDefn, vars, node.Position);
         }
 
-        public static ConstraintSet Constrain(TvTable tvTable,
-                                              Scope scope,
-                                              AzDectorPattern node)
+        public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
-            var cs = new ConstraintSet();
-            var typeExpn = node.TypeDefn.Expression;
-            for (int i = 0; i < node.Variables.Count; i++)
+            // Initialize Type.
+            if (TypeDefn.ParentUnion != null)
             {
-                var tv = tvTable.AddNode(scope, node.Variables[i]);
-                var c = new Constraint(tv, typeExpn.Elements[i], node);
+                Type = TypeDefn.ParentUnion.ToCtor();
+            }
+            else
+            {
+                Type = TypeDefn.ToCtor();
+            }
+
+            var cs = new ConstraintSet();
+            var typeExpn = TypeDefn.Expression;
+            for (int i = 0; i < Variables.Count; i++)
+            {
+                var c = new Constraint(provider.Next, typeExpn.Elements[i], this);
 
                 cs = IConstraintSet.Union(cs, c);
             }
 
             return cs;
+        }
+
+        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        {
+            var variableNodes = Variables.SelectMany(v => v.GetSubnodes()).ToList();
+            return this.ToArr().Concat(variableNodes).ToList();
         }
 
         public string Print(int i)
