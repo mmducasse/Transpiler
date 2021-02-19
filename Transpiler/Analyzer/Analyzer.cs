@@ -61,11 +61,16 @@ namespace Transpiler.Analysis
             }
 
             // Analyze functions.
-            List<AzFuncDefn> newFns = new();
+            //List<AzFuncDefn> newFns = new();
             foreach (var (azFunc, psFunc) in funcDefnsDict)
             {
                 AzFuncDefn.Analyze(fileScope, azFunc, psFunc);
-                newFns.Add(azFunc);
+                //newFns.Add(azFunc);
+            }
+
+            foreach (var (psInst, azInst) in instDefnsDict)
+            {
+                AzClassInstDefn.Analyze(fileScope, azInst, psInst);
             }
 
             // Analyze all class functions in file.
@@ -111,14 +116,7 @@ namespace Transpiler.Analysis
             {
                 var tvTable = new TvTable();
                 var constraints = AzFuncDefn.Constrain(tvTable, scope, fn as AzFuncDefn);
-                //tvTable.Print();
                 var substitution = IConstraint.Unify(scope, constraints, tvTable.TvProvider);
-
-                //Console.WriteLine("Before Solve:");
-                //tvTable.Print();
-
-                //Console.WriteLine("After Solve:");
-                //tvTable.Print(substitution);
 
                 var tv = tvTable.GetTypeOf(fn);
                 var type = IAzTypeExpn.Substitute(tv, substitution);
@@ -130,6 +128,27 @@ namespace Transpiler.Analysis
                 Console.WriteLine(fn.Print(0));
 
                 scope.FuncDefnTypes[fn] = type;
+            }
+
+            foreach (var inst in scope.ClassInstances)
+            {
+                foreach (var (_, fn) in inst.Functions)
+                {
+                    var tvTable = new TvTable();
+                    var constraints = AzFuncDefn.Constrain(tvTable, scope, fn as AzFuncDefn);
+                    var substitution = IConstraint.Unify(scope, constraints, tvTable.TvProvider);
+
+                    var tv = tvTable.GetTypeOf(fn);
+                    var type = IAzTypeExpn.Substitute(tv, substitution);
+                    type = TvUtils.WithUniqueTvs(type, new());
+
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("\n\n{0} :: {1}", fn.Name, type.PrintWithRefinements());
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine(fn.Print(0));
+
+                    scope.FuncDefnTypes[fn] = type;
+                }
             }
         }
 

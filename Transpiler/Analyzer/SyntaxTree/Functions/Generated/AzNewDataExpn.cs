@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Transpiler.Analysis
 {
@@ -10,7 +11,8 @@ namespace Transpiler.Analysis
 
         public string Print(int i)
         {
-            return string.Format("NEW {0}", Definition.Name);
+            var args = Arguments.Select(a => a.Print(0)).Separate(" ", prepend: " ");
+            return string.Format("NEW {0}{1}", Definition.Name, args);
         }
 
         public override string ToString() => Print(0);

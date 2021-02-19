@@ -1,4 +1,5 @@
-﻿using static Transpiler.Analysis.OperatorUtil;
+﻿using System.Collections.Generic;
+using static Transpiler.Analysis.OperatorUtil;
 using static Transpiler.Extensions;
 
 namespace Transpiler.Analysis
@@ -41,13 +42,13 @@ namespace Transpiler.Analysis
                                    IAzDataTypeDefn implementor,
                                    IAzDataTypeDefn @bool)
         {
-            string name = implementor.Name;
+            var type = AzTypeLambdaExpn.Make(implementor.ToCtor(), implementor.ToCtor(), @bool.ToCtor());
 
-            var fRealEq = Function2("eq" + name, implementor, implementor, @bool);
-            var fRealNeq = Function2("neqReal" + name, implementor, implementor, @bool);
-            var fns = RList(fRealEq, fRealNeq);
+            Dictionary<AzFuncDefn, IAzFuncDefn> fns = new();
+            AddInstFunc2(fns, eq, "==", "eq" + implementor.Name, type);
+            AddInstFunc2(fns, eq, "!=", "neq" + implementor.Name, type);
 
-            var instDefn = new AzClassInstDefn(eq, implementor, fns, CodePosition.Null);
+            var instDefn = new AzClassInstDefn(eq, implementor, new List<TypeVariable>(), fns, CodePosition.Null);
 
             scope.AddClassInstance(instDefn);
         }

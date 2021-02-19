@@ -1,4 +1,5 @@
-﻿using static Transpiler.Analysis.OperatorUtil;
+﻿using System.Collections.Generic;
+using static Transpiler.Analysis.OperatorUtil;
 using static Transpiler.Extensions;
 
 namespace Transpiler.Analysis
@@ -45,17 +46,17 @@ namespace Transpiler.Analysis
                                     AzClassTypeDefn num,
                                     IAzDataTypeDefn implementor)
         {
-            string name = implementor.Name;
+            //string name = implementor.Name;
 
-            var fLt = Function2("lt" + name, implementor);
-            var fLte = Function2("lte" + name, implementor);
-            var fGt = Function2("gt" + name, implementor);
-            var fGte = Function2("gte" + name, implementor);
-            var fns = RList(fLt, fLte, fGt, fGte);
+            //var fLt = Function2("lt" + name, implementor);
+            //var fLte = Function2("lte" + name, implementor);
+            //var fGt = Function2("gt" + name, implementor);
+            //var fGte = Function2("gte" + name, implementor);
+            //var fns = RList(fLt, fLte, fGt, fGte);
 
-            var instDefn = new AzClassInstDefn(num, implementor, fns, CodePosition.Null);
+            //var instDefn = new AzClassInstDefn(num, implementor, new List<TypeVariable>(), fns, CodePosition.Null);
 
-            scope.AddClassInstance(instDefn);
+            //scope.AddClassInstance(instDefn);
         }
     }
 }

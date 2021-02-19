@@ -24,8 +24,8 @@ namespace Transpiler.Generate
         {
             if (Expression is GnScopedFuncExpn scopedExpn)
             {
-                string name = Name.Generated();
-                string helperName = "c" + Name;
+                string name = Name.SafeName();
+                string helperName = "c" + Name.SafeName();
                 s += string.Format("{0}function {1}() {{\n", Indent(i), helperName);
                 foreach (var fn in scopedExpn.FuncDefinitions)
                 {
@@ -33,14 +33,14 @@ namespace Transpiler.Generate
                 }
                 string expnRes = scopedExpn.Expression.Generate(i + 1, names, ref s);
                 s += string.Format("{0}return {1}\n", Indent(i + 1), expnRes);
-                s += "}\n";
+                s += Indent(i) + "}\n";
                 s += string.Format("{0}const {1} = {2}()\n", Indent(i), name, helperName);
 
                 return s;
             }
             else
             {
-                string name = Name.Generated();
+                string name = Name.SafeName();
                 s += string.Format("{0}const {1} = ", Indent(i), name);
                 Expression.Generate(i, names, ref s);
 

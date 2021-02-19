@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using Transpiler.Analysis;
 
@@ -11,11 +12,21 @@ namespace Transpiler.Generate
             var fileScope = module.Scope;
 
             StringBuilder output = new();
+            output.Append(GetCoreJsCode());
             Generate(CoreTypes.Instance.Scope, ref output);
             Generate(fileScope, ref output);
 
-            Console.WriteLine();
-            Console.WriteLine(output.ToString());
+            TEMP_AddFinalLine(ref output);
+
+            string destFile = @"C:\Users\matth\Desktop\output.js";
+            File.WriteAllText(destFile, output.ToString());
+
+        }
+
+        private static void TEMP_AddFinalLine(ref StringBuilder output)
+        {
+            string s = "\n\nconsole.log(_ans)\n\n";
+            output.Append(s);
         }
 
         private static void Generate(IScope scope, ref StringBuilder output)
@@ -31,8 +42,20 @@ namespace Transpiler.Generate
 
                     output.Append(g);
                     output.Append("\n\n");
+
+                    Console.WriteLine();
+                    Console.WriteLine(g);
+                    Console.WriteLine();
                 }
             }
+        }
+
+        private static string GetCoreJsCode()
+        {
+            string execPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string coreJsFile = Directory.GetParent(execPath) + "\\Generator\\Core\\Core.js";
+
+            return File.ReadAllText(coreJsFile);
         }
 
         public static string Generated(this string name, int underscores = 1)
@@ -57,6 +80,9 @@ namespace Transpiler.Generate
                     '!' => "bang",
                     '=' => "equals",
                     '$' => "cash",
+                    '.' => "dot",
+                    '<' => "lcaret",
+                    '>' => "rcaret",
                     _ => symbol[i]
                 };
             }

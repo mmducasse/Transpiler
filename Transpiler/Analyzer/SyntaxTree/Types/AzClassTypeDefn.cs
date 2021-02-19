@@ -33,10 +33,12 @@ namespace Transpiler.Analysis
                                                  PsClassTypeDefn node)
         {
             var scope = new Scope(fileScope, "Class Defn");
-            var tv = scope.AddTypeVar(node.TypeVar);
-
             var classDefn = new AzClassTypeDefn(node.Name, scope, node.Position);
-            classDefn.TypeVar = tv with { Refinements = classDefn.ToArr() };
+
+            var refinements = new List<AzClassTypeDefn> { classDefn };
+            var tv = scope.AddTypeVar(node.TypeVar, refinements);
+
+            classDefn.TypeVar = tv;
             fileScope.AddType(classDefn);
 
             // Analyze the class's functions.
@@ -64,10 +66,31 @@ namespace Transpiler.Analysis
             {
                 var funcDefn = classType.Functions[i];
                 var funcNode = node.Functions[i];
-                AzFuncDefn.Analyze(classType.Scope, funcDefn, funcNode);
+
+                if (funcNode.Expression != null)
+                {
+                    // Analyze the function if it has a default implementation.
+                    AzFuncDefn.Analyze(classType.Scope, funcDefn, funcNode);
+                }
             }
 
             return classType;
+        }
+
+        public bool TryGetFunction(string name, out AzFuncDefn funcDefn)
+        {
+            funcDefn = null;
+
+            foreach (var fn in Functions)
+            {
+                if (fn.Name == name)
+                {
+                    funcDefn = fn;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public string Print(int i)

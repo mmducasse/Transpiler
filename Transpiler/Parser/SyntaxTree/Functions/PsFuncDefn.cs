@@ -55,7 +55,7 @@ namespace Transpiler.Parse
 
             // Optional Type Specification
             IPsTypeExpn typeExpn = null;
-            if (Finds(":", ref q))
+            if (Finds("::", ref q))
             {
                 // ParseTypeExpn
                 if (!IPsTypeExpn.Parse(ref q, out typeExpn))

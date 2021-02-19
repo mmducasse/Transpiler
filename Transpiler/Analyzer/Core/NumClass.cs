@@ -1,4 +1,5 @@
-﻿using static Transpiler.Analysis.OperatorUtil;
+﻿using System.Collections.Generic;
+using static Transpiler.Analysis.OperatorUtil;
 using static Transpiler.Extensions;
 
 namespace Transpiler.Analysis
@@ -43,15 +44,15 @@ namespace Transpiler.Analysis
                                     AzClassTypeDefn num,
                                     IAzDataTypeDefn implementor)
         {
-            string name = implementor.Name;
+            var type = AzTypeLambdaExpn.Make(implementor.ToCtor(), implementor.ToCtor(), implementor.ToCtor());
 
-            var fIntAdd = Function2("add" + name, implementor);
-            var fIntSub = Function2("sub" + name, implementor);
-            var fIntMul = Function2("mul" + name, implementor);
-            var fIntDiv = Function2("div" + name, implementor);
-            var fns = RList(fIntAdd, fIntSub, fIntMul, fIntDiv);
+            Dictionary<AzFuncDefn, IAzFuncDefn> fns = new();
+            AddInstFunc2(fns, num, "+", "add" + implementor.Name, type);
+            AddInstFunc2(fns, num, "-", "sub" + implementor.Name, type);
+            AddInstFunc2(fns, num, "*", "mul" + implementor.Name, type);
+            AddInstFunc2(fns, num, "/", "div" + implementor.Name, type);
 
-            var instDefn = new AzClassInstDefn(num, implementor, fns, CodePosition.Null);
+            var instDefn = new AzClassInstDefn(num, implementor, new List<TypeVariable>(), fns, CodePosition.Null);
 
             scope.AddClassInstance(instDefn);
         }

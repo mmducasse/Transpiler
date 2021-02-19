@@ -9,6 +9,8 @@ namespace Transpiler.Analysis
 
         IReadOnlyDictionary<string, IAzFuncDefn> FuncDefinitions { get; }
 
+        IReadOnlyList<AzClassInstDefn> ClassInstances { get; }
+
         bool TryGetNamedType(string typeName, out IAzTypeDefn type);
 
         bool TryGetFuncDefn(string symbol, out IAzFuncDefn defn);
@@ -45,7 +47,8 @@ namespace Transpiler.Analysis
 
         private Dictionary<IAzTypeDefn, HashSet<IAzTypeSetDefn>> SuperTypes { get; } = new();
 
-        private List<AzClassInstDefn> ClassInstances { get; } = new();
+        public IReadOnlyList<AzClassInstDefn> ClassInstances => mClassInstances;
+        private List<AzClassInstDefn> mClassInstances = new();
 
         private Dictionary<string, TypeVariable> TypeVariables { get; } = new();
 
@@ -86,6 +89,7 @@ namespace Transpiler.Analysis
 
         public void AddClassInstance(AzClassInstDefn instance)
         {
+            mClassInstances.Add(instance);
             AddSuperType(instance.Implementor, instance.Class);
         }
 
@@ -263,9 +267,14 @@ namespace Transpiler.Analysis
             return tvs;
         }
 
-        public TypeVariable AddTypeVar(string tvName)
+        public TypeVariable AddTypeVar(string tvName, IReadOnlyList<AzClassTypeDefn> refinements = null)
         {
             var tv = mTvProvider.Next;
+            if (refinements != null)
+            {
+                tv = tv with { Refinements = refinements };
+            }
+
             TypeVariables[tvName] = tv;
 
             return tv;
@@ -289,11 +298,27 @@ namespace Transpiler.Analysis
             return false;
         }
 
+        public void PrintFunctions()
+        {
+            foreach (var func in FuncDefinitions.Values)
+            {
+                Console.WriteLine(func.Print(0));
+            }
+        }
+
         public void PrintTypes()
         {
             foreach (var type in TypeDefinitions.Values)
             {
                 Console.WriteLine(type.Print(0));
+            }
+        }
+
+        public void PrintClassInstances()
+        {
+            foreach (var inst in mClassInstances)
+            {
+                Console.WriteLine(inst.Print(0));
             }
         }
 

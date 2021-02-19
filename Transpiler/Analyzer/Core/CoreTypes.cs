@@ -47,6 +47,8 @@ namespace Transpiler.Analysis
             MakeMiscFns(mScope);
 
             mScope.PrintTypes();
+            mScope.PrintFunctions();
+            mScope.PrintClassInstances();
             mScope.PrintTypeHeirarchy();
         }
 
@@ -55,7 +57,7 @@ namespace Transpiler.Analysis
             var a = TypeVariable.Simple(0);
 
             var fixType = AzTypeLambdaExpn.Make(AzTypeLambdaExpn.Make(a, a), a);
-            var fix = new Operator("fix", fixType, eFixity.Prefix);
+            var fix = new Operator("fix", "Fix", fixType, eFixity.Prefix);
             scope.AddFunction(fix, fix.Type);
         }
 

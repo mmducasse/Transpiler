@@ -15,7 +15,7 @@ namespace Transpiler.Analysis
     {
         public string Name { get; }
 
-        public IAzTypeExpn ExplicitType { get; }
+        public IAzTypeExpn ExplicitType { get; set; }
         
         public IAzFuncExpn Expression { get; set; }
 
@@ -106,14 +106,19 @@ namespace Transpiler.Analysis
         {
             tvTable.AddNode(scope, node);
 
-            var cs = IAzFuncExpn.Constrain(tvTable, scope, node.Expression);
+            if (node.Expression != null)
+            {
+                var cs = IAzFuncExpn.Constrain(tvTable, scope, node.Expression);
 
-            var tf = tvTable.GetTypeOf(node);
-            var te = tvTable.GetTypeOf(node.Expression);
+                var tf = tvTable.GetTypeOf(node);
+                var te = tvTable.GetTypeOf(node.Expression);
 
-            var c = new Constraint(tf, te, node);
+                var c = new Constraint(tf, te, node);
 
-            return IConstraintSet.Union(c, cs);
+                return IConstraintSet.Union(c, cs);
+            }
+
+            return ConstraintSet.Empty;
         }
 
         public virtual string Print(int i)

@@ -48,4 +48,10 @@
     <Compile Include="Generator\SyntaxTree\IGnNode.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Generator\Core\Core.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

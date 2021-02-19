@@ -41,9 +41,13 @@ function Match(x, pattern)
 }
 
 function MkInt(si) {
-	return new BigInt(si)
+	//return new BigInt(si)
+	return parseInt(si)
 }
 
 function MkReal(sr) {
+	//return BigDecimal(sr)
 	return parseFloat(sr)
 }
+
+

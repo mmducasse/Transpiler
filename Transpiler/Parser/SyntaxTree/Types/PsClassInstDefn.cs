@@ -6,15 +6,16 @@ namespace Transpiler.Parse
 {
     /*
 
-    instance Eq Point {
+    inst Eq Point =
 	    p1 (==) p2 = ((a p1) == (a p2)) and ((b p1) == (b p2))
 	    p1 (!=) p2 = not (p1 == p2)
 
     */
     public record PsClassInstDefn(string ClassName,
-                              IPsTypeExpn Implementor,
-                              IReadOnlyList<PsFuncDefn> Functions,
-                              CodePosition Position) : IPsDefn
+                                  string ImplementorName,
+                                  IReadOnlyList<string> TypeParameters,
+                                  IReadOnlyList<PsFuncDefn> Functions,
+                                  CodePosition Position) : IPsDefn
     {
         public static bool Parse(ref TokenQueue queue, out PsClassInstDefn node)
         {
@@ -23,15 +24,17 @@ namespace Transpiler.Parse
             var p = q.Position;
             int i = q.Indent;
 
-            if (!Finds("instance", ref q)) { return false; }
+            if (!Finds("inst", ref q)) { return false; }
             Expects(TokenType.Uppercase, ref q, out string name);
-            
-            if (!PsTypeArbExpn.Parse(ref q, out var implementor))
+            Expects(TokenType.Uppercase, ref q, out string implementorName);
+
+            List<string> typeParams = new();
+            while (Finds(TokenType.Lowercase, ref q, out string param))
             {
-                throw Error("Expected expression for class implementor in instance definition.", q);
+                typeParams.Add(param);
             }
 
-            Expects("{", ref q);
+            Expects("=", ref q);
             SkipNewlines(ref q);
 
             var q2 = q;
@@ -50,14 +53,15 @@ namespace Transpiler.Parse
                 funcDecls.Add(funcDefn);
             }
 
-            node = new PsClassInstDefn(name, implementor, funcDecls, p);
+            node = new PsClassInstDefn(name, implementorName, typeParams, funcDecls, p);
             queue = q;
             return true;
         }
 
         public string Print(int i)
         {
-            string s = string.Format("instance {0} {1} {{\n", ClassName, Implementor.Print(i));
+            var typeParams = TypeParameters.Separate(" ", prepend: " ");
+            string s = string.Format("inst {0} {1}{2} =\n", ClassName, ImplementorName, typeParams);
             foreach (var fn in Functions)
             {
                 s += string.Format("{0}{1}\n", Indent(i + 1), fn.Print(i + 1));

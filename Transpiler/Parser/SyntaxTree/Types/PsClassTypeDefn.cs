@@ -27,7 +27,7 @@ namespace Transpiler.Parse
             if (!Finds("type", ref q)) { return false; }
             Expects(TokenType.Uppercase, ref q, out string name);
             Expects(TokenType.Lowercase, ref q, out string typeVar);
-            Expects("{", ref q);
+            Expects("=", ref q);
             SkipNewlines(ref q);
 
             var q2 = q;
