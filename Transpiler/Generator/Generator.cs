@@ -31,6 +31,22 @@ namespace Transpiler.Generate
 
         private static void Generate(IScope scope, ref StringBuilder output)
         {
+            // Generate type classes.
+            foreach (var (_, typeDefn) in scope.TypeDefinitions)
+            {
+                if (typeDefn is AzClassTypeDefn classDefn)
+                {
+                    GnClassTypeDefn.Generate(classDefn, ref output);
+                }
+            }
+
+            // Generate class instances.
+            foreach (var isntDefn in scope.ClassInstances)
+            {
+                GnClassInstDefn.Generate(isntDefn, ref output);
+            }
+
+            // Generate functions.
             foreach (var func in scope.FuncDefinitions.Values)
             {
                 if (func is AzFuncDefn funcDefn &&
@@ -60,6 +76,7 @@ namespace Transpiler.Generate
 
         public static string Generated(this string name, int underscores = 1)
         {
+            if (string.IsNullOrEmpty(name)) { return ""; }
             return "_".Multiply(underscores) + name;
         }
 

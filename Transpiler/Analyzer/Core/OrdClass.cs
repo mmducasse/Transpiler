@@ -10,8 +10,8 @@ namespace Transpiler.Analysis
         {
             var num = MakeOrd(scope);
 
-            InstOrd(scope, num, CoreTypes.Instance.Int);
-            InstOrd(scope, num, CoreTypes.Instance.Real);
+            InstOrd(scope, num, CoreTypes.Instance.Int, CoreTypes.Instance.Bool);
+            InstOrd(scope, num, CoreTypes.Instance.Real, CoreTypes.Instance.Bool);
 
             return num;
         }
@@ -44,15 +44,14 @@ namespace Transpiler.Analysis
 
         private static void InstOrd(Scope scope,
                                     AzClassTypeDefn ord,
-                                    IAzDataTypeDefn implementor)
+                                    IAzDataTypeDefn implementor,
+                                    IAzDataTypeDefn @bool)
         {
-            var type = AzTypeLambdaExpn.Make(implementor.ToCtor(), implementor.ToCtor(), CoreTypes.Instance.Bool.ToCtor());
-
-            Dictionary<AzFuncDefn, IAzFuncDefn> fns = new();
-            AddInstFunc2(fns, ord, "<", "lt" + implementor.Name, type);
-            AddInstFunc2(fns, ord, "<=", "lte" + implementor.Name, type);
-            AddInstFunc2(fns, ord, ">", "gt" + implementor.Name, type);
-            AddInstFunc2(fns, ord, ">=", "gte" + implementor.Name, type);
+            var flt = Function2("<", "primLt", implementor, implementor, @bool);
+            var flte = Function2("<=", "primLte", implementor, implementor, @bool);
+            var fgt = Function2(">", "primGt", implementor, implementor, @bool);
+            var fgte = Function2(">=", "primGte", implementor, implementor, @bool);
+            var fns = RList(flt, flte, fgt, fgte);
 
             var instDefn = new AzClassInstDefn(ord, implementor, new List<TypeVariable>(), fns, CodePosition.Null);
 

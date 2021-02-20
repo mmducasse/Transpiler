@@ -19,5 +19,5 @@ Console.WriteLine(" === ANALYZER ===");
 Analyzer.Analyze(module);
 Analyzer.Print(module);
 
-//Console.WriteLine(" === GENERATOR ===");
-//Generator.Generate(module);
+Console.WriteLine(" === GENERATOR ===");
+Generator.Generate(module);

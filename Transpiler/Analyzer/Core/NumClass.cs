@@ -44,13 +44,11 @@ namespace Transpiler.Analysis
                                     AzClassTypeDefn num,
                                     IAzDataTypeDefn implementor)
         {
-            var type = AzTypeLambdaExpn.Make(implementor.ToCtor(), implementor.ToCtor(), implementor.ToCtor());
-
-            Dictionary<AzFuncDefn, IAzFuncDefn> fns = new();
-            AddInstFunc2(fns, num, "+", "add" + implementor.Name, type);
-            AddInstFunc2(fns, num, "-", "sub" + implementor.Name, type);
-            AddInstFunc2(fns, num, "*", "mul" + implementor.Name, type);
-            AddInstFunc2(fns, num, "/", "div" + implementor.Name, type);
+            var fadd = Function2("+", "primAdd", implementor);
+            var fsub = Function2("-", "primSub", implementor);
+            var fmul = Function2("*", "primMul", implementor);
+            var fdiv = Function2("/", "primDiv", implementor);
+            var fns = RList(fadd, fsub, fmul, fdiv);
 
             var instDefn = new AzClassInstDefn(num, implementor, new List<TypeVariable>(), fns, CodePosition.Null);
 

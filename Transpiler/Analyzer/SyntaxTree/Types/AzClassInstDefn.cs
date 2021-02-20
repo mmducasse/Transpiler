@@ -8,7 +8,7 @@ namespace Transpiler.Analysis
     public record AzClassInstDefn(AzClassTypeDefn Class,
                                   IAzTypeDefn Implementor,
                                   IReadOnlyList<TypeVariable> TypeParameters,
-                                  IReadOnlyDictionary<AzFuncDefn, IAzFuncDefn> Functions,
+                                  IReadOnlyList<IAzFuncDefn> Functions,
                                   CodePosition Position) : IAzDefn
     {
         public bool IsSolved => true;
@@ -44,28 +44,40 @@ namespace Transpiler.Analysis
                     var instSub = new Substitution(classDefn.TypeVar, implTypeDefn.ToCtor());
                     
                     // Initialize the instance's functions.
-                    Dictionary<AzFuncDefn, IAzFuncDefn> funcDefns = new();
+                    Dictionary<AzFuncDefn, AzFuncDefn> funcDefns = new();
                     foreach (var funcNode in node.Functions)
                     {
                         var fnDefns = AzFuncDefn.Initialize(scope, funcNode);
-                        foreach (var funcDefn in fnDefns)
+                        if (fnDefns.Count != 1)
                         {
-                            if (!classDefn.TryGetFunction(funcDefn.Name, out var classFuncDefn))
-                            {
-                                throw Analyzer.Error("Instance function " + funcDefn.Name + " is undefined.", node.Position);
-                            }
-                            if (funcDefns.ContainsKey(classFuncDefn))
-                            {
-                                throw Analyzer.Error("Duplicate nstance function " + funcDefn.Name + ".", node.Position);
-                            }
-                            var explicitType = classFuncDefn.ExplicitType.Substitute(instSub);
-                            funcDefn.ExplicitType = explicitType;
-                            funcDefns[classFuncDefn] = funcDefn;
+                            throw Analyzer.Error("Class functions may not have tuple deconstructors.", node.Position);
                         }
+                        var funcDefn = fnDefns[0];
+                        if (!classDefn.TryGetFunction(funcDefn.Name, out var classFuncDefn))
+                        {
+                            throw Analyzer.Error("Instance function " + funcDefn.Name + " is undefined.", node.Position);
+                        }
+                        if (funcDefns.ContainsKey(classFuncDefn))
+                        {
+                            throw Analyzer.Error("Duplicate nstance function " + funcDefn.Name + ".", node.Position);
+                        }
+                        var explicitType = classFuncDefn.ExplicitType.Substitute(instSub);
+                        funcDefn.ExplicitType = explicitType;
+                        funcDefns[classFuncDefn] = funcDefn;
+                    }
+
+                    List<AzFuncDefn> orderedFuncDefns = new();
+                    foreach (var classFuncDefn in classDefn.Functions)
+                    {
+                        if (!funcDefns.ContainsKey(classFuncDefn))
+                        {
+                            throw Analyzer.Error("Instance is missing function " + classFuncDefn.Name + ".", node.Position);
+                        }
+                        orderedFuncDefns.Add(funcDefns[classFuncDefn]);
                     }
 
                     //fileScope.AddSuperType(implTypeDefn, classDefn);
-                    var instDefn = new AzClassInstDefn(classDefn, implTypeDefn, typeParams, funcDefns, node.Position);
+                    var instDefn = new AzClassInstDefn(classDefn, implTypeDefn, typeParams, orderedFuncDefns, node.Position);
                     fileScope.AddClassInstance(instDefn);
 
                     return instDefn;
@@ -85,19 +97,13 @@ namespace Transpiler.Analysis
                                               AzClassInstDefn classInstDefn,
                                               PsClassInstDefn node)
         {
-            foreach (var (classFuncDefn, funcDefn) in classInstDefn.Functions)
+            foreach (var funcDefn in classInstDefn.Functions)
             {
                 foreach (var funcsNode in node.Functions)
                 {
-                    // Todo: prevent class functions from having tuple deconstructors.
-                    if (funcsNode.Names.Count != 1)
-                    {
-                        throw Analyzer.Error("Class functions may not have tuple deconstructors.", node.Position);
-                    }
-
                     if (funcDefn.Name == funcsNode.Names[0])
                     {
-                        AzFuncDefn.Analyze(scope, (funcDefn as AzFuncDefn), funcsNode);
+                        AzFuncDefn.Analyze(scope, funcDefn as AzFuncDefn, funcsNode);
                     }
                 }
             }
@@ -108,7 +114,7 @@ namespace Transpiler.Analysis
         public string Print(int i)
         {
             string s = string.Format("inst {0} {1} =\n", Class.Name, Implementor.Name);
-            foreach (var (classFunc, instFunc) in Functions)
+            foreach (var instFunc in Functions)
             {
                 s += string.Format("{0}{1}\n", Indent(i + 1), instFunc.Print(0));
             }

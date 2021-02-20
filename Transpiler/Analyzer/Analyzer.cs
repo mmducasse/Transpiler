@@ -143,48 +143,27 @@ namespace Transpiler.Analysis
 
             // Determine a set of type constraints for the 
             // function ASTs of the file.
-            var constraints = ConstraintSet.Empty;
-            foreach (var fn in scope.FuncDefinitions.Values)
+            foreach (var funcDefn in scope.AllFunctions())
             {
-                if (fn is AzFuncDefn funcDefn)
-                {
-                    constraints = IConstraintSet.Union(constraints, funcDefn.Constrain(provider, scope));
-                }
-            }
+                var constraints = funcDefn.Constrain(provider, scope);
+                Substitution substitution = IConstraint.Unify(scope, constraints, provider);
 
-            // Unify the constraints to generate a substitution
-            // that solves for all type variables in the file.
-            Substitution fileSubstitution = new Substitution();
-            foreach (var fn in scope.FuncDefinitions.Values)
-            {
-                if (fn is AzFuncDefn funcDefn)
+                foreach (var node in funcDefn.GetSubnodes())
                 {
-                    fileSubstitution = new Substitution(fileSubstitution, IConstraint.Unify(scope, constraints, provider));
-                }
-            }
-
-            // Apply the substitutions to the type of each AST node.
-            foreach (var fn in scope.FuncDefinitions.Values)
-            {
-                if (fn is AzFuncDefn funcDefn)
-                {
-                    foreach (var node in fn.GetSubnodes())
+                    if (node.Type != null)
                     {
-                        if (node.Type != null)
-                        {
-                            node.Type = node.Type.Substitute(fileSubstitution);
-                        }
+                        node.Type = node.Type.Substitute(substitution);
                     }
-
-                    funcDefn.ExplicitType = TvUtils.WithUniqueTvs(funcDefn.Type, new());
-
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("\n\n{0} :: {1}", fn.Name, funcDefn.ExplicitType.PrintWithRefinements());
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine(fn.Print(0));
-
-                    scope.FuncDefnTypes[fn] = funcDefn.Type;
                 }
+
+                funcDefn.ExplicitType = TvUtils.WithUniqueTvs(funcDefn.Type, new());
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("\n\n{0} :: {1}", funcDefn.Name, funcDefn.ExplicitType.PrintWithRefinements());
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine(funcDefn.Print(0));
+
+                scope.FuncDefnTypes[funcDefn] = funcDefn.Type;
             }
 
             //TEMP_PrintFnTypes(scope);

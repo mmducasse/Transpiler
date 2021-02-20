@@ -7,9 +7,13 @@ namespace Transpiler.Analysis
     {
         string Name { get; }
 
+        IReadOnlyList<AzFuncDefn> AllFunctions();
+
         IReadOnlyDictionary<string, IAzFuncDefn> FuncDefinitions { get; }
 
         IReadOnlyList<AzClassInstDefn> ClassInstances { get; }
+
+        IReadOnlyDictionary<string, IAzTypeDefn> TypeDefinitions { get; }
 
         bool TryGetNamedType(string typeName, out IAzTypeDefn type);
 
@@ -62,6 +66,31 @@ namespace Transpiler.Analysis
         {
             Name = name;
             Dependencies = parentScope.ToArr();
+        }
+
+        public IReadOnlyList<AzFuncDefn> AllFunctions()
+        {
+            List<AzFuncDefn> all = new();
+            foreach (var (_, func) in FuncDefinitions)
+            {
+                if (func is AzFuncDefn funcDefn)
+                {
+                    all.Add(funcDefn);
+                }
+            }
+
+            foreach (var inst in ClassInstances)
+            {
+                foreach (var func in inst.Functions)
+                {
+                    if (func is AzFuncDefn funcDefn)
+                    {
+                        all.Add(funcDefn);
+                    }
+                }
+            }
+
+            return all;
         }
 
         public void AddFunction(IAzFuncDefn func, IAzTypeExpn funcType = null)

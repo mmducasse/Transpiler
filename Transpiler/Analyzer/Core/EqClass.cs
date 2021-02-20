@@ -14,6 +14,7 @@ namespace Transpiler.Analysis
 
             InstEq(scope, eq, CoreTypes.Instance.Int, @bool);
             InstEq(scope, eq, CoreTypes.Instance.Real, @bool);
+            InstEq(scope, eq, CoreTypes.Instance.Char, @bool);
 
             return eq;
         }
@@ -42,11 +43,9 @@ namespace Transpiler.Analysis
                                    IAzDataTypeDefn implementor,
                                    IAzDataTypeDefn @bool)
         {
-            var type = AzTypeLambdaExpn.Make(implementor.ToCtor(), implementor.ToCtor(), @bool.ToCtor());
-
-            Dictionary<AzFuncDefn, IAzFuncDefn> fns = new();
-            AddInstFunc2(fns, eq, "==", "eq" + implementor.Name, type);
-            AddInstFunc2(fns, eq, "!=", "neq" + implementor.Name, type);
+            var feq = Function2("==", "primEq", implementor, implementor, @bool);
+            var fneq = Function2("!=", "primNeq", implementor, implementor, @bool);
+            var fns = RList(feq, fneq);
 
             var instDefn = new AzClassInstDefn(eq, implementor, new List<TypeVariable>(), fns, CodePosition.Null);
 

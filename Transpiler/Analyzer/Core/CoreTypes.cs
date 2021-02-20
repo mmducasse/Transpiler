@@ -18,11 +18,6 @@ namespace Transpiler.Analysis
         public AzClassTypeDefn Num { get; }
         public AzClassTypeDefn Ord { get; }
 
-        //public IReadOnlyList<Operator> Operators => mOperators;
-        //private List<Operator> mOperators { get; } = new();
-
-        //public Dictionary<INamedType, HashSet<ITypeSet>> SuperTypes { get; } = new();
-
         public IScope Scope => mScope;
         private Scope mScope = new Scope();
 
@@ -44,8 +39,6 @@ namespace Transpiler.Analysis
 
             List = CreateList(mScope);
 
-            MakeMiscFns(mScope);
-
             mScope.PrintTypes();
             mScope.PrintFunctions();
             mScope.PrintClassInstances();
@@ -53,21 +46,5 @@ namespace Transpiler.Analysis
 
             //Analyzer.TEMP_PrintFnTypes(mScope);
         }
-
-        private static void MakeMiscFns(Scope scope)
-        {
-            var a = TypeVariable.Simple(0);
-
-            var fixType = AzTypeLambdaExpn.Make(AzTypeLambdaExpn.Make(a, a), a);
-            var fix = new Operator("fix", "Fix", fixType, eFixity.Prefix);
-            scope.AddFunction(fix, fix.Type);
-        }
-
-        //private void Add(Operator op)
-        //{
-        //    mOperators.Add(op);
-        //    mScope.FuncDefinitions[op.Name] = op;
-        //    mScope.FuncDefnTypes[op.Name] = op.Type;
-        //}
     }
 }

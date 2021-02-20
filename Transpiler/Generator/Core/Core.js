@@ -1,4 +1,6 @@
-﻿
+﻿////////////////// START OF CORE.JS //////////////////
+
+
 // Gets the ith element from a composite data object.
 function Get(x, i)
 {
@@ -49,5 +51,20 @@ function MkReal(sr) {
 	//return BigDecimal(sr)
 	return parseFloat(sr)
 }
+
+const primEq = a => b => a == b
+const primNeq = a => b => a != b
+
+const primAdd = a => b => a + b
+const primSub = a => b => a - b
+const primMul = a => b => a * b
+const primDiv = a => b => a / b
+
+const primLt = a => b => a < b
+const primLte = a => b => a <= b
+const primGt = a => b => a > b
+const primGte = a => b => a >= b
+
+////////////////// END OF CORE.JS //////////////////
 
 
