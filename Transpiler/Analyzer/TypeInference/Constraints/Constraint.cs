@@ -13,8 +13,8 @@ namespace Transpiler.Analysis
     {
         public IConstraint Substitute(Substitution sub)
         {
-            return new Constraint(IAzTypeExpn.Substitute(A, sub),
-                                  IAzTypeExpn.Substitute(B, sub),
+            return new Constraint(A.Substitute(sub),
+                                  B.Substitute(sub),
                                   TEMP_Node);
         }
 

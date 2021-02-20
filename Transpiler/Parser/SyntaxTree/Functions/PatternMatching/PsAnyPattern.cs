@@ -2,9 +2,9 @@
 
 namespace Transpiler.Parse
 {
-    public record PsElsePattern(CodePosition Position) : IPsPattern
+    public record PsAnyPattern(CodePosition Position) : IPsPattern
     {
-        public static bool Parse(ref TokenQueue queue, out PsElsePattern node)
+        public static bool Parse(ref TokenQueue queue, out PsAnyPattern node)
         {
             node = null;
             var q = queue;
@@ -12,7 +12,7 @@ namespace Transpiler.Parse
 
             if (!Finds("_", ref q)) { return false; }
 
-            node = new PsElsePattern(p);
+            node = new PsAnyPattern(p);
             queue = q;
 
             return true;

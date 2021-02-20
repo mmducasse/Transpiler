@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Parse;
 
@@ -9,8 +8,6 @@ namespace Transpiler.Analysis
                                  IReadOnlyList<IAzTypeExpn> Arguments,
                                  CodePosition Position) : IAzTypeExpn
     {
-        public bool IsSolved => Arguments.Where(a => !a.IsSolved).Count() == 0;
-
         public ISet<TypeVariable> GetTypeVars()
         {
             HashSet<TypeVariable> tvs = new();
@@ -77,15 +74,15 @@ namespace Transpiler.Analysis
             return r;
         }
 
-        public static IAzTypeExpn Substitute(AzTypeCtorExpn ctorType, Substitution sub)
+        public IAzTypeExpn Substitute(Substitution substitution)
         {
-            if (ctorType.Arguments.Count == 0)
+            if (Arguments.Count == 0)
             {
-                return ctorType;
+                return this;
             }
 
-            var newArgs = ctorType.Arguments.Select(arg => IAzTypeExpn.Substitute(arg, sub)).ToList();
-            return ctorType with { Arguments = newArgs };
+            var newArgs = Arguments.Select(arg => arg.Substitute(substitution)).ToList();
+            return this with { Arguments = newArgs };
         }
 
         public string Print(int indent)

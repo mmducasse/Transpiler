@@ -9,7 +9,17 @@ namespace Transpiler.Analysis
     {
         public IAzDataTypeDefn CertainType => CoreTypes.Instance.Int;
 
-        public IAzTypeExpn Type { get => CertainType.ToCtor(); set => throw new NotImplementedException(); }
+        public IAzTypeExpn Type
+        {
+            get => CertainType.ToCtor();
+            set
+            {
+                if (value != CertainType)
+                {
+                    //throw new Exception();
+                }
+            }
+        }
 
         public static AzIntLiteral Analyze(Scope scope,
                                            PsIntLiteral node)

@@ -56,7 +56,42 @@ namespace Transpiler.Analysis
         public IReadOnlyList<IAzFuncNode> GetSubnodes()
         {
             var caseNodes = Cases.SelectMany(c => c.GetSubnodes()).ToList();
-            return this.ToArr().Concat(caseNodes).ToList();
+            return this.ToArr().Concat(Argument.GetSubnodes())
+                               .Concat(caseNodes).ToList();
+        }
+
+        public void PostAnalyze()
+        {
+            int defaultCases = Cases.Where(c => c.Pattern is AzElsePattern).Count();
+            if (defaultCases == 1) { return; }
+
+            if (defaultCases > 1)
+            {
+                throw Analyzer.Error("Multiple default cases specified.", Position);
+            }
+
+            // No default case specified, make sure the match is exhaustive.
+            if (Argument.Type is AzTypeCtorExpn typeCtorExpn &&
+                typeCtorExpn.TypeDefn is AzUnionTypeDefn unionType)
+            {
+                var dataTypes = unionType.Subtypes.ToList();
+
+                foreach (var @case in Cases)
+                {
+                    if (@case.Pattern is AzDectorPattern dectorPattern &&
+                        dectorPattern.IsCompleteMember)
+                    {
+                        var dectorType = dectorPattern.TypeDefn;
+
+                        dataTypes.Remove(dectorType);
+                    }
+                }
+
+                if (dataTypes.Count > 0)
+                {
+                    throw Analyzer.Error("Non exhaustive match expressions must contain a default case.", Position);
+                }
+            }
         }
 
         public string Print(int i)

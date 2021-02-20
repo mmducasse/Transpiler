@@ -51,7 +51,7 @@ namespace Transpiler.Analysis
             mScope.PrintClassInstances();
             mScope.PrintTypeHeirarchy();
 
-            Analyzer.TEMP_PrintFnTypes(mScope);
+            //Analyzer.TEMP_PrintFnTypes(mScope);
         }
 
         private static void MakeMiscFns(Scope scope)

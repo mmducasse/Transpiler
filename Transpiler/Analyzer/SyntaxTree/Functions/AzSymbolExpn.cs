@@ -34,7 +34,8 @@ namespace Transpiler.Analysis
             }
             else
             {
-                Type = provider.Next;
+                Definition.Type = provider.Next;
+                Type = Definition.Type;
             }
 
             return ConstraintSet.Empty;

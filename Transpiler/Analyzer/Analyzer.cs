@@ -19,6 +19,9 @@ namespace Transpiler.Analysis
 
             // Apply HM type inference alg to functions.
             SolveFunctions(fileScope);
+
+            // Perform any more verification needed after type inference is done.
+            PostAnalyze(fileScope);
         }
 
         private static void AnalyzeFile(Scope fileScope, ParseResult results)
@@ -118,69 +121,110 @@ namespace Transpiler.Analysis
                 foreach (var node in fn.GetSubnodes())
                 {
                     string nodeStr = node.Print(0).Replace("\n", "").Replace("\t", "");
+                    if (nodeStr.Length > 45)
+                    {
+                        nodeStr = nodeStr[..44] + "...";
+                    }
                     Console.Write("{0, 50}", nodeStr);
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine(" :: {0}", node.Type?.Print(0));
-                    Console.ForegroundColor = ConsoleColor.White;
+
+                    if (node.Type != null)
+                    {
+                        Console.WriteLine(" :: {0}", node.Type.Print(0));
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
                 }
             }
         }
 
         public static void SolveFunctions(Scope scope)
         {
+            var provider = new TvProvider();
+
+            // Determine a set of type constraints for the 
+            // function ASTs of the file.
+            var constraints = ConstraintSet.Empty;
             foreach (var fn in scope.FuncDefinitions.Values)
             {
-                IAzTypeExpn type;
-
-                if (fn.Type == null)
+                if (fn is AzFuncDefn funcDefn)
                 {
-                    //var tvTable = new TvTable();
-                    var provider = new TvProvider();
-                    var constraints = fn.Constrain(provider, scope);
-                    var substitution = IConstraint.Unify(scope, constraints, provider);
-
-                    //var tv = tvTable.GetTypeOf(fn);
-                    var tv = fn.Type;
-                    type = IAzTypeExpn.Substitute(tv, substitution);
-                    type = TvUtils.WithUniqueTvs(type, new());
-                    if (fn.ExplicitType == null)
-                    {
-                        (fn as AzFuncDefn).ExplicitType = type;
-                    }
+                    constraints = IConstraintSet.Union(constraints, funcDefn.Constrain(provider, scope));
                 }
-                else
-                {
-                    type = fn.Type;
-                }
-
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("\n\n{0} :: {1}", fn.Name, type.PrintWithRefinements());
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine(fn.Print(0));
-
-                scope.FuncDefnTypes[fn] = type;
             }
 
-            foreach (var inst in scope.ClassInstances)
+            // Unify the constraints to generate a substitution
+            // that solves for all type variables in the file.
+            Substitution fileSubstitution = new Substitution();
+            foreach (var fn in scope.FuncDefinitions.Values)
             {
-                foreach (var (_, fn) in inst.Functions)
+                if (fn is AzFuncDefn funcDefn)
                 {
-                    //var tvTable = new TvTable();
-                    var provider = new TvProvider();
-                    var constraints = fn.Constrain(provider, scope);
-                    var substitution = IConstraint.Unify(scope, constraints, provider);
+                    fileSubstitution = new Substitution(fileSubstitution, IConstraint.Unify(scope, constraints, provider));
+                }
+            }
 
-                    //var tv = tvTable.GetTypeOf(fn);
-                    var tv = fn.Type;
-                    var type = IAzTypeExpn.Substitute(tv, substitution);
-                    type = TvUtils.WithUniqueTvs(type, new());
+            // Apply the substitutions to the type of each AST node.
+            foreach (var fn in scope.FuncDefinitions.Values)
+            {
+                if (fn is AzFuncDefn funcDefn)
+                {
+                    foreach (var node in fn.GetSubnodes())
+                    {
+                        if (node.Type != null)
+                        {
+                            node.Type = node.Type.Substitute(fileSubstitution);
+                        }
+                    }
+
+                    funcDefn.ExplicitType = TvUtils.WithUniqueTvs(funcDefn.Type, new());
 
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("\n\n{0} :: {1}", fn.Name, type.PrintWithRefinements());
+                    Console.WriteLine("\n\n{0} :: {1}", fn.Name, funcDefn.ExplicitType.PrintWithRefinements());
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine(fn.Print(0));
 
-                    scope.FuncDefnTypes[fn] = type;
+                    scope.FuncDefnTypes[fn] = funcDefn.Type;
+                }
+            }
+
+            //TEMP_PrintFnTypes(scope);
+
+            //foreach (var inst in scope.ClassInstances)
+            //{
+            //    foreach (var (_, fn) in inst.Functions)
+            //    {
+            //        //var tvTable = new TvTable();
+            //        var constraints = fn.Constrain(provider, scope);
+            //        var substitution = IConstraint.Unify(scope, constraints, provider);
+
+            //        //var tv = tvTable.GetTypeOf(fn);
+            //        var tv = fn.Type;
+            //        var type = IAzTypeExpn.Substitute(tv, substitution);
+            //        type = TvUtils.WithUniqueTvs(type, new());
+
+            //        Console.ForegroundColor = ConsoleColor.Yellow;
+            //        Console.WriteLine("\n\n{0} :: {1}", fn.Name, type.PrintWithRefinements());
+            //        Console.ForegroundColor = ConsoleColor.White;
+            //        Console.WriteLine(fn.Print(0));
+
+            //        scope.FuncDefnTypes[fn] = type;
+            //    }
+            //}
+        }
+
+        private static void PostAnalyze(Scope scope)
+        {
+            foreach (var fn in scope.FuncDefinitions.Values)
+            {
+                if (fn is AzFuncDefn funcDefn)
+                {
+                    foreach (var node in funcDefn.GetSubnodes())
+                    {
+                        if (node is AzMatchExpn matchExpn)
+                        {
+                            matchExpn.PostAnalyze();
+                        }
+                    }
                 }
             }
         }

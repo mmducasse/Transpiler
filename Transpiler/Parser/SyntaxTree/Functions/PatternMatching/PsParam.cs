@@ -3,7 +3,6 @@
 namespace Transpiler.Parse
 {
     public record PsParam(string Name,
-                          bool IsWildcard = false,
                           CodePosition Position = null) : IPsPattern, IPsFuncDefn
     {
         public eFixity Fixity => eFixity.Prefix;
@@ -12,13 +11,6 @@ namespace Transpiler.Parse
         {
             node = null;
             var q = queue;
-
-            if (Finds("_", ref q))
-            {
-                node = new PsParam("_", IsWildcard: true);
-                queue = q;
-                return true;
-            }
 
             if (Finds(TokenType.Lowercase, ref q, out string symbol))
             {

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Transpiler.Parse;
 
 namespace Transpiler.Analysis
@@ -10,8 +8,6 @@ namespace Transpiler.Analysis
                                    IAzTypeExpn Output,
                                    CodePosition Position) : IAzTypeExpn
     {
-        public bool IsSolved => Input.IsSolved && Output.IsSolved;
-
         public ISet<TypeVariable> GetTypeVars()
         {
             HashSet<TypeVariable> tvs = new();
@@ -41,11 +37,10 @@ namespace Transpiler.Analysis
             return new(input, output, node.Position);
         }
 
-        public static IAzTypeExpn Substitute(AzTypeLambdaExpn lamType, Substitution sub)
+        public IAzTypeExpn Substitute(Substitution substitution)
         {
-            return new AzTypeLambdaExpn(IAzTypeExpn.Substitute(lamType.Input, sub),
-                                        IAzTypeExpn.Substitute(lamType.Output, sub),
-                                        lamType.Position);
+            return this with { Input = Input.Substitute(substitution),
+                               Output = Output.Substitute(substitution) };
         }
 
         public string Print(int i)

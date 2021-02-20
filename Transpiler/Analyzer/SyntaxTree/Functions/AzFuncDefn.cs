@@ -110,7 +110,7 @@ namespace Transpiler.Analysis
             {
                 Type = ExplicitType.WithUniqueTvs(provider);
             }
-            else
+            else if (Type == null)
             {
                 Type = provider.Next;
             }
@@ -137,7 +137,7 @@ namespace Transpiler.Analysis
 
         public virtual string Print(int i)
         {
-            string type = (ExplicitType == null) ? "" : " : " + ExplicitType.Print(0);
+            string type = (ExplicitType == null) ? "" : " :: " + ExplicitType.Print(0);
             var expn = (Expression == null) ? "" : " = " + Expression.Print(i + 1);
             return string.Format("{0}{1}{2}", Name, type, expn);
         }
@@ -157,7 +157,7 @@ namespace Transpiler.Analysis
 
         public override string Print(int i)
         {
-            string type = (ExplicitType == null) ? "" : " : " + ExplicitType.Print(0);
+            string type = (ExplicitType == null) ? "" : " :: " + ExplicitType.Print(0);
             return string.Format("{0}{1} = GET{2} ({3})", Name, type, TupleIndex, Expression.Print(i + 1));
         }
     }

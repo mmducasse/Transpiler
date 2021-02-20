@@ -7,7 +7,7 @@ namespace Transpiler.Analysis
 {
     public record AzAppExpn(IAzFuncExpn Function,
                             IAzFuncExpn Argument,
-                            CodePosition Position) : IAzFuncExpn
+                            CodePosition Position) : IAzFuncExpn, IAzPattern
     {
         public IAzTypeExpn Type { get; set; }
 

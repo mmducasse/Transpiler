@@ -1,7 +1,7 @@
 ﻿
 TODO:
 
-- GetN methon that extracts element from tuple
+- GetN method that extracts element from tuple
 - Instance Implementors need to introduce type variables.
 
 - Implicit match syntax

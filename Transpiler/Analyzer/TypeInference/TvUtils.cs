@@ -5,10 +5,10 @@ namespace Transpiler.Analysis
 {
     public static class TvUtils
     {
-        public static IAzTypeExpn WithUniqueTvs(this IAzTypeExpn type, TvProvider tvProvider)
+        public static Substitution UniqueTvSubstitution(this IAzTypeExpn type, TvProvider provider)
         {
             var tvs = type.GetTypeVars().ToList();
-            var newTvs = tvs.Select(tv => tvProvider.MadeUnique(tv)).ToList();
+            var newTvs = tvs.Select(tv => provider.MadeUnique(tv)).ToList();
 
             var subs = new List<Substitution>();
             for (int i = 0; i < tvs.Count; i++)
@@ -16,20 +16,24 @@ namespace Transpiler.Analysis
                 var sub = new Substitution(tvs[i], newTvs[i]);
                 subs.Add(sub);
             }
-            var substitution = new Substitution(subs.ToArray());
+            return new Substitution(subs.ToArray());
+        }
 
-            return IAzTypeExpn.Substitute(type, substitution);
+        public static IAzTypeExpn WithUniqueTvs(this IAzTypeExpn type, TvProvider provider)
+        {
+            var substitution = UniqueTvSubstitution(type, provider);
+            return type.Substitute(substitution);
         }
 
         public static TypeVariable Unify(IScope scope,
                                          TypeVariable tva,
                                          TypeVariable tvb,
-                                         TvProvider tvProvider)
+                                         TvProvider provider)
         {
             var ra = tva.Refinements;
             var rb = tvb.Refinements;
             var rc = ra.Union(rb).ToArray();
-            return tvProvider.NextR(rc);
+            return provider.NextR(rc);
         }
 
         public static string PrintWithRefinements(this IAzTypeExpn type)

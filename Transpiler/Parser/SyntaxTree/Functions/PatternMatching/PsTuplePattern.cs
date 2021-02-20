@@ -14,7 +14,7 @@ namespace Transpiler.Parse
             var p = q.Position;
 
             List<IPsPattern> elements = new();
-            if (!PsDectorPattern.Parse(ref q, out var first)) { return false; }
+            if (!ParseSubPattern(ref q, out var first)) { return false; }
             elements.Add(first);
             while (Finds(",", ref q))
             {
@@ -36,6 +36,37 @@ namespace Transpiler.Parse
             queue = q;
 
             return true;
+        }
+
+        public static bool ParseSubPattern(ref TokenQueue queue,
+                                            out IPsPattern node)
+        {
+            node = null;
+            var q = queue;
+
+            bool inParens = false;
+            if (Finds("(", ref q))
+            {
+                inParens = true;
+            }
+
+            if (inParens && PsTuplePattern.Parse(ref q, out var tupNode)) { node = tupNode; }
+            else if (PsDectorPattern.Parse(ref q, out var dctorNode)) { node = dctorNode; }
+            else if (PsAnyPattern.Parse(ref q, out var elseNode)) { node = elseNode; }
+            else if (PsParam.Parse(ref q, out var parNode)) { node = parNode; }
+            else if (IPsLiteralExpn.Parse(ref q, out var litExpnNode)) { node = litExpnNode; }
+
+            if (node != null)
+            {
+                if (inParens)
+                {
+                    Expects(")", ref q);
+                }
+                queue = q;
+                return true;
+            }
+
+            return false;
         }
 
         public string Print(int i)

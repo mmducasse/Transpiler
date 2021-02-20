@@ -5,7 +5,7 @@ using static Transpiler.Parse.ParserUtils;
 namespace Transpiler.Parse
 {
     public record PsArbExpn(IReadOnlyList<IPsFuncExpn> Children,
-                            CodePosition Position) : IPsFuncExpn
+                            CodePosition Position) : IPsFuncExpn, IPsPattern
     {
         public static bool Parse(ref TokenQueue queue, out PsArbExpn node)
         {

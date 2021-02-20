@@ -58,7 +58,7 @@ namespace Transpiler.Analysis
                             {
                                 throw Analyzer.Error("Duplicate nstance function " + funcDefn.Name + ".", node.Position);
                             }
-                            var explicitType = IAzTypeExpn.Substitute(classFuncDefn.ExplicitType, instSub);
+                            var explicitType = classFuncDefn.ExplicitType.Substitute(instSub);
                             funcDefn.ExplicitType = explicitType;
                             funcDefns[classFuncDefn] = funcDefn;
                         }

@@ -22,7 +22,10 @@ namespace Transpiler.Analysis
             {
                 foreach (var kvp in s.TypeSubstitutions)
                 {
-                    mTypeSubstitutions.Add(kvp.Key, kvp.Value);
+                    if (!mTypeSubstitutions.ContainsKey(kvp.Key))
+                    {
+                        mTypeSubstitutions.Add(kvp.Key, kvp.Value);
+                    }
                 }
             }
         }

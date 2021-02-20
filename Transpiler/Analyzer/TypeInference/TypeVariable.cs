@@ -38,6 +38,17 @@ namespace Transpiler.Analysis
             return string.Empty;
         }
 
+        public IAzTypeExpn Substitute(Substitution substitution)
+        {
+            if (substitution.TypeSubstitutions.ContainsKey(this))
+            {
+                var type = substitution.TypeSubstitutions[this];
+                return type.Substitute(substitution);
+            }
+
+            return this;
+        }
+
         public override string ToString() => Print(0);
     }
 }

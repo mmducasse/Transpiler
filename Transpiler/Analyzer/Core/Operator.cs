@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
+using static Transpiler.Extensions;
 
 namespace Transpiler.Analysis
 {
@@ -24,7 +25,10 @@ namespace Transpiler.Analysis
             return this.ToArr();
         }
 
-        public string Print(int i) => Name;
+        public string Print(int i)
+        {
+            return string.Format("{0}{1} :: {2} = {3}", Indent(i), Name, Type, BackingFunctionName);
+        }
 
         public override string ToString() => Print(0);
     }

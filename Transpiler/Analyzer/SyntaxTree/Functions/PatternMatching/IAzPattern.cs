@@ -10,24 +10,14 @@ namespace Transpiler.Analysis
         {
             return node switch
             {
-                PsElsePattern @else => AzElsePattern.Analyze(scope, @else),
+                PsAnyPattern @else => AzElsePattern.Analyze(scope, @else),
+                PsParam param => AzParam.Analyze(scope, param),
                 PsDectorPattern dector => AzDectorPattern.Analyze(scope, dector),
                 PsTuplePattern tuple => AzTuplePattern.Analyze(scope, tuple),
+                IPsLiteralExpn litExpn => IAzLiteralExpn.Analyze(scope, litExpn) as IAzPattern,
+                PsArbExpn arbExpn => AzAppExpn.Analyze(scope, arbExpn) as IAzPattern,
                 _ => throw new NotImplementedException(),
             };
         }
-
-        //public static ConstraintSet Constrain(TvTable tvTable,
-        //                                      Scope scope,
-        //                                      IAzPattern node)
-        //{
-        //    return node switch
-        //    {
-        //        AzElsePattern => ConstraintSet.Empty,
-        //        AzDectorPattern dector => AzDectorPattern.Constrain(tvTable, scope, dector),
-        //        AzTuplePattern tuple => AzTuplePattern.Constrain(tvTable, scope, tuple),
-        //        _ => throw new NotImplementedException(),
-        //    };
-        //}
     }
 }

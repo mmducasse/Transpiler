@@ -6,7 +6,7 @@ namespace Transpiler.Analysis
 {
     public interface IAzTypeExpn : IAzNode
     {
-        bool IsSolved { get; }
+        IAzTypeExpn Substitute(Substitution substitution);
 
         ISet<TypeVariable> GetTypeVars();
 
@@ -43,26 +43,6 @@ namespace Transpiler.Analysis
                 PsTypeArbExpn arbExpn => AzTypeCtorExpn.Analyze(scope, arbExpn),
                 PsTypeTupleExpn tupExpn => AzTypeTupleExpn.Analyze(scope, tupExpn),
                 PsTypeLambdaExpn lamExpn => AzTypeLambdaExpn.Analyze(scope, lamExpn),
-                _ => throw new NotImplementedException(),
-            };
-        }
-
-        public static IAzTypeExpn Substitute(IAzTypeExpn type, Substitution sub)
-        {
-            if (type.IsSolved) { return type; }
-
-            if (type is TypeVariable tv &&
-                sub.TypeSubstitutions.ContainsKey(tv))
-            {
-                return Substitute(sub.TypeSubstitutions[tv], sub);
-            }
-
-            return type switch
-            {
-                TypeVariable => type,
-                AzTypeLambdaExpn lamType => AzTypeLambdaExpn.Substitute(lamType, sub),
-                AzTypeCtorExpn ctorType => AzTypeCtorExpn.Substitute(ctorType, sub),
-                AzTypeTupleExpn tupType => AzTypeTupleExpn.Substitute(tupType, sub),
                 _ => throw new NotImplementedException(),
             };
         }

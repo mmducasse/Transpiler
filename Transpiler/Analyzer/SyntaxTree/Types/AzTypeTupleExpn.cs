@@ -7,8 +7,6 @@ namespace Transpiler.Analysis
     public record AzTypeTupleExpn(IReadOnlyList<IAzTypeExpn> Elements,
                                   CodePosition Position) : IAzTypeExpn
     {
-        public bool IsSolved => Elements.Where(e => !e.IsSolved).Count() == 0;
-
         public ISet<TypeVariable> GetTypeVars()
         {
             HashSet<TypeVariable> tvs = new();
@@ -42,10 +40,10 @@ namespace Transpiler.Analysis
             return new(elements, node.Position);
         }
 
-        public static IAzTypeExpn Substitute(AzTypeTupleExpn tupType, Substitution sub)
+        public IAzTypeExpn Substitute(Substitution substitution)
         {
-            var newElements = tupType.Elements.Select(e => IAzTypeExpn.Substitute(e, sub)).ToList();
-            return tupType with { Elements = newElements };
+            var newElements = Elements.Select(e => e.Substitute(substitution)).ToList();
+            return this with { Elements = newElements };
         }
 
         public string Print(int i)

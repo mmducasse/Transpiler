@@ -5,10 +5,12 @@ using Transpiler.Parse;
 namespace Transpiler.Analysis
 {
     public record AzDectorPattern(AzDataTypeDefn TypeDefn,
-                                  IReadOnlyList<AzParam> Variables,
+                                  IReadOnlyList<IAzPattern> Variables,
                                   CodePosition Position) : IAzPattern
     {
         public IAzTypeExpn Type { get; set; }
+
+        public bool IsCompleteMember => (Variables.Count == 0) || Variables.All(v => v is AzParam);
 
         public static AzDectorPattern Analyze(Scope scope,
                                               PsDectorPattern node)
@@ -20,12 +22,12 @@ namespace Transpiler.Analysis
 
             var dataTypeDefn = typeDefn as AzDataTypeDefn;
 
-            int elements = dataTypeDefn.Expression.Elements.Count;
+            int numElements = dataTypeDefn.Expression.Elements.Count;
 
-            var vars = node.Variables.Select(v => AzParam.Analyze(scope, v)).ToList();
-            if (vars.Count != elements)
+            var vars = node.Variables.Select(v => IAzPattern.Analyze(scope, v)).ToList();
+            if (vars.Count != numElements)
             {
-                throw Analyzer.Error(string.Format("Type {0} has {1} members.", node.TypeName, elements), node.Position);
+                throw Analyzer.Error(string.Format("Type {0} has {1} members.", node.TypeName, numElements), node.Position);
             }
 
             return new(dataTypeDefn, vars, node.Position);
@@ -34,22 +36,26 @@ namespace Transpiler.Analysis
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
             // Initialize Type.
+            Substitution uniqueSubstitution;
             if (TypeDefn.ParentUnion != null)
             {
-                Type = TypeDefn.ParentUnion.ToCtor();
+                uniqueSubstitution = TypeDefn.ParentUnion.ToCtor().UniqueTvSubstitution(provider);
+                Type = TypeDefn.ParentUnion.ToCtor().Substitute(uniqueSubstitution);
             }
             else
             {
-                Type = TypeDefn.ToCtor();
+                uniqueSubstitution = TypeDefn.ToCtor().UniqueTvSubstitution(provider);
+                Type = TypeDefn.ToCtor().Substitute(uniqueSubstitution);
             }
 
             var cs = new ConstraintSet();
-            var typeExpn = TypeDefn.Expression;
+            var typeExpn = TypeDefn.Expression.Substitute(uniqueSubstitution) as AzTypeTupleExpn;
             for (int i = 0; i < Variables.Count; i++)
             {
-                var c = new Constraint(provider.Next, typeExpn.Elements[i], this);
+                var csv = Variables[i].Constrain(provider, scope);
+                var c = new Constraint(typeExpn.Elements[i], Variables[i].Type, this);
 
-                cs = IConstraintSet.Union(cs, c);
+                cs = IConstraintSet.Union(cs, c, csv);
             }
 
             return cs;
