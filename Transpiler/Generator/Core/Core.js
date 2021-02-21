@@ -42,6 +42,26 @@ function Match(x, pattern)
 	return false;
 }
 
+function PrintResult(output) {
+	if (Match(output, ["Empty"])) {
+
+	}
+	else if (Match(output, ["Node", null, null])) {
+		var a = Get(output, 0)
+		var b = Get(output, 1)
+		if (typeof a == 'string') {
+			process.stdout.write(a)
+		}
+		else {
+			console.log(a)
+		}
+		PrintResult(b)
+	}
+	else {
+		console.log(output)
+	}
+}
+
 function MkInt(si) {
 	//return new BigInt(si)
 	return parseInt(si)

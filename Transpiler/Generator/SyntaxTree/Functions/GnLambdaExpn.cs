@@ -6,12 +6,12 @@ namespace Transpiler.Generate
     public record GnLambdaExpn(GnParam Parameter,
                                IGnFuncExpn Expression) : IGnFuncExpn
     {
-        public static GnLambdaExpn Prepare(AzLambdaExpn appExpn)
+        public static GnLambdaExpn Prepare(IScope scope, AzLambdaExpn appExpn)
         {
             // Todo: Handle tpye arguemnts.
 
-            var param = GnParam.Prepare(appExpn.Parameter);
-            var expn = IGnFuncExpn.Prepare(appExpn.Expression);
+            var param = GnParam.Prepare(scope, appExpn.Parameter);
+            var expn = IGnFuncExpn.Prepare(scope, appExpn.Expression);
 
             return new(param, expn);
         }

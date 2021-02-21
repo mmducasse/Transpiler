@@ -53,22 +53,5 @@ namespace Transpiler.Analysis
                                              ret.ToCtor());
             return new Operator(name, backingFunctionName, type, fixity);
         }
-
-        public static void AddInstFunc2(Dictionary<AzFuncDefn, IAzFuncDefn> dictionary,
-                                        AzClassTypeDefn classDefn,
-                                        string funcName,
-                                        string backingFuncName,
-                                        IAzTypeExpn type,
-                                        eFixity fixity = eFixity.Infix)
-        {
-            var op = new Operator(funcName, backingFuncName, type, fixity);
-
-            if (!classDefn.TryGetFunction(op.Name, out var classFuncDefn))
-            {
-                throw new System.Exception();
-            }
-
-            dictionary[classFuncDefn] = op;
-        }
     }
 }

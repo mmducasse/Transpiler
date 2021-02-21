@@ -1,49 +1,56 @@
-﻿//using System.Collections.Generic;
-//using System.Linq;
-//using Transpiler.Parse;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Transpiler.Analysis;
+using static Transpiler.Extensions;
 
-//namespace Transpiler.Analysis
-//{
-//    public record AzTuplePattern(IReadOnlyList<IAzPattern> Elements,
-//                                 CodePosition Position) : IAzPattern
-//    {
-//        public static AzTuplePattern Analyze(Scope scope,
-//                                              PsTuplePattern node)
-//        {
-//            var elements = node.Elements.Select(e => IAzPattern.Analyze(scope, e)).ToList();
+namespace Transpiler.Generate
+{
+    public record GnTuplePattern(IReadOnlyList<IGnPattern> Elements) : IGnDectorPattern
+    {
+        public static GnTuplePattern Prepare(IScope scope, AzTuplePattern pattern)
+        {
+            var elements = pattern.Elements.Select(v => IGnPattern.Prepare(scope, v)).ToList();
+            return new(elements);
+        }
 
-//            return new(elements, node.Position);
-//        }
+        public string Generate(int i, NameProvider names, ref string s)
+        {
+            return Generate();
+        }
 
-//        public static ConstraintSet Constrain(TvTable tvTable,
-//                                              Scope scope,
-//                                              AzTuplePattern node)
-//        {
-//            var cs = new ConstraintSet();
-//            List<IAzTypeExpn> elementTypes = new();
-//            for (int i = 0; i < node.Elements.Count; i++)
-//            {
-//                var c = IAzPattern.Constrain(tvTable, scope, node.Elements[i]);
+        public string Generate()
+        {
+            string GenerateVar(IGnPattern variable)
+            {
+                return variable switch
+                {
+                    GnSymbolExpn => "null",
+                    GnParam => "null",
+                    _ => variable.Generate(),
+                };
+            }
 
-//                var tv = tvTable.AddNode(scope, node.Elements[i]);
-//                elementTypes.Add(tv);
+            var elements = Elements.Select(GenerateVar).Separate(", ", prepend: ", ");
+            string s = string.Format("[\"\"{0}]", elements);
+            return s;
+        }
 
-//                cs = IConstraintSet.Union(cs, c);
-//            }
-
-//            var tupleType = new AzTypeTupleExpn(elementTypes, CodePosition.Null);
-//            var pattType = tvTable.GetTypeOf(node);
-//            var ctup = new Constraint(pattType, tupleType, node);
-
-//            return IConstraintSet.Union(cs, ctup);
-//        }
-
-//        public string Print(int i)
-//        {
-//            var es = Elements.Select(v => v.Print(i)).Separate(", ");
-//            return string.Format("{0}", es);
-//        }
-
-//        public override string ToString() => Print(0);
-//    }
-//}
+        public void GenerateAccessors(int i, string arg, NameProvider names, ref string s)
+        {
+            for (int idx = 0; idx < Elements.Count; idx++)
+            {
+                if (Elements[idx] is GnParam)
+                {
+                    string result = Elements[idx].Generate();
+                    s += string.Format("{0}{1} = Get({2}, {3})\n", Indent(i), result, arg, idx);
+                }
+                if (Elements[idx] is IGnDectorPattern dectorPattern)
+                {
+                    string name = names.Next;
+                    s += string.Format("{0}{1} = Get({2}, {3})\n", Indent(i), name, arg, idx);
+                    dectorPattern.GenerateAccessors(i, name, names, ref s);
+                }
+            }
+        }
+    }
+}

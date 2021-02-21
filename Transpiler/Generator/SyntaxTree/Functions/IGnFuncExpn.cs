@@ -5,18 +5,19 @@ namespace Transpiler.Generate
 {
     public interface IGnFuncExpn : IGnFuncNode
     {
-        public static IGnFuncExpn Prepare(IAzFuncExpn funcExpn)
+        public static IGnFuncExpn Prepare(IScope scope, IAzFuncExpn funcExpn)
         {
             return funcExpn switch
             {
-                AzScopedFuncExpn scopedExpn => GnScopedFuncExpn.Prepare(scopedExpn),
-                IAzLiteralExpn litExpn => IGnLiteralExpn.Prepare(litExpn),
-                AzSymbolExpn symExpn => GnSymbolExpn.Prepare(symExpn),
-                AzAppExpn appExpn => GnAppExpn.Prepare(appExpn),
-                AzLambdaExpn lamExpn => GnLambdaExpn.Prepare(lamExpn),
-                AzIfExpn ifExpn => GnIfExpn.Prepare(ifExpn),
-                AzMatchExpn matExpn => GnMatchExpn.Prepare(matExpn),
-                AzNewDataExpn newExpn => GnNewDataExpn.Prepare(newExpn),
+                AzScopedFuncExpn scopedExpn => GnScopedFuncExpn.Prepare(scope, scopedExpn),
+                IAzLiteralExpn litExpn => IGnLiteralExpn.Prepare(scope, litExpn),
+                AzSymbolExpn symExpn => GnSymbolExpn.Prepare(scope, symExpn),
+                AzAppExpn appExpn => GnAppExpn.Prepare(scope, appExpn),
+                AzLambdaExpn lamExpn => GnLambdaExpn.Prepare(scope, lamExpn),
+                AzTupleExpn tupExpn => GnTupleExpn.Prepare(scope, tupExpn),
+                AzIfExpn ifExpn => GnIfExpn.Prepare(scope, ifExpn),
+                AzMatchExpn matExpn => GnMatchExpn.Prepare(scope, matExpn),
+                AzNewDataExpn newExpn => GnNewDataExpn.Prepare(scope, newExpn),
                 _ => throw new NotImplementedException(),
             };
         }

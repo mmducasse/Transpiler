@@ -165,30 +165,6 @@ namespace Transpiler.Analysis
 
                 scope.FuncDefnTypes[funcDefn] = funcDefn.Type;
             }
-
-            //TEMP_PrintFnTypes(scope);
-
-            //foreach (var inst in scope.ClassInstances)
-            //{
-            //    foreach (var (_, fn) in inst.Functions)
-            //    {
-            //        //var tvTable = new TvTable();
-            //        var constraints = fn.Constrain(provider, scope);
-            //        var substitution = IConstraint.Unify(scope, constraints, provider);
-
-            //        //var tv = tvTable.GetTypeOf(fn);
-            //        var tv = fn.Type;
-            //        var type = IAzTypeExpn.Substitute(tv, substitution);
-            //        type = TvUtils.WithUniqueTvs(type, new());
-
-            //        Console.ForegroundColor = ConsoleColor.Yellow;
-            //        Console.WriteLine("\n\n{0} :: {1}", fn.Name, type.PrintWithRefinements());
-            //        Console.ForegroundColor = ConsoleColor.White;
-            //        Console.WriteLine(fn.Print(0));
-
-            //        scope.FuncDefnTypes[fn] = type;
-            //    }
-            //}
         }
 
         private static void PostAnalyze(Scope scope)

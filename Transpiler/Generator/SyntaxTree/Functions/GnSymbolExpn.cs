@@ -4,7 +4,7 @@ namespace Transpiler.Generate
 {
     public record GnSymbolExpn(string Name) : IGnFuncExpn, IGnPattern, IGnInlineNode
     {
-        public static GnSymbolExpn Prepare(AzSymbolExpn symExpn)
+        public static GnSymbolExpn Prepare(IScope scope, AzSymbolExpn symExpn)
         {
             return new(symExpn.Definition.Name);
         }

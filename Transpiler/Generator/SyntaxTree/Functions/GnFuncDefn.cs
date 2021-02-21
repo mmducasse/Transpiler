@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Transpiler.Analysis;
 using Transpiler.Parse;
 using static Transpiler.Extensions;
@@ -13,9 +14,22 @@ namespace Transpiler.Generate
     public record GnFuncDefn(string Name,
                              IGnFuncExpn Expression) : IGnFuncDefn
     {
-        public static GnFuncDefn Prepare(AzFuncDefn funcDefn)
+        public static GnFuncDefn Prepare(IScope scope, AzFuncDefn funcDefn)
         {
-            var expn = IGnFuncExpn.Prepare(funcDefn.Expression);
+            var expn = IGnFuncExpn.Prepare(scope, funcDefn.Expression);
+
+            var tvs = funcDefn.Type.GetTypeVars();
+            if (tvs.Count > 0)
+            {
+                foreach (var tv in tvs)
+                {
+                    foreach (var r in tv.Refinements)
+                    {
+                        var param = new GnParam("d" + r.Name + tv.Name);
+                        expn = new GnLambdaExpn(param, expn);
+                    }
+                }
+            }
 
             return new GnFuncDefn(funcDefn.Name, expn);
         }

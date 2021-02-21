@@ -7,21 +7,23 @@ namespace Transpiler.Generate
     public record GnMatchCase(IGnPattern Pattern,
                               IGnFuncExpn Expression) : IGnFuncNode
     {
-        public static GnMatchCase Prepare(AzMatchCase matchCase)
+        public static GnMatchCase Prepare(IScope scope, AzMatchCase matchCase)
         {
-            var pattern = IGnPattern.Prepare(matchCase.Pattern);
-            var expn = IGnFuncExpn.Prepare(matchCase.Expression);
+            var pattern = IGnPattern.Prepare(scope, matchCase.Pattern);
+            var expn = IGnFuncExpn.Prepare(scope, matchCase.Expression);
 
             return new(pattern, expn);
         }
 
-        public string Generate(int i, string arg, string res, NameProvider names, ref string s)
+        public string Generate(int i, bool isFirstCase, string arg, string res, NameProvider names, ref string s)
         {
-            s += string.Format("{0}if (Match({1}, {2}))\n", Indent(i), arg, Pattern.Generate());
+            string flowCtrl = isFirstCase ? "if" : "else if";
+            s += string.Format("{0}{1} (Match({2}, {3}))\n", Indent(i), flowCtrl, arg, Pattern.Generate());
             s += Indent(i) + "{\n";
-            if (Pattern is GnDectorPattern dectorPattern)
+
+            if (Pattern is IGnDectorPattern dectorPattern)
             {
-                dectorPattern.GenerateAccessors(i + 1, arg, ref s);
+                dectorPattern.GenerateAccessors(i + 1, arg, names, ref s);
             }
             if (Expression is GnScopedFuncExpn scopedExpn)
             {

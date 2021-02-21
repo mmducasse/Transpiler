@@ -9,10 +9,10 @@ namespace Transpiler.Generate
     public record GnMatchExpn(IGnFuncExpn Argument,
                               IReadOnlyList<GnMatchCase> Cases) : IGnFuncExpn
     {
-        public static GnMatchExpn Prepare(AzMatchExpn matchExpn)
+        public static GnMatchExpn Prepare(IScope scope, AzMatchExpn matchExpn)
         {
-            var arg = IGnFuncExpn.Prepare(matchExpn.Argument);
-            var cases = matchExpn.Cases.Select(c => GnMatchCase.Prepare(c)).ToList();
+            var arg = IGnFuncExpn.Prepare(scope, matchExpn.Argument);
+            var cases = matchExpn.Cases.Select(c => GnMatchCase.Prepare(scope, c)).ToList();
 
             return new(arg, cases);
         }
@@ -24,9 +24,11 @@ namespace Transpiler.Generate
 
             s += string.Format("{0}var {1};\n", Indent(i), res);
 
+            bool isFirst = true;
             foreach (var @case in Cases)
             {
-                @case.Generate(i, arg, res, names, ref s);
+                @case.Generate(i, isFirst, arg, res, names, ref s);
+                isFirst = false;
             }
 
             return res;

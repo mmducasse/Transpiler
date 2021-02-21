@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Transpiler.Analysis;
@@ -13,24 +14,28 @@ namespace Transpiler.Generate
 
             StringBuilder output = new();
             output.Append(GetCoreJsCode());
-            Generate(CoreTypes.Instance.Scope, ref output);
-            Generate(fileScope, ref output);
+            Generate("Generated Core Functions", CoreTypes.Instance.Scope, ref output);
+            Generate(module.Name, fileScope, ref output);
 
             TEMP_AddFinalLine(ref output);
 
             string destFile = @"C:\Users\matth\Desktop\output.js";
             File.WriteAllText(destFile, output.ToString());
 
+            ExecOutputFile(destFile);
         }
 
         private static void TEMP_AddFinalLine(ref StringBuilder output)
         {
-            string s = "\n\nconsole.log(_ans)\n\n";
+            string s = "\n\nPrintResult(_ans)\n\n";
+            s += "console.log(\"\")\n";
             output.Append(s);
         }
 
-        private static void Generate(IScope scope, ref StringBuilder output)
+        private static void Generate(string moduleName, IScope scope, ref StringBuilder output)
         {
+            output.AppendLine(string.Format("////////////////// START OF {0} //////////////////\n", moduleName));
+
             // Generate type classes.
             foreach (var (_, typeDefn) in scope.TypeDefinitions)
             {
@@ -43,7 +48,7 @@ namespace Transpiler.Generate
             // Generate class instances.
             foreach (var isntDefn in scope.ClassInstances)
             {
-                GnClassInstDefn.Generate(isntDefn, ref output);
+                GnClassInstDefn.Generate(scope, isntDefn, ref output);
             }
 
             // Generate functions.
@@ -52,18 +57,16 @@ namespace Transpiler.Generate
                 if (func is AzFuncDefn funcDefn &&
                     funcDefn.Expression != null)
                 {
-                    var gnFunc = GnFuncDefn.Prepare(funcDefn);
+                    var gnFunc = GnFuncDefn.Prepare(scope, funcDefn);
                     string g = "";
                     gnFunc.Generate(0, new(), ref g);
 
                     output.Append(g);
                     output.Append("\n\n");
-
-                    Console.WriteLine();
-                    Console.WriteLine(g);
-                    Console.WriteLine();
                 }
             }
+
+            output.AppendLine(string.Format("////////////////// END OF {0} //////////////////\n", moduleName));
         }
 
         private static string GetCoreJsCode()
@@ -72,6 +75,13 @@ namespace Transpiler.Generate
             string coreJsFile = Directory.GetParent(execPath) + "\\Generator\\Core\\Core.js";
 
             return File.ReadAllText(coreJsFile);
+        }
+
+        private static void ExecOutputFile(string filePath)
+        {
+            Console.WriteLine("\n\n");
+            Console.Write("ans: ");
+            Process.Start("node", filePath);
         }
 
         public static string Generated(this string name, int underscores = 1)

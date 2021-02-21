@@ -39,10 +39,10 @@ namespace Transpiler.Analysis
 
             List = CreateList(mScope);
 
-            mScope.PrintTypes();
-            mScope.PrintFunctions();
-            mScope.PrintClassInstances();
-            mScope.PrintTypeHeirarchy();
+            //mScope.PrintTypes();
+            //mScope.PrintFunctions();
+            //mScope.PrintClassInstances();
+            //mScope.PrintTypeHeirarchy();
 
             //Analyzer.TEMP_PrintFnTypes(mScope);
         }

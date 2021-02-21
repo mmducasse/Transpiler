@@ -23,6 +23,10 @@ namespace Transpiler.Analysis
 
         bool IsSubtypeOf(IAzTypeDefn subtype, IAzTypeSetDefn supertype);
 
+        bool HasClassLineage(AzClassTypeDefn subclass,
+                            AzClassTypeDefn superclass,
+                            out IReadOnlyList<AzClassTypeDefn> lineage);
+
         HashSet<IAzTypeSetDefn> GetSupertypes(IAzTypeDefn subtype);
 
         bool TryGetCommonSupertypeOf(IReadOnlyList<IAzTypeExpn> subtypes,
@@ -200,6 +204,44 @@ namespace Transpiler.Analysis
             foreach (var d in Dependencies)
             {
                 if (d.IsSubtypeOf(subtype, supertype))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
+
+        public bool HasClassLineage(AzClassTypeDefn subclass,
+                                    AzClassTypeDefn superclass,
+                                    out IReadOnlyList<AzClassTypeDefn> lineage)
+        {
+            var lineageList = new List<AzClassTypeDefn> { subclass };
+            lineage = lineageList;
+
+            if (SuperTypes.TryGetValue(subclass, out var supertypes))
+            {
+                foreach (var st in supertypes)
+                {
+                    if (st == superclass)
+                    {
+                        lineageList.Add(superclass);
+                        return true;
+                    }
+                    if (st is AzClassTypeDefn classSt &&
+                        HasClassLineage(classSt, superclass, out var nextLineage))
+                    {
+                        lineageList.AddRange(nextLineage);
+                        return true;
+                    }
+                }
+            }
+
+            foreach (var d in Dependencies)
+            {
+                if (d.HasClassLineage(subclass, superclass, out lineage))
                 {
                     return true;
                 }

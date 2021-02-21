@@ -21,8 +21,8 @@ namespace Transpiler.Analysis
             var @bool = CoreTypes.Instance.Bool;
             var eq = CoreTypes.Instance.Eq;
 
-            var ord = new AzClassTypeDefn("Ord", scope, CodePosition.Null);
-            var a = new TypeVariable(0, RList(ord, eq));
+            var ord = new AzClassTypeDefn("Ord", eq.ToArr(), scope, CodePosition.Null);
+            var a = new TypeVariable(0, ord.ToArr());
             ord.TypeVar = a;
 
             var type = AzTypeLambdaExpn.Make(a, a, @bool.ToCtor());
@@ -35,6 +35,7 @@ namespace Transpiler.Analysis
             ord.Functions = RList(fLt, fLte, fGt, fGte);
 
             scope.AddType(ord);
+            scope.AddSuperType(ord, eq);
             scope.AddFunction(fLt, fLt.ExplicitType);
             scope.AddFunction(fLte, fLte.ExplicitType);
             scope.AddFunction(fGt, fGt.ExplicitType);

@@ -33,6 +33,7 @@
     <Compile Include="Generator\SyntaxTree\Functions\GnOperator.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\GnScopedFuncExpn.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\GnSymbolExpn.cs" />
+    <Compile Include="Generator\SyntaxTree\Functions\GnTupleExpn.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\IGnFuncExpn.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\IGnFuncNode.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\IGnInlineNode.cs" />
@@ -44,6 +45,7 @@
     <Compile Include="Generator\SyntaxTree\Functions\PatternMatching\GnElsePattern.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\PatternMatching\GnMatchCase.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\PatternMatching\GnParam.cs" />
+    <Compile Include="Generator\SyntaxTree\Functions\PatternMatching\GnTuplePattern.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\PatternMatching\IGnPattern.cs" />
     <Compile Include="Generator\SyntaxTree\IGnDefn.cs" />
     <Compile Include="Generator\SyntaxTree\IGnNode.cs" />

@@ -18,9 +18,9 @@ namespace Transpiler.Analysis
 
         private static AzClassTypeDefn MakeNum(Scope scope)
         {
-            var num = new AzClassTypeDefn("Num", scope, CodePosition.Null);
             var eq = CoreTypes.Instance.Eq;
-            var a = new TypeVariable(0, RList(num, eq));
+            var num = new AzClassTypeDefn("Num", eq.ToArr(), scope, CodePosition.Null);
+            var a = new TypeVariable(0, num.ToArr());
             num.TypeVar = a;
 
             var type = AzTypeLambdaExpn.Make(a, a, a);
@@ -33,6 +33,7 @@ namespace Transpiler.Analysis
             num.Functions = RList(fAdd, fSub, fMul, fDiv);
 
             scope.AddType(num);
+            scope.AddSuperType(num, eq);
             scope.AddFunction(fAdd, fAdd.ExplicitType);
             scope.AddFunction(fSub, fSub.ExplicitType);
             scope.AddFunction(fMul, fMul.ExplicitType);

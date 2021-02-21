@@ -6,11 +6,11 @@ using static Transpiler.Extensions;
 namespace Transpiler.Generate
 {
     public record GnDectorPattern(string TypeName,
-                                  IReadOnlyList<IGnPattern> Variables) : IGnPattern
+                                  IReadOnlyList<IGnPattern> Variables) : IGnDectorPattern
     {
-        public static GnDectorPattern Prepare(AzDectorPattern pattern)
+        public static GnDectorPattern Prepare(IScope scope, AzDectorPattern pattern)
         {
-            var vars = pattern.Variables.Select(v => IGnPattern.Prepare(v)).ToList();
+            var vars = pattern.Variables.Select(v => IGnPattern.Prepare(scope, v)).ToList();
             return new(pattern.TypeDefn.Name, vars);
         }
 
@@ -21,17 +21,37 @@ namespace Transpiler.Generate
 
         public string Generate()
         {
+            string GenerateVar(IGnPattern variable)
+            {
+                return variable switch
+                {
+                    GnSymbolExpn => "null",
+                    GnParam => "null",
+                    _ => variable.Generate(),
+                };
+            }
+
             string name = TypeName;
-            var vars = Variables.Select(v => "null").Separate(", ", prepend: ", ");
+            var vars = Variables.Select(GenerateVar).Separate(", ", prepend: ", ");
             string s = string.Format("[\"{0}\"{1}]", name, vars);
             return s;
         }
 
-        public void GenerateAccessors(int i, string arg, ref string s)
+        public void GenerateAccessors(int i, string arg, NameProvider names, ref string s)
         {
             for (int idx = 0; idx < Variables.Count; idx++)
             {
-                s += string.Format("{0}{1} = Get({2}, {3})\n", Indent(i), Variables[idx].Generate(), arg, idx);
+                if (Variables[idx] is GnParam)
+                {
+                    string result = Variables[idx].Generate();
+                    s += string.Format("{0}{1} = Get({2}, {3})\n", Indent(i), result, arg, idx);
+                }
+                if (Variables[idx] is IGnDectorPattern dectorPattern)
+                {
+                    string name = names.Next;
+                    s += string.Format("{0}{1} = Get({2}, {3})\n", Indent(i), name, arg, idx);
+                    dectorPattern.GenerateAccessors(i, name, names, ref s);
+                }
             }
         }
     }

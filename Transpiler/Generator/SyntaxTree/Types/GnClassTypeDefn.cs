@@ -11,16 +11,28 @@ namespace Transpiler.Generate
     {
         public static void Generate(AzClassTypeDefn classDefn, ref StringBuilder output)
         {
-            for (int i = 0; i < classDefn.Functions.Count; i++)
+            int i = 0;
+            for (; i < classDefn.Superclasses.Count(); i++)
             {
-                string funcName = classDefn.Functions[i].Name.SafeName();
-                string s = string.Format("function {0}(dict)\n", funcName);
-                s += "{\n";
-                s += string.Format("{0}return dict[{1}]\n", Indent(1), i);
-                s += "}\n\n";
-
-                output.Append(s);
+                string fnName = string.Format("{0}From{1}", classDefn.Superclasses[i].Name, classDefn.Name);
+                output.Append(GenerateFunction(fnName, i));
             }
+
+            for (int j = 0; j < classDefn.Functions.Count; j++)
+            {
+                string fnName = classDefn.Functions[j].Name;
+                output.Append(GenerateFunction(fnName, i + j));
+            }
+        }
+
+        private static string GenerateFunction(string name, int i)
+        {
+            string s = string.Format("function {0}(dict)\n", name.SafeName());
+            s += "{\n";
+            s += string.Format("{0}return dict[{1}]\n", Indent(1), i);
+            s += "}\n\n";
+
+            return s;
         }
     }
 }

@@ -35,25 +35,21 @@ namespace Transpiler.Parse
 
             if (PsClassInstDefn.Parse(ref q, out var instNode))
             {
-                System.Console.WriteLine(instNode.Print(0));
                 r.InstDefns.Add(instNode);
                 return true;
             }
             if (PsClassTypeDefn.Parse(ref q, out var classNode))
             {
-                System.Console.WriteLine(classNode.Print(0));
                 r.ClassDefns.Add(classNode);
                 return true;
             }
             if (IPsTypeDefn.Parse(ref q, allowClasses: false, out var typeNode))
             {
-                System.Console.WriteLine(typeNode.Print(0));
                 r.TypeDefns.Add(typeNode);
                 return true;
             }
             if (PsFuncDefn.ParseDefn(ref q, out var funcNode))
             {
-                System.Console.WriteLine(funcNode.Print(0));
                 r.FuncDefns.Add(funcNode);
                 return true;
             }

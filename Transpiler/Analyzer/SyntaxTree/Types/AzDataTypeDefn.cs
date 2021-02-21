@@ -138,8 +138,9 @@ namespace Transpiler.Analysis
             dataType.Constructor.Expression = expn;
             dataType.Constructor.Expression.Type = type;
             dataType.Constructor.Type = type;
+            dataType.Constructor.ExplicitType = type;
 
-            Console.WriteLine("CTOR {0} :: {1}", dataType.Constructor.Print(0), type.Print(0));
+            //Console.WriteLine("CTOR {0} :: {1}", dataType.Constructor.Print(0), type.Print(0));
             fileScope.AddFunction(dataType.Constructor, type);
 
         }

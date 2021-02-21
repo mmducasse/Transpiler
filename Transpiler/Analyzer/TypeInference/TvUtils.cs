@@ -30,10 +30,31 @@ namespace Transpiler.Analysis
                                          TypeVariable tvb,
                                          TvProvider provider)
         {
-            var ra = tva.Refinements;
-            var rb = tvb.Refinements;
-            var rc = ra.Union(rb).ToArray();
+            var ra = tva.Refinements.ToHashSet();
+            var rb = tvb.Refinements.ToHashSet();
+            var rc = ra.Union(rb).RemoveRedundantRefinements(scope).ToArray();
             return provider.NextR(rc);
+        }
+
+        public static IReadOnlyList<AzClassTypeDefn>
+            RemoveRedundantRefinements(this IEnumerable<AzClassTypeDefn> refinements, IScope scope)
+        {
+            List<AzClassTypeDefn> redundancies = new();
+            foreach (var r1 in refinements)
+            {
+                foreach (var r2 in refinements)
+                {
+                    if ((r1 != r2) && scope.IsSubtypeOf(r1, r2))
+                    {
+                        redundancies.Add(r2);
+                    }
+                }
+            }
+
+            var neededRefinements = refinements.ToList();
+            neededRefinements.RemoveAll(r => redundancies.Contains(r));
+
+            return neededRefinements;
         }
 
         public static string PrintWithRefinements(this IAzTypeExpn type)

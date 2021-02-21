@@ -21,21 +21,21 @@ namespace Transpiler.Analysis
 
         private static AzClassTypeDefn MakeEq(Scope scope, IAzDataTypeDefn @bool)
         {
-            var cEq = new AzClassTypeDefn("Eq", scope, CodePosition.Null);
-            var a = new TypeVariable(0, cEq.ToArr());
-            cEq.TypeVar = a;
+            var eq = new AzClassTypeDefn("Eq", new List<AzClassTypeDefn>(), scope, CodePosition.Null);
+            var a = new TypeVariable(0, eq.ToArr());
+            eq.TypeVar = a;
 
             var type = AzTypeLambdaExpn.Make(a, a, @bool.ToCtor());
 
             var fEq = new AzFuncDefn("==", type, eFixity.Infix, CodePosition.Null);
             var fNeq = new AzFuncDefn("!=", type, eFixity.Infix, CodePosition.Null);
 
-            cEq.Functions = RList(fEq, fNeq);
+            eq.Functions = RList(fEq, fNeq);
 
-            scope.AddType(cEq);
+            scope.AddType(eq);
             scope.AddFunction(fEq, fEq.ExplicitType);
             scope.AddFunction(fNeq, fNeq.ExplicitType);
-            return cEq;
+            return eq;
         }
 
         private static void InstEq(Scope scope,

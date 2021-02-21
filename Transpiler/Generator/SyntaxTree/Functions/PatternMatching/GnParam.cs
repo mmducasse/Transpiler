@@ -4,7 +4,7 @@ namespace Transpiler.Generate
 {
     public record GnParam(string Name) : IGnPattern, IGnFuncDefn
     {
-        public static GnParam Prepare(AzParam param)
+        public static GnParam Prepare(IScope scope, AzParam param)
         {
             return new(param.Name);
         }

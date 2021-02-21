@@ -4,7 +4,7 @@ namespace Transpiler.Generate
 {
     public record GnIntLiteral(string Value) : IGnLiteralExpn
     {
-        public static GnIntLiteral Prepare(AzIntLiteral intLit)
+        public static GnIntLiteral Prepare(IScope scope, AzIntLiteral intLit)
         {
             return new(intLit.Value);
         }

@@ -4,7 +4,7 @@ namespace Transpiler.Generate
 {
     public record GnElsePattern() : IGnPattern
     {
-        public static GnElsePattern Prepare(AzElsePattern pattern)
+        public static GnElsePattern Prepare(IScope scope, AzElsePattern pattern)
         {
             return new();
         }

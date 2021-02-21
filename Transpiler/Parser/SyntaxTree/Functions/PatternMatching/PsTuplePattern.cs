@@ -19,7 +19,7 @@ namespace Transpiler.Parse
             while (Finds(",", ref q))
             {
                 var pn = q.Position;
-                if (!PsDectorPattern.Parse(ref q, out var next))
+                if (!ParseSubPattern(ref q, out var next))
                 {
                     throw Error("Expected pattern after ','", pn);
                 }

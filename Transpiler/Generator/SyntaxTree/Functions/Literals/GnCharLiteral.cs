@@ -4,7 +4,7 @@ namespace Transpiler.Generate
 {
     public record GnCharLiteral(string Value) : IGnLiteralExpn
     {
-        public static GnCharLiteral Prepare(AzCharLiteral charLit)
+        public static GnCharLiteral Prepare(IScope scope, AzCharLiteral charLit)
         {
             return new(charLit.Value);
         }

@@ -7,8 +7,7 @@ namespace Transpiler.Analysis
 {
     public class AzClassTypeDefn : IAzTypeSetDefn
     {
-        public IReadOnlyList<AzClassTypeDefn> Superclasses =>
-            TypeVar.Refinements.Where(s => s != this).ToList();
+        public IReadOnlyList<AzClassTypeDefn> Superclasses { get; }
 
         public TypeVariable TypeVar { get; set; }
 
@@ -21,10 +20,12 @@ namespace Transpiler.Analysis
         public CodePosition Position { get; }
 
         public AzClassTypeDefn(string name,
+                               IReadOnlyList<AzClassTypeDefn> superclasses,
                                Scope scope,
                                CodePosition position)
         {
             Name = name;
+            Superclasses = superclasses;
             Scope = scope;
             Position = position;
         }
@@ -33,7 +34,7 @@ namespace Transpiler.Analysis
                                                  PsClassTypeDefn node)
         {
             var scope = new Scope(fileScope, "Class Defn");
-            var classDefn = new AzClassTypeDefn(node.Name, scope, node.Position);
+            var classDefn = new AzClassTypeDefn(node.Name, new List<AzClassTypeDefn>(), scope, node.Position);
 
             var refinements = new List<AzClassTypeDefn> { classDefn };
             var tv = scope.AddTypeVar(node.TypeVar, refinements);

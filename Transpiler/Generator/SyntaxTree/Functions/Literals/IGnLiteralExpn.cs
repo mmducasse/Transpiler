@@ -5,13 +5,13 @@ namespace Transpiler.Generate
 {
     public interface IGnLiteralExpn : IGnFuncExpn, IGnPattern, IGnInlineNode
     {
-        public static IGnLiteralExpn Prepare(IAzLiteralExpn litExpn)
+        public static IGnLiteralExpn Prepare(IScope scope, IAzLiteralExpn litExpn)
         {
             return litExpn switch
             {
-                AzIntLiteral intLit => GnIntLiteral.Prepare(intLit),
-                AzRealLiteral realLit => GnRealLiteral.Prepare(realLit),
-                AzCharLiteral charLit => GnCharLiteral.Prepare(charLit),
+                AzIntLiteral intLit => GnIntLiteral.Prepare(scope, intLit),
+                AzRealLiteral realLit => GnRealLiteral.Prepare(scope, realLit),
+                AzCharLiteral charLit => GnCharLiteral.Prepare(scope, charLit),
                 _ => throw new NotImplementedException(),
             };
         }

@@ -7,11 +7,11 @@ namespace Transpiler.Generate
                            IGnFuncExpn ThenCase,
                            IGnFuncExpn ElseCase) : IGnFuncExpn
     {
-        public static GnIfExpn Prepare(AzIfExpn funcDefn)
+        public static GnIfExpn Prepare(IScope scope, AzIfExpn funcDefn)
         {
-            var cond = IGnFuncExpn.Prepare(funcDefn.Condition);
-            var then = IGnFuncExpn.Prepare(funcDefn.ThenCase);
-            var @else = IGnFuncExpn.Prepare(funcDefn.ElseCase);
+            var cond = IGnFuncExpn.Prepare(scope, funcDefn.Condition);
+            var then = IGnFuncExpn.Prepare(scope, funcDefn.ThenCase);
+            var @else = IGnFuncExpn.Prepare(scope, funcDefn.ElseCase);
 
             return new(cond, then, @else);
         }

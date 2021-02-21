@@ -6,16 +6,15 @@ using static Transpiler.Extensions;
 namespace Transpiler.Generate
 {
     public record GnScopedFuncExpn(IGnFuncExpn Expression,
-                                   IReadOnlyList<GnFuncDefn> FuncDefinitions
-                                   //Scope Scope,
-                                   ) : IGnFuncExpn
+                                   IReadOnlyList<GnFuncDefn> FuncDefinitions,
+                                   IScope Scope) : IGnFuncExpn
     {
-        public static GnScopedFuncExpn Prepare(AzScopedFuncExpn scopedExpn)
+        public static GnScopedFuncExpn Prepare(IScope scope, AzScopedFuncExpn scopedExpn)
         {
-            var expn = IGnFuncExpn.Prepare(scopedExpn.Expression);
-            var fns = scopedExpn.FuncDefinitions.Select(f => GnFuncDefn.Prepare(f)).ToList();
+            var expn = IGnFuncExpn.Prepare(scope, scopedExpn.Expression);
+            var fns = scopedExpn.FuncDefinitions.Select(f => GnFuncDefn.Prepare(scope, f)).ToList();
 
-            return new(expn, fns);
+            return new(expn, fns, scopedExpn.Scope);
         }
 
         public string Generate(int i, NameProvider names, ref string s)

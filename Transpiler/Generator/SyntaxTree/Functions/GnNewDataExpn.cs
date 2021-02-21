@@ -7,7 +7,7 @@ namespace Transpiler.Generate
     public record GnNewDataExpn(string Name,
                                 IReadOnlyList<string> Arguments) : IGnFuncExpn, IGnInlineNode
     {
-        public static GnNewDataExpn Prepare(AzNewDataExpn newExpn)
+        public static GnNewDataExpn Prepare(IScope scope, AzNewDataExpn newExpn)
         {
             var args = newExpn.Arguments.Select(a => a.Definition.Name).ToList();
             return new(newExpn.Definition.Name, args);

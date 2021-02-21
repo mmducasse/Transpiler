@@ -11,13 +11,13 @@ new CoreTypes();
 string path = @"C:\Users\matth\Desktop\testcode.hs";
 var module = Module.Create(path);
 
-Console.WriteLine(" === PARSER ===");
+//Console.WriteLine(" === PARSER ===");
 Parser.Parse(module);
-Parser.Print(module);
+//Parser.Print(module);
 
-Console.WriteLine(" === ANALYZER ===");
+//Console.WriteLine(" === ANALYZER ===");
 Analyzer.Analyze(module);
-Analyzer.Print(module);
+//Analyzer.Print(module);
 
-Console.WriteLine(" === GENERATOR ===");
+//Console.WriteLine(" === GENERATOR ===");
 Generator.Generate(module);
