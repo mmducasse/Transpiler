@@ -21,6 +21,12 @@ namespace Transpiler.Parse
             }
 
             module.ParseResult = r;
+
+            if (r.ModuleName == null && module.Name == null)
+            {
+                throw Error("Module name is missing in file.", CodePosition.Zero(module));
+            }
+            module.Name = r.ModuleName;
         }
 
         public static void Print(Module module)

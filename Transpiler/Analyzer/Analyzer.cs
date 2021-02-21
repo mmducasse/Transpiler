@@ -12,7 +12,8 @@ namespace Transpiler.Analysis
             var fileScope = new Scope(CoreTypes.Instance.Scope.ToArr());
             module.Scope = fileScope;
 
-            // Todo: Find and analyze usings.
+            // Find and analyze usings.
+            AnalyzeDependencies(module);
 
             // Analyze types and functions in module.
             AnalyzeFile(fileScope, module.ParseResult);
@@ -22,6 +23,34 @@ namespace Transpiler.Analysis
 
             // Perform any more verification needed after type inference is done.
             PostAnalyze(fileScope);
+        }
+
+        private static void AnalyzeDependencies(Module module)
+        {
+            foreach (var dependencyName in module.ParseResult.ImportedModules)
+            {
+                if (!Compiler.Instance.Modules.TryGetValue(dependencyName, out var dependency))
+                {
+                    throw Error("Unable to find module " + dependencyName, CodePosition.Null);
+                }
+
+                if (!module.IsFinished)
+                {
+                    Analyze(dependency);
+                }
+
+                module.Dependencies.Add(dependency);
+                module.Scope.Dependencies.Add(dependency.Scope);
+            }
+
+            // Make sure all dependencies are analyzed first.
+            foreach (var dependency in module.Dependencies)
+            {
+                if (!dependency.IsFinished)
+                {
+                    Analyze(dependency);
+                }
+            }
         }
 
         private static void AnalyzeFile(Scope fileScope, ParseResult results)

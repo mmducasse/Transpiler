@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Transpiler.Analysis;
 using Transpiler.Parse;
@@ -9,7 +8,7 @@ namespace Transpiler
     public class Module
     {
         public string Code { get; }
-        public string Name { get; }
+        public string Name { get; set; }
 
         public IReadOnlyList<LexerToken> Tokens { get; set; }
         public List<Module> Dependencies { get; } = new List<Module>();
@@ -20,6 +19,8 @@ namespace Transpiler
 
         public string Output { get; set; }
 
+        public bool IsFinished { get; set; }
+
         public Module(string code, string name)
         {
             Code = code;
@@ -29,9 +30,8 @@ namespace Transpiler
         public static Module Create(string filePath)
         {
             string code = File.ReadAllText(filePath);
-            string name = Path.GetFileNameWithoutExtension(filePath);
 
-            return new Module(code, name);
+            return new Module(code, "");
         }
     }
 }

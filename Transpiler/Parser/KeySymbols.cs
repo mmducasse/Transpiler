@@ -1,4 +1,4 @@
-﻿namespace Transpiler
+﻿namespace Transpiler.Parse
 {
     public static class KeySymbols
     {

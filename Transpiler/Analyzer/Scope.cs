@@ -39,7 +39,7 @@ namespace Transpiler.Analysis
     {
         public string Name { get; }
 
-        public IEnumerable<IScope> Dependencies { get; } = new List<IScope>();
+        public List<IScope> Dependencies { get; } = new List<IScope>();
 
         IReadOnlyDictionary<string, IAzFuncDefn> IScope.FuncDefinitions => FuncDefinitions;
         public Dictionary<string, IAzFuncDefn> FuncDefinitions { get; } = new();
@@ -63,13 +63,13 @@ namespace Transpiler.Analysis
         public Scope(IEnumerable<IScope> dependencies, string name = "<file>")
         {
             Name = name;
-            Dependencies = dependencies;
+            Dependencies.AddRange(dependencies);
         }
 
         public Scope(IScope parentScope, string name = "<?>")
         {
             Name = name;
-            Dependencies = parentScope.ToArr();
+            Dependencies.AddRange(parentScope.ToArr());
         }
 
         public IReadOnlyList<AzFuncDefn> AllFunctions()

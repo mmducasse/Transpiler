@@ -8,31 +8,31 @@ namespace Transpiler.Generate
 {
     public static class Generator
     {
-        public static void Generate(Module module)
-        {
-            var fileScope = module.Scope;
+        //public static void Generate(Module module)
+        //{
+        //    var fileScope = module.Scope;
 
-            StringBuilder output = new();
-            output.Append(GetCoreJsCode());
-            Generate("Generated Core Functions", CoreTypes.Instance.Scope, ref output);
-            Generate(module.Name, fileScope, ref output);
+        //    StringBuilder output = new();
+        //    output.Append(GetCoreJsCode());
+        //    GenerateModule("Generated Core Functions", CoreTypes.Instance.Scope, ref output);
+        //    GenerateModule(module.Name, fileScope, ref output);
 
-            TEMP_AddFinalLine(ref output);
+        //    TEMP_AddFinalLine(ref output);
 
-            string destFile = @"C:\Users\matth\Desktop\output.js";
-            File.WriteAllText(destFile, output.ToString());
+        //    string destFile = @"C:\Users\matth\Desktop\output.js";
+        //    File.WriteAllText(destFile, output.ToString());
 
-            ExecOutputFile(destFile);
-        }
+        //    ExecOutputFile(destFile);
+        //}
 
-        private static void TEMP_AddFinalLine(ref StringBuilder output)
+        public static void TEMP_AddFinalLine(ref StringBuilder output)
         {
             string s = "\n\nPrintResult(_ans)\n\n";
             s += "console.log(\"\")\n";
             output.Append(s);
         }
 
-        private static void Generate(string moduleName, IScope scope, ref StringBuilder output)
+        public static void GenerateModule(string moduleName, IScope scope, ref StringBuilder output)
         {
             output.AppendLine(string.Format("////////////////// START OF {0} //////////////////\n", moduleName));
 
@@ -69,19 +69,12 @@ namespace Transpiler.Generate
             output.AppendLine(string.Format("////////////////// END OF {0} //////////////////\n", moduleName));
         }
 
-        private static string GetCoreJsCode()
+        public static string GetCoreJsCode()
         {
             string execPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string coreJsFile = Directory.GetParent(execPath) + "\\Generator\\Core\\Core.js";
 
             return File.ReadAllText(coreJsFile);
-        }
-
-        private static void ExecOutputFile(string filePath)
-        {
-            Console.WriteLine("\n\n");
-            Console.Write("ans: ");
-            Process.Start("node", filePath);
         }
 
         public static string Generated(this string name, int underscores = 1)

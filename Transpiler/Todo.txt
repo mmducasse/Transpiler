@@ -5,6 +5,7 @@ TODO:
 - Instance Implementors need to introduce type variables.
 
 - Multiple modules
+- Better errors.
 - Implicit match syntax
 - Explict type annotations inline
 - Make recursion, mutual recursion type checkable (batch type inference based on dependencies)
