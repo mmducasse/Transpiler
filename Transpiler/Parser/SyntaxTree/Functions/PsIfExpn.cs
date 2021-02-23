@@ -8,7 +8,7 @@ namespace Transpiler.Parse
                            IPsFuncExpn ElseCase,
                            CodePosition Position) : IPsFuncExpn
     {
-        public static bool Parse(ref TokenQueue queue, out PsIfExpn node)
+        public static bool Parse(ref TokenQueue queue, bool isInline, out PsIfExpn node)
         {
             node = null;
             var q = queue;
@@ -16,12 +16,10 @@ namespace Transpiler.Parse
 
             // If
             if (!Finds("if", ref q)) { return false; }
-            if (!PsArbExpn.Parse(ref q, out var condNode))
+            if (!PsArbExpn.Parse(ref q, isInline, out var condNode))
             {
                 throw Error("Expected expression as condition in If expression.", q);
             }
-
-            bool isInline = false;
 
             // Then
             if (!Finds(TokenType.NewLine, ref q))
@@ -31,7 +29,7 @@ namespace Transpiler.Parse
             if (!isInline) { ExpectsIndents(ref q, queue.Indent + 1); }
             Expects("then", ref q);
             IPsFuncExpn thenNode;
-            if (isInline && IPsFuncExpn.ParseInline(ref q, out thenNode)) { }
+            if (isInline && IPsFuncExpn.Parse(ref q, isInline, out thenNode)) { }
             else if (PsScopedFuncExpn.Parse(ref q, out thenNode)) { }
             else
             {
@@ -46,7 +44,7 @@ namespace Transpiler.Parse
             }
             Expects("else", ref q);
             IPsFuncExpn elseNode;
-            if (isInline && IPsFuncExpn.ParseInline(ref q, out elseNode)) { }
+            if (isInline && IPsFuncExpn.Parse(ref q, isInline, out elseNode)) { }
             else if (PsScopedFuncExpn.Parse(ref q, out elseNode)) { }
             else
             {

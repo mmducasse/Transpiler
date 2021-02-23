@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Transpiler.Parse;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
 using Transpiler.Analysis;
 using Transpiler.Generate;
-using System.Text;
-using System.IO;
-using System.Diagnostics;
-using System.Threading;
-using System.Linq;
+using Transpiler.Parse;
 
 namespace Transpiler
 {
@@ -27,7 +26,7 @@ namespace Transpiler
 
             new CoreTypes();
 
-            string path = @"C:\Users\matth\Desktop\testcode.hs";
+            //string path = @"C:\Users\matth\Desktop\testcode.hs";
 
             // REPL Loop.
             while (true)
@@ -121,6 +120,8 @@ namespace Transpiler
                     }
 
                     Console.WriteLine("Ok!");
+
+                    newModules.ForEach(m => Console.WriteLine("Loaded " + m.Name));
                 }
                 catch (CompilerException ce)
                 {

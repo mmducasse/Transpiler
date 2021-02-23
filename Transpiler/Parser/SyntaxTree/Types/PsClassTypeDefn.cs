@@ -4,14 +4,6 @@ using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
-
-    /*
-    
-    type Eq a {
-	    x (==) y : a -> a -> Bool = x != y
-	    x (!=) y : a -> a -> Bool = x == y
-
-    */
     public record PsClassTypeDefn(string Name,
                                   string TypeVar,
                                   IReadOnlyList<PsFuncDefn> Functions,

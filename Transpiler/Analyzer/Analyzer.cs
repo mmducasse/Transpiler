@@ -236,8 +236,8 @@ namespace Transpiler.Analysis
                                       CodePosition position)
         {
             return new CompilerException(eCompilerStage.Analyzer,
-                                            reason,
-                                            position);
+                                         reason,
+                                         position);
         }
     }
 }

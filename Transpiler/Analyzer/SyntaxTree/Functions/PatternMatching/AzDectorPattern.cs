@@ -53,7 +53,7 @@ namespace Transpiler.Analysis
             for (int i = 0; i < Variables.Count; i++)
             {
                 var csv = Variables[i].Constrain(provider, scope);
-                var c = new Constraint(typeExpn.Elements[i], Variables[i].Type, this);
+                var c = new Constraint(typeExpn.Elements[i], Variables[i].Type, Position);
 
                 cs = IConstraintSet.Union(cs, c, csv);
             }

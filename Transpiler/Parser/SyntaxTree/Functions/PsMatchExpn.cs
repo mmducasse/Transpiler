@@ -24,7 +24,7 @@ namespace Transpiler.Parse
             IPsFuncExpn condition = null;
             if (Finds("match", ref q))
             {
-                if (!IPsFuncExpn.ParseInline(ref q, out condition))
+                if (!IPsFuncExpn.Parse(ref q, isInline: true, out condition))
                 {
                     throw Error("Expected inline expression after 'match'", q);
                 }

@@ -9,13 +9,13 @@ namespace Transpiler.Analysis
     /// </summary>
     public record Constraint(IAzTypeExpn A,
                              IAzTypeExpn B,
-                             IAzNode TEMP_Node) : IConstraint
+                             CodePosition Position) : IConstraint
     {
         public IConstraint Substitute(Substitution sub)
         {
             return new Constraint(A.Substitute(sub),
                                   B.Substitute(sub),
-                                  TEMP_Node);
+                                  Position);
         }
 
         public static Substitution Unify(IScope scope,
@@ -97,8 +97,8 @@ namespace Transpiler.Analysis
             if (c.A is AzTypeLambdaExpn fa &&
                 c.B is AzTypeLambdaExpn fb)
             {
-                var c1 = new Constraint(fa.Input, fb.Input, c.TEMP_Node);
-                var c2 = new Constraint(fa.Output, fb.Output, c.TEMP_Node);
+                var c1 = new Constraint(fa.Input, fb.Input, c.Position);
+                var c2 = new Constraint(fa.Output, fb.Output, c.Position);
 
                 var cs2 = IConstraintSet.Union(c1, c2, cs);
 
@@ -113,7 +113,7 @@ namespace Transpiler.Analysis
                 ConstraintSet cargs = new();
                 for (int i = 0; i < tupa.Elements.Count; i++)
                 {
-                    var carg = new Constraint(tupa.Elements[i], tupb.Elements[i], c.TEMP_Node);
+                    var carg = new Constraint(tupa.Elements[i], tupb.Elements[i], c.Position);
                     cargs.Add(carg);
                 }
                 var cs2 = IConstraintSet.Union(cs, cargs);
@@ -130,7 +130,7 @@ namespace Transpiler.Analysis
                 ConstraintSet cargs = new();
                 for (int i = 0; i < ctora.Arguments.Count; i++)
                 {
-                    var carg = new Constraint(ctora.Arguments[i], ctorb.Arguments[i], c.TEMP_Node);
+                    var carg = new Constraint(ctora.Arguments[i], ctorb.Arguments[i], c.Position);
                     cargs.Add(carg);
                 }
                 var cs2 = IConstraintSet.Union(cs, cargs);
@@ -138,7 +138,10 @@ namespace Transpiler.Analysis
                 return IConstraint.Unify(scope, cs2, tvProvider);
             }
 
-            throw Analyzer.Error("Type inference failed.", c.TEMP_Node.Position);
+            string errorMsg = string.Format("Type inference failed ({0} != {1}).",
+                                            c.A.PrintWithRefinements(),
+                                            c.B.PrintWithRefinements());
+            throw Analyzer.Error(errorMsg, c.Position);
         }
 
         public override string ToString() => string.Format("{0} = {1}", A.Print(0), B.Print(0));

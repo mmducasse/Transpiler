@@ -67,7 +67,6 @@ namespace Transpiler.Analysis
             foreach (var c in mHashSet)
             {
                 s += string.Format("{0}\n", c.ToString());
-                s += string.Format("{0}\n\n", c.TEMP_Node.Print(0));
             }
 
             return s;

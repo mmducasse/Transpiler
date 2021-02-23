@@ -47,7 +47,7 @@ namespace Transpiler.Analysis
 
             var p = CodePosition.Null;
             var lamType = new AzTypeLambdaExpn(Argument.Type, Type, p);
-            var cfx = new Constraint(Function.Type, lamType, this);
+            var cfx = new Constraint(Function.Type, lamType, Position);
 
             return IConstraintSet.Union(cfx, csf, csx);
         }

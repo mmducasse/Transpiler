@@ -30,7 +30,7 @@ namespace Transpiler.Analysis
             var cse = Expression.Constrain(provider, scope);
 
             var lamType = new AzTypeLambdaExpn(Parameter.Type, Expression.Type, Null);
-            var cf = new Constraint(Type, lamType, this);
+            var cf = new Constraint(Type, lamType, Position);
 
             return IConstraintSet.Union(cf, csp, cse);
         }

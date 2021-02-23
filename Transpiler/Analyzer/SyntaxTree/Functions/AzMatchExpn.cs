@@ -55,8 +55,8 @@ namespace Transpiler.Analysis
 
                 var tcase = @case.Type as AzTypeLambdaExpn;
 
-                var cinput = new Constraint(targ, tcase.Input, this);
-                var coutput = new Constraint(tmatch, tcase.Output, this);
+                var cinput = new Constraint(targ, tcase.Input, Position);
+                var coutput = new Constraint(tmatch, tcase.Output, Position);
 
                 cs = IConstraintSet.Union(cs, c, cinput, coutput);
             }

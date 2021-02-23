@@ -8,7 +8,7 @@ namespace Transpiler.Parse
     public record PsArbExpn(IReadOnlyList<IPsFuncExpn> Children,
                             CodePosition Position) : IPsFuncExpn, IPsPattern
     {
-        public static bool Parse(ref TokenQueue queue, out PsArbExpn node)
+        public static bool Parse(ref TokenQueue queue, bool isInline, out PsArbExpn node)
         {
             node = null;
             var q = queue;
@@ -21,7 +21,7 @@ namespace Transpiler.Parse
                 var q2 = q;
                 if (Finds("(", ref q2))
                 {
-                    if (!IPsFuncExpn.ParseInline(ref q2, out var arbSubNode))
+                    if (!IPsFuncExpn.Parse(ref q2, isInline: true, out var arbSubNode))
                     {
                         throw Error("Expected inline expression after '('", q2);
                     }

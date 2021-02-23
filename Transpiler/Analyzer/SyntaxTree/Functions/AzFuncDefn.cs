@@ -118,7 +118,7 @@ namespace Transpiler.Analysis
             if (Expression != null)
             {
                 var cs = Expression.Constrain(provider, scope);
-                var c = new Constraint(Type, Expression.Type, this);
+                var c = new Constraint(Type, Expression.Type, Position);
 
                 return IConstraintSet.Union(c, cs);
             }

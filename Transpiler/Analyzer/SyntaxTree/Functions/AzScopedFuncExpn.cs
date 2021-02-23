@@ -49,7 +49,7 @@ namespace Transpiler.Analysis
             }
 
             var cse = Expression.Constrain(provider, Scope);
-            var ccc = new Constraint(Type, Expression.Type, this);
+            var ccc = new Constraint(Type, Expression.Type, Position);
 
             return IConstraintSet.Union(cse, cs, ccc);
         }

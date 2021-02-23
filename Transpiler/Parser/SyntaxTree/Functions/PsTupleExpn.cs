@@ -15,13 +15,13 @@ namespace Transpiler.Parse
 
             var subExpns = new List<IPsFuncExpn>();
 
-            if (!PsArbExpn.Parse(ref q, out var firstExpn)) { return false; }
+            if (!PsArbExpn.Parse(ref q, isInline: true, out var firstExpn)) { return false; }
             var q2 = q;
             if (!Finds(",", ref q2)) { return false; }
             subExpns.Add(firstExpn);
             while (Finds(",", ref q))
             {
-                if (!PsArbExpn.Parse(ref q, out var nextExpn))
+                if (!PsArbExpn.Parse(ref q, isInline: true, out var nextExpn))
                 {
                     throw Error("Expected expression after ',' in tuple.", q);
                 }

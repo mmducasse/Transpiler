@@ -51,7 +51,7 @@ namespace Transpiler.Parse
             int indent = q.Indent;
             var subDefns = new List<PsFuncDefn>();
 
-            if (!IPsFuncExpn.Parse(ref q, out var expn)) { return false; }
+            if (!IPsFuncExpn.Parse(ref q, isInline: false, out var expn)) { return false; }
 
             var q2 = q;
             if (!(Finds(TokenType.NewLine, ref q2) &&

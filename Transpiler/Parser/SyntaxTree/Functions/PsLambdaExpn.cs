@@ -6,7 +6,7 @@ namespace Transpiler.Parse
                                IPsFuncExpn Expression,
                                CodePosition Position) : IPsFuncExpn
     {
-        public static bool Parse(ref TokenQueue queue, out PsLambdaExpn node)
+        public static bool Parse(ref TokenQueue queue, bool isInline, out PsLambdaExpn node)
         {
             node = null;
             var q = queue;
@@ -14,7 +14,7 @@ namespace Transpiler.Parse
 
             if (!PsParam.Parse(ref q, out var paramNode)) { return false; }
             if (!Finds("->", ref q)) { return false; }
-            if (!IPsFuncExpn.Parse(ref q, out var expnNode))
+            if (!IPsFuncExpn.Parse(ref q, isInline, out var expnNode))
             {
                 throw Error("Expected expression after '->' in lambda function.", q);
             }

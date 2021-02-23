@@ -19,18 +19,12 @@ namespace Transpiler.Generate
 
         public string Generate(int i, NameProvider names, ref string s)
         {
-            throw new System.Exception();
-
-            //s += string.Format("{0}{{\n", Indent(i));
-            //foreach (var fn in FuncDefinitions)
-            //{
-            //    fn.Generate(i + 1, names, ref s);
-            //    s += "\n";
-            //}
-            //string expnRes = Expression.Generate(i, names, ref s);
-            //s += string.Format("\n{0}return {1} \n", Indent(i + 1), expnRes);
-            //s += "}}\n";
-            //return s;
+            foreach (var fn in FuncDefinitions)
+            {
+                fn.Generate(i + 1, names, ref s);
+                s += "\n";
+            }
+            return Expression.Generate(i, names, ref s);
         }
     }
 }

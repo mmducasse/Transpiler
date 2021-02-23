@@ -40,21 +40,8 @@ namespace Transpiler.Generate
                                          ref string s)
         {
             s += Indent(i) + "{\n";
-            if (@case is GnScopedFuncExpn scopedElseCase)
-            {
-                foreach (var fn in scopedElseCase.FuncDefinitions)
-                {
-                    fn.Generate(i + 1, names, ref s);
-                    s += "\n";
-                }
-                string expnRes = scopedElseCase.Expression.Generate(i + 1, names, ref s);
-                s += string.Format("{0}{1} = {2}\n", Indent(i + 1), res, expnRes);
-            }
-            else
-            {
-                string expnRes = @case.Generate(i + 1, names, ref s);
-                s += string.Format("{0}{1} = ", Indent(i + 1), res, expnRes);
-            }
+            string expnRes = @case.Generate(i + 1, names, ref s);
+            s += string.Format("{0}{1} = {2}\n", Indent(i + 1), res, expnRes);
             s += Indent(i) + "}\n";
         }
     }

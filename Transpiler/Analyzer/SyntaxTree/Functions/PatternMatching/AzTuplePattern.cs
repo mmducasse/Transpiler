@@ -33,7 +33,7 @@ namespace Transpiler.Analysis
             }
 
             var tupleType = new AzTypeTupleExpn(elementTypes, Null);
-            var ctup = new Constraint(Type, tupleType, this);
+            var ctup = new Constraint(Type, tupleType, Position);
 
             return IConstraintSet.Union(cs, ctup);
         }

@@ -14,7 +14,7 @@ namespace Transpiler.Parse
             else if (PsDectorPattern.Parse(ref q, out var dctorNode)) { node = dctorNode; }
             else if (PsAnyPattern.Parse(ref q, out var elseNode)) { node = elseNode; }
             else if (IPsLiteralExpn.Parse(ref q, out var litExpnNode)) { node = litExpnNode; }
-            else if (PsArbExpn.Parse(ref q, out var arbExpnNode)) { node = arbExpnNode; }
+            else if (PsArbExpn.Parse(ref q, isInline: true, out var arbExpnNode)) { node = arbExpnNode; }
 
             if (node != null)
             {

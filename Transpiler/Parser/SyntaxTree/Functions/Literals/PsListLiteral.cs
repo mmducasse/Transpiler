@@ -18,7 +18,7 @@ namespace Transpiler.Parse
                 List<IPsFuncExpn> elements = new();
                 while (!Finds(TokenType.NewLine, ref q))
                 {
-                    if (!PsArbExpn.Parse(ref q, out var arbNode))
+                    if (!PsArbExpn.Parse(ref q, isInline: true, out var arbNode))
                     {
                         throw Error("Expected expression in list element.", q.Position);
                     }
