@@ -20,7 +20,7 @@ namespace Transpiler.Parse
         public static void Expects(string s, ref TokenQueue q)
         {
             if (s != q.Current.Value)
-                throw Error("Expected " + s, q);
+                throw Error("Expected " + s + ".", q);
 
             q = q.Next;
         }
@@ -35,7 +35,7 @@ namespace Transpiler.Parse
             value = null;
 
             if ((tokenType & q.Current.Type) == 0)
-                throw Error("Expected " + tokenType.ToString() + " token ", q);
+                throw Error("Expected " + tokenType.ToString() + " token.", q);
 
             value = q.Current.Value;
             q = q.Next;
@@ -209,7 +209,7 @@ namespace Transpiler.Parse
         public static Exception Error(string reason,
                                       CodePosition position)
         {
-            return new InterpreterException(eInterpreterStage.Parser,
+            return new CompilerException(eCompilerStage.Parser,
                                             reason,
                                             position);
         }

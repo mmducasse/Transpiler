@@ -2,27 +2,26 @@
 
 namespace Transpiler
 {
-    public enum eInterpreterStage
+    public enum eCompilerStage
     {
-        Loading,
-        Lexer,
         Parser,
         Analyzer,
-        Generator
+        Generator,
+        Input,
     }
 
-    public class InterpreterException : Exception
+    public class CompilerException : Exception
     {
-        private eInterpreterStage mStage;
+        private eCompilerStage mStage;
         private string mReason = string.Empty;
 
         private string mModuleName = string.Empty;
         private string mCode = string.Empty;
         private CodePosition mPosition;
 
-        public InterpreterException(eInterpreterStage stage,
-                                    string reason,
-                                    CodePosition position)
+        public CompilerException(eCompilerStage stage,
+                                 string reason,
+                                 CodePosition position)
         {
             mStage = stage;
             mReason = reason;
@@ -33,31 +32,34 @@ namespace Transpiler
             mCode = lines[mPosition.Line];
         }
 
-        public InterpreterException(eInterpreterStage stage,
-                                    string reason)
+        public CompilerException(eCompilerStage stage,
+                                 string reason)
         {
             mStage = stage;
             mReason = reason;
         }
 
-        public string Info()
+        public string Info
         {
-            string info = "";
+            get
+            {
+                string info = "";
 
-            info += string.Format("{0} Error in module {1}\n", StageString(mStage), mModuleName);
-            info += string.Format("{0}: {1}\n", mPosition.Line + 1, mCode);
-            info += mReason + "\n\n";
-            info += GetAdjacentLines(mCode, mPosition.Line);
+                info += string.Format("{0} Error in module {1}\n", StageString(mStage), mModuleName);
+                info += string.Format("{0}: {1}\n", mPosition.Line + 1, mCode);
+                info += " ".Multiply(3 + mPosition.Column) + "^\n";
+                info += mReason + "\n\n";
 
-            return info;
+                return info;
+            }
         }
 
-        private static string GetAdjacentLines(string code, int line)
-        {
-            return string.Format("{0}\n{1}\n{2}", GetLine(code, line - 1),
-                                                  GetLine(code, line),
-                                                  GetLine(code, line + 1));
-        }
+        //private static string GetAdjacentLines(string code, int line)
+        //{
+        //    return string.Format("{0}\n{1}\n{2}", GetLine(code, line - 1),
+        //                                          GetLine(code, line),
+        //                                          GetLine(code, line + 1));
+        //}
 
         private static string GetLine(string code, int line)
         {
@@ -65,17 +67,25 @@ namespace Transpiler
             return lines[line];
         }
 
-        private string StageString(eInterpreterStage stage)
+        private string StageString(eCompilerStage stage)
         {
-            switch (stage)
+            return stage switch
             {
-                case eInterpreterStage.Loading: return "Loading";
-                case eInterpreterStage.Lexer: return "Lexer";
-                case eInterpreterStage.Parser: return "Parser";
-                case eInterpreterStage.Analyzer: return "Analyzer";
-                case eInterpreterStage.Generator: return "Generator";
-            }
-            return "";
+                eCompilerStage.Parser => "Parser",
+                eCompilerStage.Analyzer => "Analyzer",
+                eCompilerStage.Generator => "Generator",
+                _ => "Input",
+            };
+        }
+    }
+
+    public static class ExceptionUtil
+    {
+        public static void Print(this CompilerException exception)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(exception.Info);
+            Console.ForegroundColor = ConsoleColor.White;
         }
     }
 }

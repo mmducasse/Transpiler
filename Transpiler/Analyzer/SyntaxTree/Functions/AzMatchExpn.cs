@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using static Transpiler.Extensions;
-using Transpiler.Parse;
-using static Transpiler.CodePosition;
 using System.Linq;
+using Transpiler.Parse;
+using static Transpiler.Extensions;
 
 namespace Transpiler.Analysis
 {
@@ -12,10 +11,9 @@ namespace Transpiler.Analysis
     {
         public IAzTypeExpn Type { get; set; }
 
-        public static AzMatchExpn Analyze(Scope parentScope,
+        public static IAzFuncExpn Analyze(Scope parentScope,
                                           PsMatchExpn node)
         {
-            var arg = IAzFuncExpn.Analyze(parentScope, node.Argument);
 
             List<AzMatchCase> cases = new();
             foreach (var c in node.Cases)
@@ -25,7 +23,20 @@ namespace Transpiler.Analysis
                 cases.Add(matchCase);
             }
 
-            return new(arg, cases, node.Position);
+            if (node.IsTerse)
+            {
+                var param = new AzParam("$0", node.Position);
+                var symbol = new AzSymbolExpn(param, node.Position);
+                var matchExpn = new AzMatchExpn(symbol, cases, node.Position);
+                var scopedExpn = new AzScopedFuncExpn(matchExpn, RList<AzFuncDefn>(), parentScope, node.Position);
+                return new AzLambdaExpn(param, scopedExpn, node.Position);
+            }
+            else
+            {
+                var arg = IAzFuncExpn.Analyze(parentScope, node.Argument);
+
+                return new AzMatchExpn(arg, cases, node.Position);
+            }
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)

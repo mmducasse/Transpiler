@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using static Transpiler.Parse.ParserUtils;
+using static Transpiler.Parse.KeySymbols;
 
 namespace Transpiler.Parse
 {
@@ -32,6 +33,12 @@ namespace Transpiler.Parse
                 {
                     doContinue = false;
                     break;
+                }
+                else if (ReservedWords.Contains(q2.Current.Value))
+                {
+                    doContinue = false;
+                    break;
+
                 }
                 else if (ParseSimple(ref q2, out var simpleNode))
                 {

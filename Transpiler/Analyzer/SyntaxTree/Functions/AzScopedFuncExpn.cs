@@ -15,16 +15,25 @@ namespace Transpiler.Analysis
         //public static AzScopedFuncExpn Make(IAzFuncExpn expression) =>
         //    new(expression, new List<PsFuncDefn>());
 
-        public static AzScopedFuncExpn Analyze(Scope parentScope,
+        public static IAzFuncExpn Analyze(Scope parentScope,
                                                PsScopedFuncExpn scopedExpn)
         {
             var scope = new Scope(parentScope);
 
             var newSubDefns = Analyzer.AnalyzeFunctions(scope, scopedExpn.FuncDefinitions);
 
-            var newExpn = IAzFuncExpn.Analyze(scope, scopedExpn.Expression);
+            if (scopedExpn.Expression is PsMatchExpn matchExpn &&
+                matchExpn.IsTerse)
+            {
+                // This will return a lambda with a scoped expn at it's tail.
+                return IAzFuncExpn.Analyze(scope, scopedExpn.Expression);
+            }
+            else
+            {
+                var newExpn = IAzFuncExpn.Analyze(scope, scopedExpn.Expression);
 
-            return new(newExpn, newSubDefns, scope, scopedExpn.Position);
+                return new AzScopedFuncExpn(newExpn, newSubDefns, scope, scopedExpn.Position);
+            }
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope _)

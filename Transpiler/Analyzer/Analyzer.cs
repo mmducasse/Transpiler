@@ -23,6 +23,8 @@ namespace Transpiler.Analysis
 
             // Perform any more verification needed after type inference is done.
             PostAnalyze(fileScope);
+
+            //Print(module);
         }
 
         private static void AnalyzeDependencies(Module module)
@@ -142,29 +144,29 @@ namespace Transpiler.Analysis
             return newFns;
         }
 
-        public static void TEMP_PrintFnTypes(Scope scope)
-        {
-            foreach (var fn in scope.FuncDefinitions.Values)
-            {
-                Console.WriteLine("\n\n {0}\n", fn.Name);
-                foreach (var node in fn.GetSubnodes())
-                {
-                    string nodeStr = node.Print(0).Replace("\n", "").Replace("\t", "");
-                    if (nodeStr.Length > 45)
-                    {
-                        nodeStr = nodeStr[..44] + "...";
-                    }
-                    Console.Write("{0, 50}", nodeStr);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
+        //public static void TEMP_PrintFnTypes(Scope scope)
+        //{
+        //    foreach (var fn in scope.FuncDefinitions.Values)
+        //    {
+        //        Console.WriteLine("\n\n {0}\n", fn.Name);
+        //        foreach (var node in fn.GetSubnodes())
+        //        {
+        //            string nodeStr = node.Print(0).Replace("\n", "").Replace("\t", "");
+        //            if (nodeStr.Length > 45)
+        //            {
+        //                nodeStr = nodeStr[..44] + "...";
+        //            }
+        //            Console.Write("{0, 50}", nodeStr);
+        //            Console.ForegroundColor = ConsoleColor.Yellow;
 
-                    if (node.Type != null)
-                    {
-                        Console.WriteLine(" :: {0}", node.Type.Print(0));
-                        Console.ForegroundColor = ConsoleColor.White;
-                    }
-                }
-            }
-        }
+        //            if (node.Type != null)
+        //            {
+        //                Console.WriteLine(" :: {0}", node.Type.Print(0));
+        //                Console.ForegroundColor = ConsoleColor.White;
+        //            }
+        //        }
+        //    }
+        //}
 
         public static void SolveFunctions(Scope scope)
         {
@@ -187,10 +189,10 @@ namespace Transpiler.Analysis
 
                 funcDefn.ExplicitType = TvUtils.WithUniqueTvs(funcDefn.Type, new());
 
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("\n\n{0} :: {1}", funcDefn.Name, funcDefn.ExplicitType.PrintWithRefinements());
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine(funcDefn.Print(0));
+                //Console.ForegroundColor = ConsoleColor.Yellow;
+                //Console.WriteLine("\n\n{0} :: {1}", funcDefn.Name, funcDefn.ExplicitType.PrintWithRefinements());
+                //Console.ForegroundColor = ConsoleColor.White;
+                //Console.WriteLine(funcDefn.Print(0));
 
                 scope.FuncDefnTypes[funcDefn] = funcDefn.Type;
             }
@@ -224,7 +226,7 @@ namespace Transpiler.Analysis
 
             foreach (var fn in scope.FuncDefinitions.Values)
             {
-                //Console.WriteLine(fn.Print(0));
+                Console.WriteLine("\n" + fn.Print(0) + "\n");
             }
 
             scope.PrintTypeHeirarchy();
@@ -233,7 +235,7 @@ namespace Transpiler.Analysis
         public static Exception Error(string reason,
                                       CodePosition position)
         {
-            return new InterpreterException(eInterpreterStage.Analyzer,
+            return new CompilerException(eCompilerStage.Analyzer,
                                             reason,
                                             position);
         }

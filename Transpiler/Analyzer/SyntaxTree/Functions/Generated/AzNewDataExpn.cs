@@ -13,7 +13,16 @@ namespace Transpiler.Analysis
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
-            throw new System.NotImplementedException();
+            if (Definition.ParentUnion != null)
+            {
+                Type = Definition.ParentUnion.ToCtor().WithUniqueTvs(provider);
+            }
+            else
+            {
+                Type = Definition.ToCtor().WithUniqueTvs(provider);
+            }
+
+            return ConstraintSet.Empty;
         }
 
         public IReadOnlyList<IAzFuncNode> GetSubnodes()

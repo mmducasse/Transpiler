@@ -7,6 +7,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
+using System.Linq;
 
 namespace Transpiler
 {
@@ -46,19 +47,33 @@ namespace Transpiler
                 }
                 else
                 {
-                    string inputText = "";
-                    foreach (var (moduleName, _) in Modules)
+                    try
                     {
-                        inputText += string.Format("use {0}\n", moduleName);
-                    }
-                    inputText += "ans = " + input + "\n";
-                    var inputModule = new Module(inputText, "INPUTMODULE");
-                    Parser.Parse(inputModule);
-                    Analyzer.Analyze(inputModule);
-                    var output = GenerateOutput(inputModule);
+                        string inputText = "";
+                        foreach (var (moduleName, _) in Modules)
+                        {
+                            inputText += string.Format("use {0}\n", moduleName);
+                        }
+                        inputText += "ans = " + input + "\n";
+                        var inputModule = new Module(inputText, "INPUTMODULE");
+                        Parser.Parse(inputModule);
+                        Analyzer.Analyze(inputModule);
 
-                    string TEMP_destFile = @"C:\Users\matth\Desktop\output.js";
-                    ExecOutputFile(TEMP_destFile, output);
+                        var funcDefn = inputModule.Scope.FuncDefinitions.First().Value;
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("\n\n{0} :: {1}", funcDefn.Name, funcDefn.ExplicitType.PrintWithRefinements());
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine(funcDefn.Print(0));
+
+                        var output = GenerateOutput(inputModule);
+
+                        string TEMP_destFile = @"C:\Users\matth\Desktop\output.js";
+                        ExecOutputFile(TEMP_destFile, output);
+                    }
+                    catch (CompilerException ce)
+                    {
+                        ce.Print();
+                    }
                 }
             }
 
@@ -87,22 +102,30 @@ namespace Transpiler
             rootFolder = @"C:\Users\matth\Desktop\FunctionalCode\"; // rootFolder.Trim();
             if (Directory.Exists(rootFolder))
             {
-                var files = Directory.GetFiles(rootFolder, "*.hs", SearchOption.AllDirectories);
-                List<Module> newModules = new();
-                foreach (var file in files)
+                try
                 {
-                    var module = Module.Create(file);
-                    Parser.Parse(module);
-                    mModules[module.Name] = module;
-                    newModules.Add(module);
-                }
+                    Console.Write("Loading... ");
+                    var files = Directory.GetFiles(rootFolder, "*.hs", SearchOption.AllDirectories);
+                    List<Module> newModules = new();
+                    foreach (var file in files)
+                    {
+                        var module = Module.Create(file);
+                        Parser.Parse(module);
+                        mModules[module.Name] = module;
+                        newModules.Add(module);
+                    }
 
-                foreach (var module in newModules)
-                {
-                    Analyzer.Analyze(module);
+                    foreach (var module in newModules)
+                    {
+                        Analyzer.Analyze(module);
+                    }
+
+                    Console.WriteLine("Ok!");
                 }
-                // Load dependent modules, if they arent already.
-                // Analyze module
+                catch (CompilerException ce)
+                {
+                    ce.Print();
+                }
             }
             else
             {
@@ -132,9 +155,7 @@ namespace Transpiler
         {
             string destFile = @"C:\Users\matth\Desktop\output.js";
             File.WriteAllText(destFile, output.ToString());
-
-            Console.WriteLine("\n\n");
-            Console.Write("ans: ");
+            Console.Write("ans = ");
             var nodeJs = Process.Start("node", filePath);
             nodeJs.WaitForExit();
             nodeJs.Dispose();

@@ -24,7 +24,7 @@ namespace Transpiler.Generate
 
             var condRes = Condition.Generate(i, names, ref s);
 
-            s += string.Format("{0}if ({1})\n", Indent(i), condRes);
+            s += string.Format("{0}if (Match({1}, ['True']))\n", Indent(i), condRes);
             GenerateCase(ThenCase, res, i, names, ref s);
 
             s += string.Format("{0}else\n", Indent(i));
@@ -52,8 +52,8 @@ namespace Transpiler.Generate
             }
             else
             {
-                s += string.Format("{0}{1} = ", Indent(i + 1), res);
-                @case.Generate(i + 1, names, ref s);
+                string expnRes = @case.Generate(i + 1, names, ref s);
+                s += string.Format("{0}{1} = ", Indent(i + 1), res, expnRes);
             }
             s += Indent(i) + "}\n";
         }

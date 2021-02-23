@@ -1,18 +1,19 @@
 ﻿
 TODO:
 
-- GetN method that extracts element from tuple
-- Instance Implementors need to introduce type variables.
-
-- Multiple modules
-- Better errors.
-- Implicit match syntax
-- Explict type annotations inline
+- More flexible infix operations, maybe associativity too
 - Make recursion, mutual recursion type checkable (batch type inference based on dependencies)
-- Make CodePosition.Null point to some predefined module.
 - Make token indentation more robust
 - Better code locations for errors
--$0, $1, etc to represent lambda inputs
+- Make CodePosition.Null point to some predefined module.
+- Closures
+- Putchar and Get char functions
+- Add vars in REPL
+- Fix inline lambdas
+- GetN method that extracts element from tuple
+- Explict type annotations inline
+- Instance Implementors need to introduce type variables.
+- $0, $1, etc to represent lambda inputs
 - Type aliases
 - Pattern aliases
 - Nested unions

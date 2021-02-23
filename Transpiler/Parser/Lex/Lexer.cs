@@ -130,7 +130,7 @@ namespace Transpiler.Parse
         private static bool MatchComment(ref LexerQueue q,
                                          TokenList tokens)
         {
-            if (Match(ref q, "#", out var position))
+            if (Match(ref q, "--", out var position))
             {
                 q = q.NextRow;
 
@@ -305,9 +305,9 @@ namespace Transpiler.Parse
 
         private static void Error(string reason, CodePosition position)
         {
-            throw new InterpreterException(eInterpreterStage.Lexer,
-                                           reason,
-                                           position);
+            throw new CompilerException(eCompilerStage.Parser,
+                                        reason,
+                                        position);
         }
     }
 }

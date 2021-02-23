@@ -8,6 +8,8 @@ namespace Transpiler.Parse
                               IReadOnlyList<PsMatchCase> Cases,
                               CodePosition Position) : IPsFuncExpn
     {
+        public bool IsTerse => Argument == null;
+
         public static bool Parse(ref TokenQueue queue, out PsMatchExpn node)
         {
             node = null;
@@ -15,16 +17,23 @@ namespace Transpiler.Parse
             var q = queue;
             var p = q.Position;
 
-            if (!Finds("match", ref q)) { return false; }
-            if (!IPsFuncExpn.ParseInline(ref q, out var conditionNode))
+            var q2 = q;
+            if (!Finds(TokenType.NewLine, ref q2) &&
+                !Finds("match", ref q2)) { return false; }
+
+            IPsFuncExpn condition = null;
+            if (Finds("match", ref q))
             {
-                throw Error("Expected inline expression after 'match'", q);
+                if (!IPsFuncExpn.ParseInline(ref q, out condition))
+                {
+                    throw Error("Expected inline expression after 'match'", q);
+                }
             }
 
-            var q2 = q;
-            if (!Finds(TokenType.NewLine, ref q2)) { return false; }
-            if (!FindsIndents(ref q2, indent + 1)) { return false; }
-            if (!Finds("|", ref q2)) { return false; }
+            var q3 = q;
+            if (!Finds(TokenType.NewLine, ref q3)) { return false; }
+            if (!FindsIndents(ref q3, indent + 1)) { return false; }
+            if (!Finds("|", ref q3)) { return false; }
 
             List<PsMatchCase> cases = new();
             while (Finds(TokenType.NewLine, ref q) &&
@@ -39,11 +48,10 @@ namespace Transpiler.Parse
                 cases.Add(matchCaseNode);
             }
 
-            node = new PsMatchExpn(conditionNode, cases, p);
+            node = new PsMatchExpn(condition, cases, p);
             queue = q;
             return true;
         }
-
 
         public string Print(int i)
         {

@@ -72,18 +72,26 @@ function MkReal(sr) {
 	return parseFloat(sr)
 }
 
-const primEq = a => b => a == b
-const primNeq = a => b => a != b
+function MkBool(b) {
+	if (b) {
+		return ['True']
+	} else {
+		return ['False']
+	}
+}
+
+const primEq = a => b => MkBool(a == b)
+const primNeq = a => b => MkBool(a != b)
 
 const primAdd = a => b => a + b
 const primSub = a => b => a - b
 const primMul = a => b => a * b
 const primDiv = a => b => a / b
 
-const primLt = a => b => a < b
-const primLte = a => b => a <= b
-const primGt = a => b => a > b
-const primGte = a => b => a >= b
+const primLt = a => b => MkBool(a < b)
+const primLte = a => b => MkBool(a <= b)
+const primGt = a => b => MkBool(a > b)
+const primGte = a => b => MkBool(a >= b)
 
 ////////////////// END OF CORE.JS //////////////////
 

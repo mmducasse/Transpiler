@@ -21,20 +21,34 @@ namespace Transpiler.Parse
                 throw Error("Expected expression as condition in If expression.", q);
             }
 
+            bool isInline = false;
+
             // Then
-            Expects(TokenType.NewLine, ref q);
-            ExpectsIndents(ref q, queue.Indent + 1);
+            if (!Finds(TokenType.NewLine, ref q))
+            {
+                isInline = true;
+            }
+            if (!isInline) { ExpectsIndents(ref q, queue.Indent + 1); }
             Expects("then", ref q);
-            if (!PsScopedFuncExpn.Parse(ref q, out var thenNode))
+            IPsFuncExpn thenNode;
+            if (isInline && IPsFuncExpn.ParseInline(ref q, out thenNode)) { }
+            else if (PsScopedFuncExpn.Parse(ref q, out thenNode)) { }
+            else
             {
                 throw Error("Expected expression as then case in If expression.", q);
             }
 
             // Else
-            Expects(TokenType.NewLine, ref q);
-            ExpectsIndents(ref q, queue.Indent + 1);
+            if (!isInline)
+            {
+                Expects(TokenType.NewLine, ref q);
+                ExpectsIndents(ref q, queue.Indent + 1);
+            }
             Expects("else", ref q);
-            if (!PsScopedFuncExpn.Parse(ref q, out var elseNode))
+            IPsFuncExpn elseNode;
+            if (isInline && IPsFuncExpn.ParseInline(ref q, out elseNode)) { }
+            else if (PsScopedFuncExpn.Parse(ref q, out elseNode)) { }
+            else
             {
                 throw Error("Expected expression as else case in If expression.", q);
             }
