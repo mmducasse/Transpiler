@@ -5,7 +5,7 @@ namespace Transpiler.Analysis
 {
     public interface IAzLiteralExpn : IAzFuncExpn, IAzPattern
     {
-        IAzDataTypeDefn CertainType { get; }
+        IAzTypeDefn CertainType { get; }
 
         string Value { get; }
 
@@ -19,6 +19,7 @@ namespace Transpiler.Analysis
                 PsCharLiteral charLit => AzCharLiteral.Analyze(scope, charLit),
                 PsStringLiteral stringLit => AzStringLiteral.Analyze(scope, stringLit),
                 PsListLiteral listLit => AzListLiteral.Analyze(scope, listLit),
+                PsUndefinedLiteral undefLit => AzUndefinedLiteral.Analyze(scope, undefLit),
                 _ => throw new ArgumentException(),
             };
         }

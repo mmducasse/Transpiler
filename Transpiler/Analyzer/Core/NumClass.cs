@@ -10,15 +10,15 @@ namespace Transpiler.Analysis
         {
             var num = MakeNum(scope);
 
-            InstNum(scope, num, CoreTypes.Instance.Int);
-            InstNum(scope, num, CoreTypes.Instance.Real);
+            InstNum(scope, num, Core.Instance.Int);
+            InstNum(scope, num, Core.Instance.Real);
 
             return num;
         }
 
         private static AzClassTypeDefn MakeNum(Scope scope)
         {
-            var eq = CoreTypes.Instance.Eq;
+            var eq = Core.Instance.Eq;
             var num = new AzClassTypeDefn("Num", eq.ToArr(), scope, CodePosition.Null);
             var a = new TypeVariable(0, num.ToArr());
             num.TypeVar = a;

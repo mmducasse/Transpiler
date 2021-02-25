@@ -32,7 +32,7 @@ namespace Transpiler.Analysis
             var cse = ElseCase.Constrain(provider, scope);
 
             var cif = new Constraint(Type, ThenCase.Type, Position);
-            var cc = new Constraint(Condition.Type, CoreTypes.Instance.Bool.ToCtor(), Position);
+            var cc = new Constraint(Condition.Type, Core.Instance.Bool.ToCtor(), Position);
             var cf = new Constraint(ThenCase.Type, ElseCase.Type, Position);
 
             return IConstraintSet.Union(cif, cc, cf, csc, cst, cse);

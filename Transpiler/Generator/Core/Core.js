@@ -62,6 +62,10 @@ function PrintResult(output) {
 	}
 }
 
+function Undefined() {
+	throw 'Undefined!'
+}
+
 function MkInt(si) {
 	//return new BigInt(si)
 	return parseInt(si)

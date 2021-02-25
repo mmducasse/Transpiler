@@ -12,6 +12,7 @@ namespace Transpiler.Generate
                 AzIntLiteral intLit => GnIntLiteral.Prepare(scope, intLit),
                 AzRealLiteral realLit => GnRealLiteral.Prepare(scope, realLit),
                 AzCharLiteral charLit => GnCharLiteral.Prepare(scope, charLit),
+                AzUndefinedLiteral => GnUndefinedLiteral.Prepare(),
                 _ => throw new NotImplementedException(),
             };
         }

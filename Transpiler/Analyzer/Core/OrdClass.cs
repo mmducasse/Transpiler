@@ -10,16 +10,16 @@ namespace Transpiler.Analysis
         {
             var num = MakeOrd(scope);
 
-            InstOrd(scope, num, CoreTypes.Instance.Int, CoreTypes.Instance.Bool);
-            InstOrd(scope, num, CoreTypes.Instance.Real, CoreTypes.Instance.Bool);
+            InstOrd(scope, num, Core.Instance.Int, Core.Instance.Bool);
+            InstOrd(scope, num, Core.Instance.Real, Core.Instance.Bool);
 
             return num;
         }
 
         private static AzClassTypeDefn MakeOrd(Scope scope)
         {
-            var @bool = CoreTypes.Instance.Bool;
-            var eq = CoreTypes.Instance.Eq;
+            var @bool = Core.Instance.Bool;
+            var eq = Core.Instance.Eq;
 
             var ord = new AzClassTypeDefn("Ord", eq.ToArr(), scope, CodePosition.Null);
             var a = new TypeVariable(0, ord.ToArr());

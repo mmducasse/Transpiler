@@ -24,7 +24,7 @@ namespace Transpiler
 
             Instance = this;
 
-            new CoreTypes();
+            new Core();
 
             //string path = @"C:\Users\matth\Desktop\testcode.hs";
 
@@ -138,7 +138,7 @@ namespace Transpiler
         {
             var output = new StringBuilder();
             output.Append(Generator.GetCoreJsCode());
-            Generator.GenerateModule("Generated Core Functions", CoreTypes.Instance.Scope, ref output);
+            Generator.GenerateModule("Generated Core Functions", Core.Instance.Scope, ref output);
 
             foreach (var (_, module) in Modules)
             {

@@ -5,8 +5,8 @@ namespace Transpiler.Analysis
 {
     public interface IAzFuncExpn : IAzFuncStmt
     {
-        public static new IAzFuncExpn Analyze(Scope scope,
-                                              IPsFuncExpn node)
+        public static IAzFuncExpn Analyze(Scope scope,
+                                          IPsFuncExpn node)
         {
             return node switch
             {

@@ -42,6 +42,7 @@
     <Compile Include="Generator\SyntaxTree\Functions\Literals\GnCharLiteral.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\Literals\GnIntLiteral.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\Literals\GnRealLiteral.cs" />
+    <Compile Include="Generator\SyntaxTree\Functions\Literals\GnUndefinedLiteral.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\Literals\IGnLiteralExpn.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\PatternMatching\GnDectorPattern.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\PatternMatching\GnElsePattern.cs" />

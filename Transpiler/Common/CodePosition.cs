@@ -1,4 +1,6 @@
-﻿namespace Transpiler
+﻿using Transpiler.Analysis;
+
+namespace Transpiler
 {
     public record CodePosition(Module Module,
                                int Line,
@@ -8,7 +10,7 @@
         public CodePosition NextLine => new(Module, Line + 1, 0);
 
         public static CodePosition Zero(Module module) => new(module, 0, 0);
-        public static CodePosition Null => new(null, 0, 0);
+        public static CodePosition Null => new(Core.Instance.Module, 0, 0);
 
         public override string ToString() => string.Format("{0} ({1}, {2})", Module?.Name, Line, Column);
     }

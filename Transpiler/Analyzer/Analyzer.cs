@@ -9,7 +9,7 @@ namespace Transpiler.Analysis
         public static void Analyze(Module module)
         {
             // Create the top-level scope.
-            var fileScope = new Scope(CoreTypes.Instance.Scope.ToArr());
+            var fileScope = new Scope(Core.Instance.Scope.ToArr());
             module.Scope = fileScope;
 
             // Find and analyze usings.

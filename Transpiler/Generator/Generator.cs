@@ -27,8 +27,15 @@ namespace Transpiler.Generate
 
         public static void TEMP_AddFinalLine(ref StringBuilder output)
         {
-            string s = "\n\nPrintResult(_ans)\n\n";
-            s += "console.log(\"\")\n";
+            //string s = "\n\nPrintResult(_ans)\n\n";
+            //s += "console.log(\"\")\n";
+            //output.Append(s);
+            string s = "\n\n";
+            s += "try {\n";
+            s += "   PrintResult(_ans)\n";
+            s += "} catch (e) {\n";
+            s += "   console.log(\"\")\n";
+            s += "}\n";
             output.Append(s);
         }
 
@@ -103,6 +110,7 @@ namespace Transpiler.Generate
                     '.' => "dot",
                     '<' => "lcaret",
                     '>' => "rcaret",
+                    '?' => "qmark",
                     _ => symbol[i]
                 };
             }

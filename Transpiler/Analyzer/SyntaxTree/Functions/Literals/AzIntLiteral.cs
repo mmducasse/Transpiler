@@ -7,11 +7,11 @@ namespace Transpiler.Analysis
     public record AzIntLiteral(string Value,
                                CodePosition Position) : IAzLiteralExpn
     {
-        public IAzDataTypeDefn CertainType => CoreTypes.Instance.Int;
+        public IAzTypeDefn CertainType => Core.Instance.Int;
 
         public IAzTypeExpn Type
         {
-            get => CertainType.ToCtor();
+            get => Core.Instance.Int.ToCtor();
             set
             {
                 if (value != CertainType)

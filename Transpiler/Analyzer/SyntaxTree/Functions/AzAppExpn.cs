@@ -15,27 +15,64 @@ namespace Transpiler.Analysis
                                           PsArbExpn node)
         {
             var subexpns = node.Children.Select(c => IAzFuncExpn.Analyze(scope, c)).ToList();
+            return Arrange(subexpns);
+        }
 
+        private static IAzFuncExpn Arrange(IReadOnlyList<IAzFuncExpn> subexpns)
+        {
+            // Zero subexpressions (illegal).
+            if (subexpns.Count == 0)
+            {
+                throw new NotImplementedException();
+            }
+
+            // One subexpression.
+            if (subexpns.Count == 1)
+            {
+                return subexpns[0];
+            }
+
+            // Two subexpressions and the first is an infix operator.
+            if ((subexpns.Count == 2) &&
+                subexpns[0] is AzSymbolExpn op1 &&
+                op1.Definition.Fixity == eFixity.Infix)
+            {
+                var param = new AzParam("$0", op1.Position);
+                var symbol = new AzSymbolExpn(param, op1.Position);
+                var innerApp = new AzAppExpn(op1, symbol, op1.Position);
+                var outerApp = new AzAppExpn(innerApp, subexpns[1], op1.Position);
+
+                return new AzLambdaExpn(param, outerApp, op1.Position);
+            }
+
+            // Three subexpressions and the second is an infix operator.
             if ((subexpns.Count == 3) &&
                 subexpns[1] is AzSymbolExpn symExpn &&
                 symExpn.Definition.Fixity == eFixity.Infix)
             {
                 var op = subexpns[1];
-                var app = new AzAppExpn(op, subexpns[0], op.Position);
-                app = new AzAppExpn(app, subexpns[2], op.Position);
-                return app;
+                var app2 = new AzAppExpn(op, subexpns[0], op.Position);
+                app2 = new AzAppExpn(app2, subexpns[2], op.Position);
+                return app2;
             }
-            else
+
+            // Multiple subexpressions.
+            IAzFuncExpn app = subexpns[0];
+            var p = app.Position;
+            for (int i = 1; i < subexpns.Count; i++)
             {
-                IAzFuncExpn app = subexpns[0];
-                var p = app.Position;
-                for (int i = 1; i < subexpns.Count; i++)
+                if (subexpns[i] is AzSymbolExpn opi &&
+                    opi.Definition.Fixity != eFixity.Prefix)
+                {
+                    app = new AzAppExpn(subexpns[i], app, p);
+                }
+                else
                 {
                     app = new AzAppExpn(app, subexpns[i], p);
                 }
-
-                return app;
             }
+
+            return app;
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)

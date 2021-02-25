@@ -12,6 +12,7 @@
             else if (PsCharLiteral.Parse(ref q, out var charNode)) { node = charNode; }
             else if (PsStringLiteral.Parse(ref q, out var stringNode)) { node = stringNode; }
             else if (PsListLiteral.Parse(ref q, out var listNode)) { node = listNode; }
+            else if (PsUndefinedLiteral.Parse(ref q, out var undefNode)) { node = undefNode; }
 
             if (node != null)
             {

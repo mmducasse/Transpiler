@@ -4,14 +4,16 @@ using Transpiler.Parse;
 
 namespace Transpiler.Analysis
 {
-    public record AzRealLiteral(string Value,
-                                CodePosition Position) : IAzLiteralExpn
+    public record AzUndefinedLiteral(CodePosition Position) : IAzLiteralExpn
     {
-        public IAzTypeDefn CertainType => Core.Instance.Real;
+        public string Value => "Undefined";
+
+        private static TypeVariable mCertainType = TypeVariable.Simple(0);
+        public IAzTypeDefn CertainType => mCertainType;
 
         public IAzTypeExpn Type
         {
-            get => Core.Instance.Real.ToCtor();
+            get => mCertainType;
             set
             {
                 if (value != CertainType)
@@ -21,16 +23,16 @@ namespace Transpiler.Analysis
             }
         }
 
-        public static AzRealLiteral Analyze(Scope scope,
-                                            PsRealLiteral node)
+        public static AzUndefinedLiteral Analyze(Scope scope,
+                                                 PsUndefinedLiteral node)
         {
-            return new(node.Value, node.Position);
+            return new(node.Position);
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope) => ConstraintSet.Empty;
 
         public IReadOnlyList<IAzFuncNode> GetSubnodes() => this.ToArr();
 
-        public string Print(int indent) => Value;
+        public string Print(int indent) => "Undefined";
     }
 }

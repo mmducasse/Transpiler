@@ -5,7 +5,7 @@ using static Transpiler.Analysis.ListDataType;
 
 namespace Transpiler.Analysis
 {
-    public class CoreTypes
+    public class Core
     {
         public AzPrimitiveTypeDefn Int { get; }
         public AzPrimitiveTypeDefn Real { get; }
@@ -18,26 +18,30 @@ namespace Transpiler.Analysis
         public AzClassTypeDefn Num { get; }
         public AzClassTypeDefn Ord { get; }
 
-        public IScope Scope => mScope;
-        private Scope mScope = new Scope();
+        public Module Module { get; }
 
-        public static CoreTypes Instance { get; private set; }
+        public IScope Scope => Module.Scope;
 
-        public CoreTypes()
+        public static Core Instance { get; private set; }
+
+        public Core()
         {
             Instance = this;
 
-            Int = AzPrimitiveTypeDefn.Make(mScope, "Int");
-            Real = AzPrimitiveTypeDefn.Make(mScope, "Real");
-            Char = AzPrimitiveTypeDefn.Make(mScope, "Char");
+            Module = new Module(" ", "Core");
+            Module.Scope = new();
 
-            Bool = AzUnionTypeDefn.Make(mScope, "Bool", "True", "False");
+            Int = AzPrimitiveTypeDefn.Make(Module.Scope, "Int");
+            Real = AzPrimitiveTypeDefn.Make(Module.Scope, "Real");
+            Char = AzPrimitiveTypeDefn.Make(Module.Scope, "Char");
 
-            Eq = CreateEq(mScope);
-            Num = CreateNum(mScope);
-            Ord = CreateOrd(mScope);
+            Bool = AzUnionTypeDefn.Make(Module.Scope, "Bool", "True", "False");
 
-            List = CreateList(mScope);
+            Eq = CreateEq(Module.Scope);
+            Num = CreateNum(Module.Scope);
+            Ord = CreateOrd(Module.Scope);
+
+            List = CreateList(Module.Scope);
 
             //mScope.PrintTypes();
             //mScope.PrintFunctions();

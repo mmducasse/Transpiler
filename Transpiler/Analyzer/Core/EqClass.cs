@@ -8,13 +8,13 @@ namespace Transpiler.Analysis
     {
         public static AzClassTypeDefn CreateEq(Scope scope)
         {
-            var @bool = CoreTypes.Instance.Bool;
+            var @bool = Core.Instance.Bool;
 
             var eq = MakeEq(scope, @bool);
 
-            InstEq(scope, eq, CoreTypes.Instance.Int, @bool);
-            InstEq(scope, eq, CoreTypes.Instance.Real, @bool);
-            InstEq(scope, eq, CoreTypes.Instance.Char, @bool);
+            InstEq(scope, eq, Core.Instance.Int, @bool);
+            InstEq(scope, eq, Core.Instance.Real, @bool);
+            InstEq(scope, eq, Core.Instance.Char, @bool);
 
             return eq;
         }

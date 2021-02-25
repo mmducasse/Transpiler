@@ -25,12 +25,14 @@ namespace Transpiler.Parse
                 }
                 else if (Finds("(", ref q2))
                 {
-                    if (!IPsFuncExpn.Parse(ref q2, isInline: true, out var arbSubNode))
+                    if (IPsFuncExpn.Parse(ref q2, isInline: true, out var arbSubNode))
                     {
-                        throw Error("Expected inline expression after '('", q2);
+                        subExpns.Add(arbSubNode);
                     }
-
-                    subExpns.Add(arbSubNode);
+                    else
+                    {
+                        subExpns.Add(new PsTupleExpn(new List<IPsFuncExpn>(), q2.Position));
+                    }
                     Expects(")", ref q2);
                 }
                 else if (Finds(")", ref q2))
