@@ -98,7 +98,7 @@ namespace Transpiler.Analysis
             //List<AzFuncDefn> newFns = new();
             foreach (var (azFunc, psFunc) in funcDefnsDict)
             {
-                AzFuncDefn.Analyze(fileScope, azFunc, psFunc);
+                AzFuncDefn.Analyze(fileScope, new("p"), azFunc, psFunc);
                 //newFns.Add(azFunc);
             }
 
@@ -137,7 +137,7 @@ namespace Transpiler.Analysis
             List<AzFuncDefn> newFns = new();
             foreach (var (azFunc, psFunc) in funcDefnsDict)
             {
-                AzFuncDefn.Analyze(scope, azFunc, psFunc);
+                AzFuncDefn.Analyze(scope, new("p"), azFunc, psFunc);
                 newFns.Add(azFunc);
             }
 

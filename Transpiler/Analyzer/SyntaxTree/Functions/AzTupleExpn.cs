@@ -11,12 +11,13 @@ namespace Transpiler.Analysis
         public IAzTypeExpn Type { get; set; }
 
         public static AzTupleExpn Analyze(Scope scope,
+                                          NameProvider provider,
                                           PsTupleExpn node)
         {
             List<IAzFuncExpn> elements = new();
             foreach (var n in node.Elements)
             {
-                var expn = IAzFuncExpn.Analyze(scope, n);
+                var expn = IAzFuncExpn.Analyze(scope, provider, n);
                 elements.Add(expn);
             }
 

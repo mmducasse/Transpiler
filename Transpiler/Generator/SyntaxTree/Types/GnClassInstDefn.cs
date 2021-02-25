@@ -30,7 +30,7 @@ namespace Transpiler.Generate
                     funcDefn.Expression != null)
                 {
                     var gnFunc = GnFuncDefn.Prepare(scope, funcDefn);
-                    string instFuncName = gnFunc.Generate(0, new(), instDefn.Implementor.Name, ref s);
+                    string instFuncName = gnFunc.Generate(0, new("a"), instDefn.Implementor.Name, ref s);
                     s += "\n";
 
                     dict.Add(instFuncName);

@@ -12,10 +12,11 @@ namespace Transpiler.Analysis
         public IAzTypeExpn Type { get; set; }
 
         public static AzLambdaExpn Analyze(Scope scope,
+                                           NameProvider provider,
                                            PsLambdaExpn node)
         {
-            var arg = AzParam.Analyze(scope, node.Parameter);
-            var expr = IAzFuncExpn.Analyze(scope, node.Expression);
+            var arg = AzParam.Analyze(scope, provider, node.Parameter);
+            var expr = IAzFuncExpn.Analyze(scope, provider, node.Expression);
 
             var newLambdaExpr = new AzLambdaExpn(arg, expr, node.Position);
             return newLambdaExpr;

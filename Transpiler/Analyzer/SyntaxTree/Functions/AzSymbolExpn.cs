@@ -11,6 +11,7 @@ namespace Transpiler.Analysis
         public IAzTypeExpn Type { get; set; }
 
         public static AzSymbolExpn Analyze(Scope scope,
+                                           NameProvider provider,
                                            PsSymbolExpn node)
         {
             if (scope.TryGetFuncDefn(node.Name, out var funcDefn))

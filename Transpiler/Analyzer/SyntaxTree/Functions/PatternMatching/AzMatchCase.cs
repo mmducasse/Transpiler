@@ -12,10 +12,11 @@ namespace Transpiler.Analysis
         public IAzTypeExpn Type { get; set; }
 
         public static AzMatchCase Analyze(Scope scope,
+                                          NameProvider provider,
                                           PsMatchCase node)
         {
-            var pattern = IAzPattern.Analyze(scope, node.Pattern);
-            var expn = IAzFuncExpn.Analyze(scope, node.Expression);
+            var pattern = IAzPattern.Analyze(scope, provider, node.Pattern);
+            var expn = IAzFuncExpn.Analyze(scope, provider, node.Expression);
 
             return new(pattern, expn, node.Position);
         }

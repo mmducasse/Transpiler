@@ -22,6 +22,7 @@ namespace Transpiler.Analysis
         }
 
         public static AzRealLiteral Analyze(Scope scope,
+                                            NameProvider provider,
                                             PsRealLiteral node)
         {
             return new(node.Value, node.Position);

@@ -14,6 +14,7 @@ namespace Transpiler.Analysis
         public IAzTypeExpn Type { get; set; }
 
         public static AzClosureExpn Analyze(Scope parentScope,
+                                            NameProvider provider,
                                             PsClosureExpn node)
         {
             var scope = new Scope(parentScope, "Closure");
@@ -24,13 +25,13 @@ namespace Transpiler.Analysis
                 switch (s)
                 {
                     case IPsFuncExpn funcExpn:
-                        statements.Add(IAzFuncExpn.Analyze(scope, funcExpn));
+                        statements.Add(IAzFuncExpn.Analyze(scope, provider, funcExpn));
                         break;
                     case PsFuncDefn funcDefn:
                         var funcDefns = AzFuncDefn.Initialize(scope, funcDefn);
                         foreach (var fn in funcDefns)
                         {
-                            AzFuncDefn.Analyze(scope, fn, funcDefn);
+                            AzFuncDefn.Analyze(scope, provider, fn, funcDefn);
                             statements.Add(fn);
                         }
                         break;
@@ -39,7 +40,7 @@ namespace Transpiler.Analysis
                 }
             }
 
-            var returnExpn = IAzFuncExpn.Analyze(scope, node.ReturnExpression);
+            var returnExpn = IAzFuncExpn.Analyze(scope, provider, node.ReturnExpression);
 
             return new(statements, returnExpn, scope, node.Position);
         }

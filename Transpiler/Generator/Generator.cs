@@ -66,7 +66,7 @@ namespace Transpiler.Generate
                 {
                     var gnFunc = GnFuncDefn.Prepare(scope, funcDefn);
                     string g = "";
-                    gnFunc.Generate(0, new(), ref g);
+                    gnFunc.Generate(0, new("a"), ref g);
 
                     output.Append(g);
                     output.Append("\n\n");

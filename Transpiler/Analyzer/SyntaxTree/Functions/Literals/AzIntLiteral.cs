@@ -22,6 +22,7 @@ namespace Transpiler.Analysis
         }
 
         public static AzIntLiteral Analyze(Scope scope,
+                                           NameProvider provider,
                                            PsIntLiteral node)
         {
             return new(node.Value, node.Position);

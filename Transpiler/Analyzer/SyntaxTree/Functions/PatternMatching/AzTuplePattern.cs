@@ -11,9 +11,10 @@ namespace Transpiler.Analysis
         public IAzTypeExpn Type { get; set; }
 
         public static AzTuplePattern Analyze(Scope scope,
-                                              PsTuplePattern node)
+                                             NameProvider provider,
+                                             PsTuplePattern node)
         {
-            var elements = node.Elements.Select(e => IAzPattern.Analyze(scope, e)).ToList();
+            var elements = node.Elements.Select(e => IAzPattern.Analyze(scope, provider, e)).ToList();
 
             return new(elements, node.Position);
         }

@@ -16,6 +16,7 @@ namespace Transpiler.Analysis
         //    new(expression, new List<PsFuncDefn>());
 
         public static IAzFuncExpn Analyze(Scope parentScope,
+                                          NameProvider provider,
                                           PsScopedFuncExpn scopedExpn)
         {
             var scope = new Scope(parentScope);
@@ -26,11 +27,11 @@ namespace Transpiler.Analysis
                 matchExpn.IsTerse)
             {
                 // This will return a lambda with a scoped expn at it's tail.
-                return IAzFuncExpn.Analyze(scope, scopedExpn.Expression);
+                return IAzFuncExpn.Analyze(scope, provider, scopedExpn.Expression);
             }
             else
             {
-                var newExpn = IAzFuncExpn.Analyze(scope, scopedExpn.Expression);
+                var newExpn = IAzFuncExpn.Analyze(scope, provider, scopedExpn.Expression);
 
                 return new AzScopedFuncExpn(newExpn, newSubDefns, scope, scopedExpn.Position);
             }

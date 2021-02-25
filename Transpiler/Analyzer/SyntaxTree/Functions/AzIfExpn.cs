@@ -13,11 +13,12 @@ namespace Transpiler.Analysis
         public IAzTypeExpn Type { get; set; }
 
         public static AzIfExpn Analyze(Scope scope,
+                                       NameProvider provider,
                                        PsIfExpn ifExpn)
         {
-            var condition = IAzFuncExpn.Analyze(scope, ifExpn.Condition);
-            var thenCase = IAzFuncExpn.Analyze(scope, ifExpn.ThenCase);
-            var elseCase = IAzFuncExpn.Analyze(scope, ifExpn.ElseCase);
+            var condition = IAzFuncExpn.Analyze(scope, provider, ifExpn.Condition);
+            var thenCase = IAzFuncExpn.Analyze(scope, provider, ifExpn.ThenCase);
+            var elseCase = IAzFuncExpn.Analyze(scope, provider, ifExpn.ElseCase);
 
             var newIfExpn = new AzIfExpn(condition, thenCase, elseCase, ifExpn.Position);
             return newIfExpn;

@@ -7,9 +7,10 @@ namespace Transpiler.Analysis
     public static class AzListLiteral
     {
         public static IAzFuncExpn Analyze(Scope scope,
+                                          NameProvider provider,
                                           PsListLiteral listLiteral)
         {
-            var elements = listLiteral.Elements.Select(e => IAzFuncExpn.Analyze(scope, e)).ToList();
+            var elements = listLiteral.Elements.Select(e => IAzFuncExpn.Analyze(scope, provider, e)).ToList();
 
             return CreateList(scope, elements);
 

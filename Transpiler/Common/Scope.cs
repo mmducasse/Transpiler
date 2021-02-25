@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Transpiler.Analysis;
 
-namespace Transpiler.Analysis
+namespace Transpiler
 {
     public interface IScope
     {

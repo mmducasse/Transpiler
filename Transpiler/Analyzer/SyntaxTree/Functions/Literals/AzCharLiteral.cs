@@ -22,6 +22,7 @@ namespace Transpiler.Analysis
         }
 
         public static AzCharLiteral Analyze(Scope scope,
+                                            NameProvider provider,
                                             PsCharLiteral node)
         {
             return new(node.Value, node.Position);

@@ -8,6 +8,7 @@ namespace Transpiler.Analysis
         public IAzTypeExpn Type { get; set; }
 
         public static AzElsePattern Analyze(Scope scope,
+                                            NameProvider provider,
                                             PsAnyPattern node)
         {
              return new(node.Position);

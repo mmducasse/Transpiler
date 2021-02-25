@@ -103,7 +103,7 @@ namespace Transpiler.Analysis
                 {
                     if (funcDefn.Name == funcsNode.Names[0])
                     {
-                        AzFuncDefn.Analyze(scope, funcDefn as AzFuncDefn, funcsNode);
+                        AzFuncDefn.Analyze(scope, new("p"), funcDefn as AzFuncDefn, funcsNode);
                     }
                 }
             }

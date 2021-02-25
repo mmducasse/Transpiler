@@ -24,6 +24,7 @@ namespace Transpiler.Analysis
         }
 
         public static AzUndefinedLiteral Analyze(Scope scope,
+                                                 NameProvider provider,
                                                  PsUndefinedLiteral node)
         {
             return new(node.Position);

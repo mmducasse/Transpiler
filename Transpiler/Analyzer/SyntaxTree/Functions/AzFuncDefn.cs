@@ -67,6 +67,7 @@ namespace Transpiler.Analysis
         }
 
         public static AzFuncDefn Analyze(Scope parentScope,
+                                         NameProvider provider,
                                          AzFuncDefn funcDefn,
                                          PsFuncDefn node)
         {
@@ -76,12 +77,12 @@ namespace Transpiler.Analysis
             var paramStack = new Stack<AzParam>();
             foreach (var param in node.Parameters)
             {
-                var paramDefn = new AzParam(param.Name, param.Position);
+                var paramDefn = new AzParam(param.Name, false, param.Position);
                 scope.AddFunction(paramDefn);
                 paramStack.Push(paramDefn);
             }
 
-            var expn = IAzFuncExpn.Analyze(scope, node.Expression);
+            var expn = IAzFuncExpn.Analyze(scope, provider, node.Expression);
 
             while (paramStack.TryPop(out var paramDefn))
             {

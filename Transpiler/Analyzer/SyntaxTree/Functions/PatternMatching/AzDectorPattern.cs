@@ -13,6 +13,7 @@ namespace Transpiler.Analysis
         public bool IsCompleteMember => (Variables.Count == 0) || Variables.All(v => v is AzParam);
 
         public static AzDectorPattern Analyze(Scope scope,
+                                              NameProvider provider,
                                               PsDectorPattern node)
         {
             if (!scope.TryGetNamedType(node.TypeName, out var typeDefn))
@@ -24,7 +25,7 @@ namespace Transpiler.Analysis
 
             int numElements = dataTypeDefn.Expression.Elements.Count;
 
-            var vars = node.Variables.Select(v => IAzPattern.Analyze(scope, v)).ToList();
+            var vars = node.Variables.Select(v => IAzPattern.Analyze(scope, provider, v)).ToList();
             if (vars.Count != numElements)
             {
                 throw Analyzer.Error(string.Format("Type {0} has {1} members.", node.TypeName, numElements), node.Position);
