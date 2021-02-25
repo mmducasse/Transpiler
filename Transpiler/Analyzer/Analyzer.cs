@@ -24,7 +24,7 @@ namespace Transpiler.Analysis
             // Perform any more verification needed after type inference is done.
             PostAnalyze(fileScope);
 
-            //Print(module);
+            Print(module);
         }
 
         private static void AnalyzeDependencies(Module module)

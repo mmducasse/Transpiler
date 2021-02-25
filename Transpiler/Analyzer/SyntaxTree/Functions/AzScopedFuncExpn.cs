@@ -16,7 +16,7 @@ namespace Transpiler.Analysis
         //    new(expression, new List<PsFuncDefn>());
 
         public static IAzFuncExpn Analyze(Scope parentScope,
-                                               PsScopedFuncExpn scopedExpn)
+                                          PsScopedFuncExpn scopedExpn)
         {
             var scope = new Scope(parentScope);
 

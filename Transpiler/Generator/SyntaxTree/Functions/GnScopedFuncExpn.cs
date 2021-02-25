@@ -9,10 +9,10 @@ namespace Transpiler.Generate
                                    IReadOnlyList<GnFuncDefn> FuncDefinitions,
                                    IScope Scope) : IGnFuncExpn
     {
-        public static GnScopedFuncExpn Prepare(IScope scope, AzScopedFuncExpn scopedExpn)
+        public static GnScopedFuncExpn Prepare(AzScopedFuncExpn scopedExpn)
         {
-            var expn = IGnFuncExpn.Prepare(scope, scopedExpn.Expression);
-            var fns = scopedExpn.FuncDefinitions.Select(f => GnFuncDefn.Prepare(scope, f)).ToList();
+            var expn = IGnFuncExpn.Prepare(scopedExpn.Scope, scopedExpn.Expression);
+            var fns = scopedExpn.FuncDefinitions.Select(f => GnFuncDefn.Prepare(scopedExpn.Scope, f)).ToList();
 
             return new(expn, fns, scopedExpn.Scope);
         }
@@ -21,7 +21,7 @@ namespace Transpiler.Generate
         {
             foreach (var fn in FuncDefinitions)
             {
-                fn.Generate(i + 1, names, ref s);
+                fn.Generate(i, names, ref s);
                 s += "\n";
             }
             return Expression.Generate(i, names, ref s);

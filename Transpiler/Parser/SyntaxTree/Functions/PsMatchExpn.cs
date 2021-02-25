@@ -55,7 +55,13 @@ namespace Transpiler.Parse
 
         public string Print(int i)
         {
-            string s = string.Format("match {0}\n", Argument.Print(i));
+            string s = "";
+                
+            if (!IsTerse)
+            {
+                string.Format("match {0}\n", Argument.Print(i));
+            }
+
             foreach (var c in Cases)
             {
                 s += string.Format("{0}| {1}\n", Indent(i + 1), c.Print(i + 1));

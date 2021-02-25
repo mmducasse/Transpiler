@@ -27,6 +27,8 @@ namespace Transpiler.Parse
                 throw Error("Module name is missing in file.", CodePosition.Zero(module));
             }
             module.Name = r.ModuleName;
+
+            Print(module);
         }
 
         public static void Print(Module module)

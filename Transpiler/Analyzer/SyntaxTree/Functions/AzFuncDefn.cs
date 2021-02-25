@@ -4,7 +4,7 @@ using Transpiler.Parse;
 
 namespace Transpiler.Analysis
 {
-    public interface IAzFuncDefn : IAzDefn, IAzFuncNode
+    public interface IAzFuncDefn : IAzDefn, IAzFuncStmt
     {
         eFixity Fixity { get; }
 

@@ -19,7 +19,11 @@ namespace Transpiler.Parse
             while (doContinue)
             {
                 var q2 = q;
-                if (Finds("(", ref q2))
+                if (Finds("=", ref q))
+                {
+                    return false;
+                }
+                else if (Finds("(", ref q2))
                 {
                     if (!IPsFuncExpn.Parse(ref q2, isInline: true, out var arbSubNode))
                     {

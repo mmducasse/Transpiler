@@ -63,8 +63,8 @@ namespace Transpiler.Parse
                 return true;
             }
 
-            Expects(TokenType.NewLine, ref q);
-            while (FindsIndents(ref q, indent + 1))
+            while (Finds(TokenType.NewLine, ref q) &&
+                   FindsIndents(ref q, indent + 1))
             {
                 if (!PsFuncDefn.ParseDefn(ref q, out var funcDefnNode))
                 {

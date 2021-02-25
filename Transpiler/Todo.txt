@@ -1,20 +1,20 @@
 ﻿
 TODO:
 
-- Add core libraries to project
 - Make interpreter more efficient (dont regenerate loaded code each time)
 - More flexible infix operations, maybe associativity too
 - Make recursion, mutual recursion type checkable (batch type inference based on dependencies)
 - Make token indentation more robust
-- Better code locations for errors
-- Make CodePosition.Null point to some predefined module.
-- Closures
 - Putchar and Get char functions
+- Add Undefined
+- Add null
 - Add vars in REPL
+- Prevent cyclic dependencies
 - GetN method that extracts element from tuple
 - Explict type annotations inline
 - Instance Implementors need to introduce type variables.
 - Improve type expression parsing
+- Add core libraries to project
 - $0, $1, etc to represent lambda inputs
 - Type aliases
 - Pattern aliases

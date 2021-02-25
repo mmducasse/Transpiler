@@ -6,7 +6,7 @@ using static Transpiler.Extensions;
 
 namespace Transpiler.Generate
 {
-    public interface IGnFuncDefn : IGnDefn, IGnFuncNode
+    public interface IGnFuncDefn : IGnDefn, IGnFuncStmt
     {
     }
 

@@ -4,7 +4,7 @@ using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
-    public interface IPsFuncDefn : IPsDefn
+    public interface IPsFuncDefn : IPsDefn, IPsFuncStmt
     {
     }
 
