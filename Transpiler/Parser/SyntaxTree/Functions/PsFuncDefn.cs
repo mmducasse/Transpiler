@@ -60,7 +60,7 @@ namespace Transpiler.Parse
                 // ParseTypeExpn
                 if (!IPsTypeExpn.Parse(ref q, out typeExpn))
                 {
-                    throw Error("Expected type expression after ':'.", q);
+                    throw Error("Expected type expression after '::'.", q);
                 }
             }
             else if (forceExplicitType)
@@ -179,7 +179,7 @@ namespace Transpiler.Parse
             string s = string.Format("{0}{1}{2}", accessMod, names, parameters);
             if (TypeExpression != null)
             {
-                s += string.Format(" : {0}", TypeExpression.Print(i + 1));
+                s += string.Format(" :: {0}", TypeExpression.Print(i + 1));
             }
             if (Expression != null)
             {

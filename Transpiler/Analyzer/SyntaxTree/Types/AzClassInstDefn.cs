@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Transpiler.Parse;
 using static Transpiler.Extensions;
+using static Transpiler.Keywords;
 
 namespace Transpiler.Analysis
 {
@@ -36,6 +37,9 @@ namespace Transpiler.Analysis
                     var tv = scope.AddTypeVar(tvName);
                     typeParams.Add(tv);
                 }
+
+                // Apply refinements to the type varaibles.
+                AzTypeRefinementGroup.AnalyzeRefinements(scope, node.Refinements);
 
                 // Get a reference to the class definition.
                 if (fileScope.TryGetNamedType(node.ClassName, out var typeDefn) &&
@@ -113,7 +117,7 @@ namespace Transpiler.Analysis
 
         public string Print(int i)
         {
-            string s = string.Format("inst {0} {1} =\n", Class.Name, Implementor.Name);
+            string s = string.Format("{0} {1} {2} =\n", TypeInstance, Class.Name, Implementor.Name);
             foreach (var instFunc in Functions)
             {
                 s += string.Format("{0}{1}\n", Indent(i + 1), instFunc.Print(0));

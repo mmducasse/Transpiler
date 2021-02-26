@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using static Transpiler.UI;
 
 namespace Transpiler.Analysis
 {
@@ -23,7 +23,7 @@ namespace Transpiler.Analysis
 
         public void PrintSignature()
         {
-            throw new NotImplementedException();
+            PrLn(Name);
         }
 
         public override string ToString() => Name;

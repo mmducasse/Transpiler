@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using static Transpiler.Parse.ParserUtils;
-using static Transpiler.Parse.KeySymbols;
+using static Transpiler.Keywords;
 
 namespace Transpiler.Parse
 {

@@ -27,7 +27,14 @@ namespace Transpiler
 
         public static void PrLn(string text, params object[] args)
         {
-            Console.WriteLine(text, args);
+            if (args.Length > 0)
+            {
+                Console.WriteLine(text, args);
+            }
+            else
+            {
+                Console.WriteLine(text);
+            }
         }
 
         public static void PrLn(string text,

@@ -37,22 +37,5 @@
             IReadOnlyListow,
             BigIReadOnlyListow,
         };
-
-        public const string If = "if";
-        public const string Then = "then";
-        public const string Else = "else";
-        public const string Match = "match";
-        //public const string Type = "type";
-        //public const string Inst = "inst";
-
-        public static readonly string[] ReservedWords = new[]
-        {
-            If,
-            Then,
-            Else,
-            Match,
-            //Type,
-            //Inst,
-        };
     }
 }

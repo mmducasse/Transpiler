@@ -7,12 +7,11 @@ TODO:
 
 - Add vars in REPL
 - GetN method that extracts element from tuple
-- Explict type annotations inline
-- Instance Implementors need to introduce type variables.
-- Improve type expression parsing
+- DataType accessor functions
 - Add core libraries to project
 - Make recursion, mutual recursion type checkable (batch type inference based on dependencies)
 
+- Explict type annotations inline
 - Operator associativity
 - $0, $1, etc to represent lambda inputs
 - Type aliases

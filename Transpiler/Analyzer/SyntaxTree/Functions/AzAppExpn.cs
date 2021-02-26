@@ -66,11 +66,11 @@ namespace Transpiler.Analysis
                 if (subexpns[i] is AzSymbolExpn opi &&
                     opi.Definition.Fixity != eFixity.Prefix)
                 {
-                    app = new AzAppExpn(subexpns[i], app, p);
+                    app = new AzAppExpn(subexpns[i], app, subexpns[i].Position);
                 }
                 else
                 {
-                    app = new AzAppExpn(app, subexpns[i], p);
+                    app = new AzAppExpn(app, subexpns[i], app.Position);
                 }
             }
 

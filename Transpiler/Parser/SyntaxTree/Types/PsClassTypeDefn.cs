@@ -4,7 +4,8 @@ using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
-    public record PsClassTypeDefn(string Name,
+    public record PsClassTypeDefn(PsTypeRefinementGroup Refinements,
+                                  string Name,
                                   string TypeVar,
                                   IReadOnlyList<PsFuncDefn> Functions,
                                   CodePosition Position) : IPsTypeDefn
@@ -17,6 +18,9 @@ namespace Transpiler.Parse
             int i = q.Indent;
 
             if (!Finds("type", ref q)) { return false; }
+
+            PsTypeRefinementGroup.Parse(ref q, out var refinements);
+
             Expects(TokenType.Uppercase, ref q, out string name);
             Expects(TokenType.Lowercase, ref q, out string typeVar);
             Expects("=", ref q);
@@ -38,14 +42,14 @@ namespace Transpiler.Parse
                 funcDecls.Add(funcDecl);
             }
 
-            node = new PsClassTypeDefn(name, typeVar, funcDecls, p);
+            node = new PsClassTypeDefn(refinements, name, typeVar, funcDecls, p);
             queue = q;
             return true;
         }
 
         public string Print(int i)
         {
-            string s = string.Format("type {0} {1} {{\n", Name, TypeVar);
+            string s = string.Format("type {0}{1} {2} =\n", Refinements, Name, TypeVar);
             foreach (var fn in Functions)
             {
                 s += string.Format("{0}{1}\n", Indent(i + 1), fn.Print(i + 1));

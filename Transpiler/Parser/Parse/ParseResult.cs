@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static Transpiler.UI;
 
 namespace Transpiler.Parse
 {
@@ -22,27 +23,31 @@ namespace Transpiler.Parse
 
         public void Print()
         {
-            Console.WriteLine("module {0}", ModuleName);
+            PrLn("module {0}", ModuleName);
 
             foreach (var import in ImportedModules)
             {
-                Console.WriteLine("use {0}", import);
+                PrLn("use {0}", import.ModuleName);
             }
 
-            List<PsDataTypeDefn> typeDefns = new();
+            foreach (var @class in ClassDefns)
+            {
+                PrLn(@class.Print(0));
+            }
+
+            foreach (var inst in InstDefns)
+            {
+                PrLn(inst.Print(0));
+            }
 
             foreach (var type in TypeDefns)
             {
-                //typeDefns.AddRange(Analyzer.FlattenTypeDefnNode(new Scope(), type));
-            }
-            foreach (var type in typeDefns)
-            {
-                Console.WriteLine(type.Print(0));
+                PrLn(type.Print(0));
             }
 
             foreach (var func in FuncDefns)
             {
-                Console.WriteLine(func.Print(0));
+                PrLn(func.Print(0));
             }
         }
     }

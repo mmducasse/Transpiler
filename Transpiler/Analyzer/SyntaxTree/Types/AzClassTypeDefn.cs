@@ -42,6 +42,9 @@ namespace Transpiler.Analysis
             classDefn.TypeVar = tv;
             fileScope.AddType(classDefn);
 
+            // Apply refinements to the type varaible.
+            AzTypeRefinementGroup.AnalyzeRefinements(scope, node.Refinements);
+
             // Analyze the class's functions.
             List<AzFuncDefn> funcDefns = new();
             foreach (var funcNode in node.Functions)
@@ -111,7 +114,6 @@ namespace Transpiler.Analysis
 
         public void PrintSignature()
         {
-            throw new System.NotImplementedException();
         }
     }
 }

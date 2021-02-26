@@ -1,17 +1,12 @@
 ﻿using System.Collections.Generic;
 using static Transpiler.Extensions;
 using static Transpiler.Parse.ParserUtils;
+using static Transpiler.Keywords;
 
 namespace Transpiler.Parse
 {
-    /*
-
-    inst Eq Point =
-	    p1 (==) p2 = ((a p1) == (a p2)) and ((b p1) == (b p2))
-	    p1 (!=) p2 = not (p1 == p2)
-
-    */
-    public record PsClassInstDefn(string ClassName,
+    public record PsClassInstDefn(PsTypeRefinementGroup Refinements,
+                                  string ClassName,
                                   string ImplementorName,
                                   IReadOnlyList<string> TypeParameters,
                                   IReadOnlyList<PsFuncDefn> Functions,
@@ -24,7 +19,10 @@ namespace Transpiler.Parse
             var p = q.Position;
             int i = q.Indent;
 
-            if (!Finds("inst", ref q)) { return false; }
+            if (!Finds(TypeInstance, ref q)) { return false; }
+
+            PsTypeRefinementGroup.Parse(ref q, out var refinements);
+
             Expects(TokenType.Uppercase, ref q, out string name);
             Expects(TokenType.Uppercase, ref q, out string implementorName);
 
@@ -53,7 +51,7 @@ namespace Transpiler.Parse
                 funcDecls.Add(funcDefn);
             }
 
-            node = new PsClassInstDefn(name, implementorName, typeParams, funcDecls, p);
+            node = new PsClassInstDefn(refinements, name, implementorName, typeParams, funcDecls, p);
             queue = q;
             return true;
         }
@@ -61,7 +59,7 @@ namespace Transpiler.Parse
         public string Print(int i)
         {
             var typeParams = TypeParameters.Separate(" ", prepend: " ");
-            string s = string.Format("inst {0} {1}{2} =\n", ClassName, ImplementorName, typeParams);
+            string s = string.Format("{0} {1}{2} {3}{4} =\n", TypeInstance, Refinements, ClassName, ImplementorName, typeParams);
             foreach (var fn in Functions)
             {
                 s += string.Format("{0}{1}\n", Indent(i + 1), fn.Print(i + 1));

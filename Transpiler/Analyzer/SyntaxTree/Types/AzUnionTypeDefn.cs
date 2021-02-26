@@ -111,7 +111,6 @@ namespace Transpiler.Analysis
 
         public void PrintSignature()
         {
-            throw new System.NotImplementedException();
         }
     }
 }

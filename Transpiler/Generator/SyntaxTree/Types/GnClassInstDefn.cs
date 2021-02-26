@@ -33,7 +33,7 @@ namespace Transpiler.Generate
                     string instFuncName = gnFunc.Generate(0, new("a"), instDefn.Implementor.Name, ref s);
                     s += "\n";
 
-                    dict.Add(instFuncName);
+                    dict.Add(instFuncName + "()");
                 }
                 else if (instFunc is Operator op)
                 {
