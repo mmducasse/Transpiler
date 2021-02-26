@@ -30,6 +30,11 @@ namespace Transpiler.Analysis
             return string.Format("{0}{1} :: {2} = {3}", Indent(i), Name, Type, BackingFunctionName);
         }
 
+        public void PrintSignature()
+        {
+            throw new NotImplementedException();
+        }
+
         public override string ToString() => Print(0);
     }
 

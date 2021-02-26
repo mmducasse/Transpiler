@@ -62,6 +62,18 @@ function PrintResult(output) {
 	}
 }
 
+let fs = require('fs')
+function Getchar() {
+	let buffer = Buffer.alloc(1)
+	fs.readSync(0, buffer, 0, 1)
+	return buffer.toString('utf8')
+}
+
+function Putchar(c) {
+	console.log(c)
+	return ['']
+}
+
 function Undefined() {
 	throw 'Undefined!'
 }

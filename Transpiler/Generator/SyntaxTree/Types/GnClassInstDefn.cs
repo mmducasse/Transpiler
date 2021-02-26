@@ -17,7 +17,7 @@ namespace Transpiler.Generate
             for (int x = 0; x < instDefn.Class.Superclasses.Count; x++)
             {
                 string superClassName = instDefn.Class.Superclasses[x].Name;
-                string superInstName = superClassName.Generated() + instDefn.Implementor.Name.Generated();
+                string superInstName = superClassName + "_" + instDefn.Implementor.Name;
 
                 dict.Add(superInstName);
             }
@@ -41,7 +41,7 @@ namespace Transpiler.Generate
                 }
             }
 
-            string dictName = instDefn.Class.Name.Generated() + instDefn.Implementor.Name.Generated();
+            string dictName = instDefn.Class.Name + "_" + instDefn.Implementor.Name;
             s += string.Format("const {0} = [\n", dictName);
             s += dict.Separate(",\n");
             s += "]\n\n";

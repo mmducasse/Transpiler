@@ -3,10 +3,13 @@ using System.Collections.Generic;
 
 namespace Transpiler.Parse
 {
+    public record PsImportNode(string ModuleName,
+                               CodePosition Position);
+
     public class ParseResult
     {
         public string ModuleName { get; set; } = null;
-        public List<string> ImportedModules { get; } = new();
+        public List<PsImportNode> ImportedModules { get; } = new();
         public List<PsFuncDefn> FuncDefns { get; } = new();
         public List<IPsTypeDefn> TypeDefns { get; } = new();
         public List<PsClassTypeDefn> ClassDefns { get; } = new();

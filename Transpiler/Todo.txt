@@ -1,27 +1,19 @@
 ﻿
 IMPROVEMENTS:
 
-- Ps: Negative numbers
-- Ps: Lexer goes out of bounds when REPL sees postfix symbols
-- Az: Need to pass name provider for auto generated lambda params
-- Gn: Stop evaluating to const, just invoke() functions inline
-- Gn: Need to add type parameters to scope in Prepare
+- Gn: Need to add type parameters to scope in Prepare, do this in functin args all at once
 
 TODO:
 
-- Make interpreter more efficient (dont regenerate loaded code each time)
-- Make recursion, mutual recursion type checkable (batch type inference based on dependencies)
-- Make token indentation more robust
-- Putchar and Get char functions
 - Add vars in REPL
-- Prevent cyclic dependencies
 - GetN method that extracts element from tuple
 - Explict type annotations inline
 - Instance Implementors need to introduce type variables.
 - Improve type expression parsing
 - Add core libraries to project
-- Operator associativity
+- Make recursion, mutual recursion type checkable (batch type inference based on dependencies)
 
+- Operator associativity
 - $0, $1, etc to represent lambda inputs
 - Type aliases
 - Pattern aliases

@@ -19,7 +19,7 @@ namespace Transpiler
 
         public string Output { get; set; }
 
-        public bool IsFinished { get; set; }
+        public bool IsAnalyzed { get; set; }
 
         public Module(string code, string name)
         {

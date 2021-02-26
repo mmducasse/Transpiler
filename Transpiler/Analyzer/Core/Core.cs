@@ -2,6 +2,8 @@
 using static Transpiler.Analysis.NumClass;
 using static Transpiler.Analysis.OrdClass;
 using static Transpiler.Analysis.ListDataType;
+using System.Collections.Generic;
+using static Transpiler.CodePosition;
 
 namespace Transpiler.Analysis
 {
@@ -43,12 +45,29 @@ namespace Transpiler.Analysis
 
             List = CreateList(Module.Scope);
 
-            //mScope.PrintTypes();
-            //mScope.PrintFunctions();
-            //mScope.PrintClassInstances();
-            //mScope.PrintTypeHeirarchy();
+            CreateMiscFunctions(Module.Scope);
 
-            //Analyzer.TEMP_PrintFnTypes(mScope);
+            if (Compiler.DebugCore)
+            {
+                Module.Scope.PrintTypes();
+                Module.Scope.PrintFunctions();
+                Module.Scope.PrintClassInstances();
+                Module.Scope.PrintTypeHeirarchy();
+
+                //Analyzer.TEMP_PrintFnTypes(mScope);
+            }
+        }
+
+        private void CreateMiscFunctions(Scope scope)
+        {
+            var @void = new AzTypeTupleExpn(new List<IAzTypeExpn>(), Null);
+            var getcharType = new AzTypeLambdaExpn(@void, Char.ToCtor(), Null);
+            var getchar = new Operator("getchar", "Getchar", getcharType, Fixity: eFixity.Prefix);
+            scope.AddFunction(getchar, getcharType);
+
+            var putcharType = new AzTypeLambdaExpn(Char.ToCtor(), @void, Null);
+            var putchar = new Operator("putchar", "Putchar", putcharType, Fixity: eFixity.Prefix);
+            scope.AddFunction(putchar, putcharType);
         }
     }
 }

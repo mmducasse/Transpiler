@@ -27,9 +27,9 @@ namespace Transpiler.Generate
 
         private static string GenerateFunction(string name, int i)
         {
-            string s = string.Format("function {0}(dict)\n", name.SafeName());
+            string s = string.Format("function {0}()\n", name.SafeNameGenerated());
             s += "{\n";
-            s += string.Format("{0}return dict[{1}]\n", Indent(1), i);
+            s += string.Format("{0}return dict => dict[{1}];\n", Indent(1), i);
             s += "}\n\n";
 
             return s;

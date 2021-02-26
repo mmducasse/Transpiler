@@ -38,6 +38,11 @@ namespace Transpiler.Analysis
             return string.Empty;
         }
 
+        public void PrintSignature()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public IAzTypeExpn Substitute(Substitution substitution)
         {
             if (substitution.TypeSubstitutions.ContainsKey(this))

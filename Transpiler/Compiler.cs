@@ -17,6 +17,14 @@ namespace Transpiler
         public IReadOnlyDictionary<string, Module> Modules => mModules;
         public Dictionary<string, Module> mModules = new();
 
+        private string mOutput = "";
+
+        public static bool DebugCore { get; } = false;
+        public static bool DebugParser { get; } = false;
+        public static bool DebugAnalyzer { get; } = false;
+
+        private const string DEST_JS_FILE = @"C:\Users\matth\Desktop\output.js";
+
         public Compiler()
         {
             Console.WriteLine("Transpiler");
@@ -40,6 +48,10 @@ namespace Transpiler
                 {
                     Load(input[5..]);
                 }
+                else if (input.StartsWith("list:"))
+                {
+                    List(input[5..]);
+                }
                 else if (string.IsNullOrWhiteSpace(input))
                 {
                     // Do nothing...
@@ -56,7 +68,7 @@ namespace Transpiler
                         inputText += "ans = " + input + "\n";
                         var inputModule = new Module(inputText, "INPUTMODULE");
                         Parser.Parse(inputModule);
-                        Analyzer.Analyze(inputModule);
+                        Analyzer.Analyze(inputModule, new());
 
                         var funcDefn = inputModule.Scope.FuncDefinitions.First().Value;
                         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -64,10 +76,8 @@ namespace Transpiler
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.WriteLine(funcDefn.Print(0));
 
-                        var output = GenerateOutput(inputModule);
-
-                        string TEMP_destFile = @"C:\Users\matth\Desktop\output.js";
-                        ExecOutputFile(TEMP_destFile, output);
+                        AddCompiledInputModule(inputModule);
+                        ExecOutputFile();
                     }
                     catch (CompilerException ce)
                     {
@@ -76,23 +86,6 @@ namespace Transpiler
                 }
             }
 
-        }
-
-        public Module GetModule(string moduleName)
-        {
-            if (Modules.TryGetValue(moduleName, out var module))
-            {
-                if (!module.IsFinished)
-                {
-                    Parser.Parse(module);
-                    Analyzer.Analyze(module);
-                    module.IsFinished = true;
-                }
-
-                return module;
-            }
-
-            throw new Exception();
         }
 
         private void Load(string rootFolder)
@@ -116,8 +109,13 @@ namespace Transpiler
 
                     foreach (var module in newModules)
                     {
-                        Analyzer.Analyze(module);
+                        if (!module.IsAnalyzed)
+                        {
+                            Analyzer.Analyze(module, new());
+                        }
                     }
+
+                    CompileModulesToJs();
 
                     Console.WriteLine("Ok!");
 
@@ -134,7 +132,39 @@ namespace Transpiler
             }
         }
 
-        private StringBuilder GenerateOutput(Module inputModule)
+        #region List
+
+        private void List(string moduleName)
+        {
+            if (string.IsNullOrWhiteSpace(moduleName))
+            {
+                foreach (var module in Modules.Values)
+                {
+                    ListModule(module);
+                }
+            }
+            else if (Modules.TryGetValue(moduleName, out var module))
+            {
+                ListModule(module);
+            }
+            else
+            {
+                throw Error("Module " + moduleName + " is not loaded.");
+            }
+            Console.WriteLine();
+        }
+
+        private void ListModule(Module module)
+        {
+            Console.WriteLine();
+            Console.WriteLine(module.Name);
+            //module.Scope.PrintTypes();
+            module.Scope.PrintFunctions();
+        }
+
+        #endregion
+
+        private void CompileModulesToJs()
         {
             var output = new StringBuilder();
             output.Append(Generator.GetCoreJsCode());
@@ -145,21 +175,33 @@ namespace Transpiler
                 Generator.GenerateModule(module.Name, module.Scope, ref output);
             }
 
+            mOutput = output.ToString();
+        }
+
+        private void AddCompiledInputModule(Module inputModule)
+        {
+            var output = new StringBuilder();
+
             Generator.GenerateModule(inputModule.Name, inputModule.Scope, ref output);
 
             Generator.TEMP_AddFinalLine(ref output);
-
-            return output;
+            File.WriteAllText(DEST_JS_FILE, mOutput);
+            File.AppendAllText(DEST_JS_FILE, output.ToString());
         }
 
-        private void ExecOutputFile(string filePath, StringBuilder output)
+        private void ExecOutputFile()
         {
-            string destFile = @"C:\Users\matth\Desktop\output.js";
-            File.WriteAllText(destFile, output.ToString());
             Console.Write("ans = ");
-            var nodeJs = Process.Start("node", filePath);
+            var nodeJs = Process.Start("node", DEST_JS_FILE);
             nodeJs.WaitForExit();
             nodeJs.Dispose();
+        }
+
+        public static Exception Error(string reason)
+        {
+            return new CompilerException(eCompilerStage.Input,
+                                         reason,
+                                         CodePosition.Null);
         }
     }
 }

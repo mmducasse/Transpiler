@@ -6,14 +6,14 @@ namespace Transpiler.Analysis
 {
     public static class Analyzer
     {
-        public static void Analyze(Module module)
+        public static void Analyze(Module module, Stack<Module> dependents)
         {
             // Create the top-level scope.
             var fileScope = new Scope(Core.Instance.Scope.ToArr());
             module.Scope = fileScope;
 
             // Find and analyze usings.
-            AnalyzeDependencies(module);
+            AnalyzeDependencies(module, dependents);
 
             // Analyze types and functions in module.
             AnalyzeFile(fileScope, module.ParseResult);
@@ -24,35 +24,41 @@ namespace Transpiler.Analysis
             // Perform any more verification needed after type inference is done.
             PostAnalyze(fileScope);
 
-            Print(module);
+            if (Compiler.DebugAnalyzer)
+            {
+                Print(module);
+            }
         }
 
-        private static void AnalyzeDependencies(Module module)
+        private static void AnalyzeDependencies(Module module, Stack<Module> dependents)
         {
-            foreach (var dependencyName in module.ParseResult.ImportedModules)
+            dependents.Push(module);
+
+            // Make sure all dependencies are analyzed first.
+            foreach (var import in module.ParseResult.ImportedModules)
             {
-                if (!Compiler.Instance.Modules.TryGetValue(dependencyName, out var dependency))
+                if (!Compiler.Instance.Modules.TryGetValue(import.ModuleName, out var dependency))
                 {
-                    throw Error("Unable to find module " + dependencyName, CodePosition.Null);
+                    throw Error("Unable to find module " + import.ModuleName, import.Position);
                 }
 
-                if (!module.IsFinished)
+                // Make sure we aren't in a cyclic dependency between modules.
+                if (dependents.Contains(dependency))
                 {
-                    Analyze(dependency);
+                    throw Error("Cyclic module dependency detected between modules " +
+                                module.Name + " and " + dependency.Name + ".", import.Position);
+                }
+
+                if (!module.IsAnalyzed)
+                {
+                    Analyze(dependency, dependents);
                 }
 
                 module.Dependencies.Add(dependency);
                 module.Scope.Dependencies.Add(dependency.Scope);
             }
 
-            // Make sure all dependencies are analyzed first.
-            foreach (var dependency in module.Dependencies)
-            {
-                if (!dependency.IsFinished)
-                {
-                    Analyze(dependency);
-                }
-            }
+            dependents.Pop();
         }
 
         private static void AnalyzeFile(Scope fileScope, ParseResult results)

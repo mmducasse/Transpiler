@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Parse;
+using static Transpiler.UI;
 
 namespace Transpiler.Analysis
 {
@@ -141,6 +142,12 @@ namespace Transpiler.Analysis
             string type = (ExplicitType == null) ? "" : " :: " + ExplicitType.Print(0);
             var expn = (Expression == null) ? "" : " = " + Expression.Print(i + 1);
             return string.Format("{0}{1}{2}", Name, type, expn);
+        }
+
+        public void PrintSignature()
+        {
+            Pr("{0} :: ", Name);
+            PrLn(ExplicitType.Print(0), foregroundColor: Yellow);
         }
     }
 

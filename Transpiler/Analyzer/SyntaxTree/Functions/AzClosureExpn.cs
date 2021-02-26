@@ -63,7 +63,8 @@ namespace Transpiler.Analysis
 
         public IReadOnlyList<IAzFuncNode> GetSubnodes()
         {
-            return this.ToArr().Concat(Statements.Concat(ReturnExpression.ToArr())).ToList();
+            var statementNodes = Statements.SelectMany(f => f.GetSubnodes()).ToList();
+            return this.ToArr().Concat(statementNodes).Concat(ReturnExpression.ToArr()).ToList();
         }
 
         public string Print(int i)

@@ -20,7 +20,7 @@ namespace Transpiler.Generate
 
         public string Generate()
         {
-            var args = Arguments.Select(a => a.SafeName()).Separate(", ", prepend: ", ");
+            var args = Arguments.Select(a => a.SafeNameGenerated()).Separate(", ", prepend: ", ");
             string s = string.Format("[\"{0}\"{1}]", Name, args);
             return s;
         }

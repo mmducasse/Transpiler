@@ -108,5 +108,10 @@ namespace Transpiler.Analysis
         }
 
         public override string ToString() => Name;
+
+        public void PrintSignature()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

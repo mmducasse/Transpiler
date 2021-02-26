@@ -28,7 +28,10 @@ namespace Transpiler.Parse
             }
             module.Name = r.ModuleName;
 
-            Print(module);
+            if (Compiler.DebugParser)
+            {
+                Print(module);
+            }
         }
 
         public static void Print(Module module)
@@ -88,6 +91,7 @@ namespace Transpiler.Parse
         private static bool ParseImport(ref TokenQueue queue, ParseResult r)
         {
             var q = queue;
+            var p = q.Position;
 
             if (!Finds("use", ref q)) { return false; }
             if (!ParseModuleName(ref q, out string importName))
@@ -95,7 +99,7 @@ namespace Transpiler.Parse
                 throw Error("Expected properly formatted module name after 'use'.", q);
             }
 
-            r.ImportedModules.Add(importName);
+            r.ImportedModules.Add(new(importName, p));
             queue = q;
             return true;
         }

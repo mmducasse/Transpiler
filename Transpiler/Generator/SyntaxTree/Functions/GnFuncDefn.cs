@@ -41,13 +41,13 @@ namespace Transpiler.Generate
 
         public string Generate(int i, NameProvider names, string namePrefix, ref string s)
         {
-            string name = namePrefix.Generated() + Name.SafeName();
-            string helperName = "c" + namePrefix.Generated() + Name.SafeName();
-            s += string.Format("{0}function {1}() {{\n", Indent(i), helperName);
+            string name = namePrefix.Generated() + Name.SafeNameGenerated();
+            //string helperName = "c" + namePrefix.Generated() + Name.SafeName();
+            s += string.Format("{0}function {1}() {{\n", Indent(i), name);
             string expnRes = Expression.Generate(i + 1, names, ref s);
             s += string.Format("{0}return {1}\n", Indent(i + 1), expnRes);
             s += Indent(i) + "}\n";
-            s += string.Format("{0}const {1} = {2}()\n", Indent(i), name, helperName);
+            //s += string.Format("{0}const {1} = {2}()\n", Indent(i), name, helperName);
 
             return name;
         }

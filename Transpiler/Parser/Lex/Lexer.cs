@@ -16,8 +16,6 @@ namespace Transpiler.Parse
                 token.Value = value;
                 token.Position = position;
                 mTokens.Add(token);
-
-                UI.DebugPrLn(token);
             }
         }
 
@@ -143,10 +141,18 @@ namespace Transpiler.Parse
 
         private static bool MatchNumberLiteral(ref LexerQueue q, TokenList tokens)
         {
-            if (!char.IsNumber(q.Current)) { return false; }
-
+            bool isPositive = true;
             var position = q.Position;
-            string number = string.Empty;
+            var q2 = q;
+            if (q2.Current == '-')
+            {
+                isPositive = false;
+                q2 = q.NextCol;
+            }
+            if (!char.IsNumber(q2.Current)) { return false; }
+            q = q2;
+
+            string number = isPositive ? string.Empty : "-";
 
             while (true)
             {
@@ -281,7 +287,8 @@ namespace Transpiler.Parse
             if (!char.IsWhiteSpace(q.Current)
                 && !char.IsLetterOrDigit(q.Current))
             {
-                while (!char.IsWhiteSpace(q.Current)
+                while (q.HasCurrent &&
+                       !char.IsWhiteSpace(q.Current)
                        && !char.IsLetterOrDigit(q.Current)
                        && !KeySymbols.All.Contains(q.Current.ToString()))
                 {

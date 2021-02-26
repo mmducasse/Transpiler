@@ -38,6 +38,11 @@ namespace Transpiler.Analysis
 
         public string Print(int i) => Name;
 
+        public void PrintSignature()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public override string ToString() => Print(0);
     }
 }

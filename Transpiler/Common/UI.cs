@@ -4,28 +4,42 @@ namespace Transpiler
 {
     public static class UI
     {
-        public const ConsoleColor DefaultForeground = ConsoleColor.Gray;
-        public const ConsoleColor DefaultBackground = ConsoleColor.Black;
-
-        public static bool Debug { get; set; }
-
-        public static void Init()
-        {
-            Console.ForegroundColor = DefaultForeground;
-            Console.BackgroundColor = DefaultBackground;
-        }
-
-        public static void DebugPrLn(object x)
-        {
-            if (Debug)
-            {
-                Console.WriteLine(x.ToString());
-            }
-        }
+        public static ConsoleColor White => ConsoleColor.White;
+        public static ConsoleColor Black => ConsoleColor.Black;
+        public static ConsoleColor Yellow => ConsoleColor.Yellow;
 
         public static void Pr(string text, params object[] args)
         {
             Console.Write(text, args);
+        }
+
+        public static void Pr(string text,
+                              ConsoleColor foregroundColor,
+                              ConsoleColor backgroundColor = ConsoleColor.Black,
+                              params object[] args)
+        {
+            Console.ForegroundColor = foregroundColor;
+            Console.BackgroundColor = backgroundColor;
+            Console.Write(text, args);
+            Console.ForegroundColor = White;
+            Console.BackgroundColor = Black;
+        }
+
+        public static void PrLn(string text, params object[] args)
+        {
+            Console.WriteLine(text, args);
+        }
+
+        public static void PrLn(string text,
+                                ConsoleColor foregroundColor,
+                                ConsoleColor backgroundColor = ConsoleColor.Black,
+                                params object[] args)
+        {
+            Console.ForegroundColor = foregroundColor;
+            Console.BackgroundColor = backgroundColor;
+            Console.WriteLine(text, args);
+            Console.ForegroundColor = White;
+            Console.BackgroundColor = Black;
         }
 
         public static void PrX(string text, int x, int y,
@@ -38,20 +52,8 @@ namespace Transpiler
 
             Console.Write(text);
 
-            if (foreground.HasValue) { Console.ForegroundColor = DefaultForeground; }
-            if (background.HasValue) { Console.BackgroundColor = DefaultBackground; }
-        }
-
-        public static void PrLn(string text, params object[] args)
-        {
-            Console.WriteLine(text, args);
-        }
-
-        public static void PrLnError(string text, params object[] args)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(text, args);
-            Console.ForegroundColor = UI.DefaultForeground;
+            if (foreground.HasValue) { Console.ForegroundColor = White; }
+            if (background.HasValue) { Console.BackgroundColor = Black; }
         }
     }
 }

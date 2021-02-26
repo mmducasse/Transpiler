@@ -21,6 +21,11 @@ namespace Transpiler.Analysis
 
         public string Print(int i) => Name;
 
+        public void PrintSignature()
+        {
+            throw new NotImplementedException();
+        }
+
         public override string ToString() => Name;
     }
 }

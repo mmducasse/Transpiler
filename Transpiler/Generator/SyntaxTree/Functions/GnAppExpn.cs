@@ -23,7 +23,7 @@ namespace Transpiler.Generate
                 foreach (var (defnType, expnType) in typeMapping)
                 {
                     string typeParamName = CreateTypeArgString(scope, defnType, expnType);
-                    var param = new GnSymbolExpn(typeParamName);
+                    var param = new GnSymbolExpn(typeParamName, false, true);
                     func = new GnAppExpn(func, param);
                 }
 

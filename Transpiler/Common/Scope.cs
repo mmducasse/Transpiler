@@ -352,7 +352,7 @@ namespace Transpiler
         {
             foreach (var func in FuncDefinitions.Values)
             {
-                Console.WriteLine(func.Print(0));
+                func.PrintSignature();
             }
         }
 
@@ -360,7 +360,7 @@ namespace Transpiler
         {
             foreach (var type in TypeDefinitions.Values)
             {
-                Console.WriteLine(type.Print(0));
+                type.PrintSignature();
             }
         }
 

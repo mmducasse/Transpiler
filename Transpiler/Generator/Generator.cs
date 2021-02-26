@@ -8,32 +8,14 @@ namespace Transpiler.Generate
 {
     public static class Generator
     {
-        //public static void Generate(Module module)
-        //{
-        //    var fileScope = module.Scope;
-
-        //    StringBuilder output = new();
-        //    output.Append(GetCoreJsCode());
-        //    GenerateModule("Generated Core Functions", CoreTypes.Instance.Scope, ref output);
-        //    GenerateModule(module.Name, fileScope, ref output);
-
-        //    TEMP_AddFinalLine(ref output);
-
-        //    string destFile = @"C:\Users\matth\Desktop\output.js";
-        //    File.WriteAllText(destFile, output.ToString());
-
-        //    ExecOutputFile(destFile);
-        //}
-
         public static void TEMP_AddFinalLine(ref StringBuilder output)
         {
-            //string s = "\n\nPrintResult(_ans)\n\n";
-            //s += "console.log(\"\")\n";
-            //output.Append(s);
             string s = "\n\n";
             s += "try {\n";
-            s += "   PrintResult(_ans)\n";
+            s += "   PrintResult(_ans())\n";
+            s += "   console.log(\"\")\n";
             s += "} catch (e) {\n";
+            s += "   console.log(e)\n";
             s += "   console.log(\"\")\n";
             s += "}\n";
             output.Append(s);
@@ -61,16 +43,20 @@ namespace Transpiler.Generate
             // Generate functions.
             foreach (var func in scope.FuncDefinitions.Values)
             {
+                string g = "";
                 if (func is AzFuncDefn funcDefn &&
                     funcDefn.Expression != null)
                 {
                     var gnFunc = GnFuncDefn.Prepare(scope, funcDefn);
-                    string g = "";
                     gnFunc.Generate(0, new("a"), ref g);
-
-                    output.Append(g);
-                    output.Append("\n\n");
                 }
+                else if (func is Operator op)
+                {
+                    GnOperator.Generate(op, 0, ref g);
+                }
+
+                output.Append(g);
+                output.Append("\n\n");
             }
 
             output.AppendLine(string.Format("////////////////// END OF {0} //////////////////\n", moduleName));
@@ -115,12 +101,17 @@ namespace Transpiler.Generate
                 };
             }
 
-            if (s == symbol)
-            {
-                return symbol.Generated();
-            }
-
             return s;
+        }
+
+        public static string SafeNameGenerated(this string symbol)
+        {
+            string result = symbol.SafeName();
+            if (result == symbol)
+            {
+                return result.Generated();
+            }
+            return result;
         }
     }
 }
