@@ -43,22 +43,22 @@ namespace Transpiler
                 Console.Write("FL1> ");
                 Console.ForegroundColor = ConsoleColor.White;
 
-                string input = Console.ReadLine();
-                if (input.StartsWith("load:"))
+                try
                 {
-                    Load(input[5..]);
-                }
-                else if (input.StartsWith("list:"))
-                {
-                    List(input[5..]);
-                }
-                else if (string.IsNullOrWhiteSpace(input))
-                {
-                    // Do nothing...
-                }
-                else
-                {
-                    try
+                    string input = Console.ReadLine();
+                    if (input.StartsWith("load:"))
+                    {
+                        Load(input[5..]);
+                    }
+                    else if (input.StartsWith("list:"))
+                    {
+                        List(input[5..]);
+                    }
+                    else if (string.IsNullOrWhiteSpace(input))
+                    {
+                        // Do nothing...
+                    }
+                    else
                     {
                         string inputText = "";
                         foreach (var (moduleName, _) in Modules)
@@ -79,13 +79,12 @@ namespace Transpiler
                         AddCompiledInputModule(inputModule);
                         ExecOutputFile();
                     }
-                    catch (CompilerException ce)
-                    {
-                        ce.Print();
-                    }
+                }
+                catch (CompilerException ce)
+                {
+                    ce.Print();
                 }
             }
-
         }
 
         private void Load(string rootFolder)
@@ -94,37 +93,30 @@ namespace Transpiler
             rootFolder = @"C:\Users\matth\Desktop\FunctionalCode\"; // rootFolder.Trim();
             if (Directory.Exists(rootFolder))
             {
-                try
+                Console.Write("Loading... ");
+                var files = Directory.GetFiles(rootFolder, "*.hs", SearchOption.AllDirectories);
+                List<Module> newModules = new();
+                foreach (var file in files)
                 {
-                    Console.Write("Loading... ");
-                    var files = Directory.GetFiles(rootFolder, "*.hs", SearchOption.AllDirectories);
-                    List<Module> newModules = new();
-                    foreach (var file in files)
-                    {
-                        var module = Module.Create(file);
-                        Parser.Parse(module);
-                        mModules[module.Name] = module;
-                        newModules.Add(module);
-                    }
-
-                    foreach (var module in newModules)
-                    {
-                        if (!module.IsAnalyzed)
-                        {
-                            Analyzer.Analyze(module, new());
-                        }
-                    }
-
-                    CompileModulesToJs();
-
-                    Console.WriteLine("Ok!");
-
-                    newModules.ForEach(m => Console.WriteLine("Loaded " + m.Name));
+                    var module = Module.Create(file);
+                    Parser.Parse(module);
+                    mModules[module.Name] = module;
+                    newModules.Add(module);
                 }
-                catch (CompilerException ce)
+
+                foreach (var module in newModules)
                 {
-                    ce.Print();
+                    if (!module.IsAnalyzed)
+                    {
+                        Analyzer.Analyze(module, new());
+                    }
                 }
+
+                CompileModulesToJs();
+
+                Console.WriteLine("Ok!");
+
+                newModules.ForEach(m => Console.WriteLine("Loaded " + m.Name));
             }
             else
             {
@@ -136,6 +128,7 @@ namespace Transpiler
 
         private void List(string moduleName)
         {
+            moduleName = moduleName.Trim();
             if (string.IsNullOrWhiteSpace(moduleName))
             {
                 foreach (var module in Modules.Values)

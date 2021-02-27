@@ -1,6 +1,7 @@
 ﻿
 IMPROVEMENTS:
 
+- Az: Move Unify cases into their own methods.
 - Gn: Need to add type parameters to scope in Prepare, do this in functin args all at once
 
 TODO:

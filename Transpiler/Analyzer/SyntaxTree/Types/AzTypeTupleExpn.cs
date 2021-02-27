@@ -40,7 +40,8 @@ namespace Transpiler.Analysis
             return new(elements, node.Position);
         }
 
-        public IAzTypeExpn Substitute(Substitution substitution)
+        IAzTypeExpn IAzTypeExpn.Substitute(Substitution substitution) => Substitute(substitution);
+        public AzTypeTupleExpn Substitute(Substitution substitution)
         {
             var newElements = Elements.Select(e => e.Substitute(substitution)).ToList();
             return this with { Elements = newElements };

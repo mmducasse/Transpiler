@@ -24,6 +24,7 @@
     <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\IAzPattern.cs" />
     <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\AzMatchCase.cs" />
     <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\AzTuplePattern.cs" />
+    <Compile Include="Generator\SyntaxTree\Functions\Generated\GnGetElementExpn.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\GnAppExpn.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\GnClosureExpn.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\GnDectorFuncDefn.cs" />
@@ -31,7 +32,7 @@
     <Compile Include="Generator\SyntaxTree\Functions\GnIfExpn.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\GnLambdaExpn.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\GnMatchExpn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\GnNewDataExpn.cs" />
+    <Compile Include="Generator\SyntaxTree\Functions\Generated\GnNewDataExpn.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\GnOperator.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\GnScopedFuncExpn.cs" />
     <Compile Include="Generator\SyntaxTree\Functions\GnSymbolExpn.cs" />

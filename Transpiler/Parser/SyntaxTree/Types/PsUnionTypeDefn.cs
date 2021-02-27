@@ -54,6 +54,8 @@ namespace Transpiler.Parse
                 }
             }
 
+            if (subTypes.Count == 0) { return false; }
+
             node = new(name, parameters, subTypes, p);
             queue = q;
             return true;
@@ -71,7 +73,7 @@ namespace Transpiler.Parse
                 var q2 = q;
                 if (Finds(TokenType.NewLine, ref q2))
                 {
-                    node = new PsDataTypeDefn(name, new List<string>(), PsTypeTupleExpn.Empty, p);
+                    node = new PsDataTypeDefn(name, new List<string>(), new List<PsDataTypeElement>(), p);
                     queue = q;
                     return true;
                 }

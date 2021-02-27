@@ -30,6 +30,11 @@ namespace Transpiler.Analysis
             }
         }
 
+        public void Add(TypeVariable tv, IAzTypeExpn newType)
+        {
+            mTypeSubstitutions[tv] = newType;
+        }
+
         public string Print()
         {
             return TypeSubstitutions.

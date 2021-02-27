@@ -27,10 +27,10 @@ namespace Transpiler.Analysis
 
             var type = AzTypeLambdaExpn.Make(a, a, @bool.ToCtor());
 
-            var fLt = new AzFuncDefn("<", type, eFixity.Infix, CodePosition.Null);
-            var fLte = new AzFuncDefn("<=", type, eFixity.Infix, CodePosition.Null);
-            var fGt = new AzFuncDefn(">", type, eFixity.Infix, CodePosition.Null);
-            var fGte = new AzFuncDefn(">=", type, eFixity.Infix, CodePosition.Null);
+            var fLt = new AzFuncDefn("<", type, eFixity.Infix, true, CodePosition.Null);
+            var fLte = new AzFuncDefn("<=", type, eFixity.Infix, true, CodePosition.Null);
+            var fGt = new AzFuncDefn(">", type, eFixity.Infix, true, CodePosition.Null);
+            var fGte = new AzFuncDefn(">=", type, eFixity.Infix, true, CodePosition.Null);
 
             ord.Functions = RList(fLt, fLte, fGt, fGte);
 

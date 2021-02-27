@@ -15,6 +15,8 @@ namespace Transpiler.Analysis
 
         public AzFuncDefn Constructor { get; }
 
+        public IReadOnlyList<AzFuncDefn> Accessors { get; }
+
         public AzUnionTypeDefn ParentUnion { get; }
 
         public Scope Scope { get; }
@@ -24,6 +26,7 @@ namespace Transpiler.Analysis
         public AzDataTypeDefn(string name,
                               IReadOnlyList<TypeVariable> parameters,
                               AzFuncDefn constructor,
+                              IReadOnlyList<AzFuncDefn> accessors,
                               AzUnionTypeDefn parentUnion,
                               Scope scope,
                               CodePosition position)
@@ -31,6 +34,7 @@ namespace Transpiler.Analysis
             Name = name;
             Parameters = parameters;
             Constructor = constructor;
+            Accessors = accessors;
             ParentUnion = parentUnion;
             Scope = scope;
             Position = position;
@@ -38,8 +42,14 @@ namespace Transpiler.Analysis
 
         public static AzDataTypeDefn Make(Scope fileScope, string name, AzUnionTypeDefn parentUnion)
         {
-            var ctorFunc = new AzFuncDefn(name, null, eFixity.Prefix, CodePosition.Null);
-            var typeDefn = new AzDataTypeDefn(name, new List<TypeVariable>(), ctorFunc, parentUnion, fileScope, CodePosition.Null);
+            var ctorFunc = new AzFuncDefn(name, null, eFixity.Prefix, true, CodePosition.Null);
+            var typeDefn = new AzDataTypeDefn(name,
+                                              new List<TypeVariable>(),
+                                              ctorFunc,
+                                              new List<AzFuncDefn>(),
+                                              parentUnion,
+                                              fileScope,
+                                              CodePosition.Null);
 
             typeDefn.Expression = new AzTypeTupleExpn(new List<IAzTypeExpn>(), CodePosition.Null);
             CreateConstructor(fileScope, typeDefn, parentUnion);
@@ -74,8 +84,25 @@ namespace Transpiler.Analysis
                 throw Analyzer.Error("Nested data types may not have explicit type parameters", node.Position);
             }
 
-            var ctorFunc = new AzFuncDefn(node.Name, null, eFixity.Prefix, node.Position);
-            var typeDefn = new AzDataTypeDefn(node.Name, typeVars, ctorFunc, parentUnion, scope, node.Position);
+            var ctorFunc = new AzFuncDefn(node.Name, null, eFixity.Prefix, true, node.Position);
+
+            List<AzFuncDefn> accessors = new();
+            for (int i = 0; i < node.Elements.Count; i++)
+            {
+                if (node.Elements[i].HasAccessor)
+                {
+                    var e = node.Elements[i];
+                    var accessor = new AzFuncDefn(e.Name, null, eFixity.Prefix, true, e.Position);
+                    accessors.Add(accessor);
+                    fileScope.AddFunction(accessor);
+                }
+                else
+                {
+                    accessors.Add(null);
+                }
+            }
+
+            var typeDefn = new AzDataTypeDefn(node.Name, typeVars, ctorFunc, accessors, parentUnion, scope, node.Position);
             fileScope.AddType(typeDefn);
 
             return typeDefn;
@@ -85,16 +112,21 @@ namespace Transpiler.Analysis
                                              AzDataTypeDefn dataType,
                                              PsDataTypeDefn node)
         {
-            var typeExpn = IAzTypeExpn.Analyze(dataType.Scope, node.Expression);
-            // Make sure the expression is represented as a tuple.
-            if (typeExpn is AzTypeTupleExpn tupleTypeExpn)
+            List<IAzTypeExpn> elementTypes = new();
+            for (int i = 0; i < node.Elements.Count; i++)
             {
-                dataType.Expression = tupleTypeExpn;
+                var typeExpn = IAzTypeExpn.Analyze(dataType.Scope, node.Elements[i].TypeExpression);
+                elementTypes.Add(typeExpn);
             }
-            else
+            dataType.Expression = new AzTypeTupleExpn(elementTypes, dataType.Position);
+            for (int i = 0; i < node.Elements.Count; i++)
             {
-                dataType.Expression = new AzTypeTupleExpn(typeExpn.ToArr(), node.Position);
+                if (node.Elements[i].HasAccessor)
+                {
+                    CreateAccessor(fileScope, dataType, i, node.Elements.Count);
+                }
             }
+
             IAzDataTypeDefn retType = (dataType.ParentUnion != null) ? dataType.ParentUnion : dataType;
             CreateConstructor(fileScope, dataType, retType);
 
@@ -143,6 +175,26 @@ namespace Transpiler.Analysis
             //Console.WriteLine("CTOR {0} :: {1}", dataType.Constructor.Print(0), type.Print(0));
             fileScope.AddFunction(dataType.Constructor, type);
 
+        }
+
+        public static void CreateAccessor(Scope fileScope,
+                                          AzDataTypeDefn dataType,
+                                          int elementIndex,
+                                          int numElements)
+        {
+            var retType = dataType.Expression.Elements[elementIndex];
+            var type = new AzTypeLambdaExpn(dataType.ToCtor(), retType, CodePosition.Null);
+
+            var param = new AzParam("a", IsAutoGenerated: true, CodePosition.Null);
+            var symExpn = new AzSymbolExpn(param, CodePosition.Null);
+            var getExpn = new AzGetElementExpn(elementIndex, numElements, symExpn, CodePosition.Null);
+            var lamExpn = new AzLambdaExpn(param, getExpn, CodePosition.Null);
+
+            var accessor = dataType.Accessors[elementIndex];
+            accessor.Expression = lamExpn;
+            accessor.Expression.Type = type;
+            accessor.Type = type;
+            accessor.ExplicitType = type;
         }
 
         public string Print(int i)

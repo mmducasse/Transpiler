@@ -27,8 +27,8 @@ namespace Transpiler.Analysis
 
             var type = AzTypeLambdaExpn.Make(a, a, @bool.ToCtor());
 
-            var fEq = new AzFuncDefn("==", type, eFixity.Infix, CodePosition.Null);
-            var fNeq = new AzFuncDefn("!=", type, eFixity.Infix, CodePosition.Null);
+            var fEq = new AzFuncDefn("==", type, eFixity.Infix, true, CodePosition.Null);
+            var fNeq = new AzFuncDefn("!=", type, eFixity.Infix, true, CodePosition.Null);
 
             eq.Functions = RList(fEq, fNeq);
 
