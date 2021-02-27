@@ -51,12 +51,7 @@ namespace Transpiler.Analysis
                     Dictionary<AzFuncDefn, AzFuncDefn> funcDefns = new();
                     foreach (var funcNode in node.Functions)
                     {
-                        var fnDefns = AzFuncDefn.Initialize(scope, funcNode);
-                        if (fnDefns.Count != 1)
-                        {
-                            throw Analyzer.Error("Class functions may not have tuple deconstructors.", node.Position);
-                        }
-                        var funcDefn = fnDefns[0];
+                        var funcDefn = AzFuncDefn.Initialize(scope, funcNode);
                         if (!classDefn.TryGetFunction(funcDefn.Name, out var classFuncDefn))
                         {
                             throw Analyzer.Error("Instance function " + funcDefn.Name + " is undefined.", node.Position);
@@ -105,7 +100,7 @@ namespace Transpiler.Analysis
             {
                 foreach (var funcsNode in node.Functions)
                 {
-                    if (funcDefn.Name == funcsNode.Names[0])
+                    if (funcDefn.Name == funcsNode.Name)
                     {
                         AzFuncDefn.Analyze(scope, new("p"), funcDefn as AzFuncDefn, funcsNode);
                     }

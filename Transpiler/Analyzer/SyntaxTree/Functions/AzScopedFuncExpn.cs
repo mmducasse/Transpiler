@@ -6,7 +6,7 @@ using static Transpiler.Extensions;
 namespace Transpiler.Analysis
 {
     public record AzScopedFuncExpn(IAzFuncExpn Expression,
-                                   IReadOnlyList<AzFuncDefn> FuncDefinitions,
+                                   IReadOnlyList<IAzFuncStmtDefn> FuncDefinitions,
                                    Scope Scope,
                                    CodePosition Position) : IAzFuncExpn
     {

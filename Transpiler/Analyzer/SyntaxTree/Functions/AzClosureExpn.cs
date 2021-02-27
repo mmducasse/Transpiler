@@ -27,11 +27,11 @@ namespace Transpiler.Analysis
                     case IPsFuncExpn funcExpn:
                         statements.Add(IAzFuncExpn.Analyze(scope, provider, funcExpn));
                         break;
-                    case PsFuncDefn funcDefn:
-                        var funcDefns = AzFuncDefn.Initialize(scope, funcDefn);
-                        foreach (var fn in funcDefns)
+                    case IPsFuncStmtDefn psFuncStmtDefn:
+                        var azFuncStmtDefns = IAzFuncStmtDefn.Initialize(scope, psFuncStmtDefn);
+                        foreach (var fn in azFuncStmtDefns)
                         {
-                            AzFuncDefn.Analyze(scope, provider, fn, funcDefn);
+                            IAzFuncStmtDefn.Analyze(scope, provider, fn, psFuncStmtDefn);
                             statements.Add(fn);
                         }
                         break;

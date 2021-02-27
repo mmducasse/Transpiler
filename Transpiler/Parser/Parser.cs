@@ -59,9 +59,9 @@ namespace Transpiler.Parse
                 r.TypeDefns.Add(typeNode);
                 return true;
             }
-            if (PsFuncDefn.ParseDefn(ref q, out var funcNode))
+            if (IPsFuncStmtDefn.Parse(ref q, out var funcStmtNode))
             {
-                r.FuncDefns.Add(funcNode);
+                r.FuncDefns.Add(funcStmtNode);
                 return true;
             }
 

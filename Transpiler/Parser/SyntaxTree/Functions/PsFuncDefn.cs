@@ -4,18 +4,14 @@ using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
-    public interface IPsFuncDefn : IPsDefn, IPsFuncStmt
-    {
-    }
-
     // Todo: Add optional Type constraint property.
-    public record PsFuncDefn(IReadOnlyList<string> Names,
+    public record PsFuncDefn(string Name,
                              IReadOnlyList<PsParam> Parameters,
                              bool IsPrivate,
                              IPsTypeExpn TypeExpression,
                              IPsFuncExpn Expression,
                              eFixity Fixity,
-                             CodePosition Position) : IPsFuncDefn
+                             CodePosition Position) : IPsFuncStmtDefn
     {
         public static bool ParseDefn(ref TokenQueue queue, out PsFuncDefn node)
         {
@@ -49,8 +45,8 @@ namespace Transpiler.Parse
                 isPrivate = true;
             }
 
-            if (ParseInfix(ref q, out var names, out var parameters, out eFixity fixity)) { }
-            else if (ParsePrefix(ref q, out names, out parameters, out fixity)) { }
+            if (ParseInfix(ref q, out string name, out var parameters, out eFixity fixity)) { }
+            else if (ParsePrefix(ref q, out name, out parameters, out fixity)) { }
             else { return false; }
 
             // Optional Type Specification
@@ -81,41 +77,23 @@ namespace Transpiler.Parse
                 throw Error("Expected expression in function definition", q);
             }
 
-
-            //// Turn args into lambdas.
-            //while (parameters.TryPop(out string arg))
-            //{
-            //    var argNode = new PsParam(arg);
-            //    var expn = scopedExpn.Expression;
-            //    var lambda = new PsLambdaExpn(argNode, expn, p);
-            //    scopedExpn = new PsScopedFuncExpn(lambda, scopedExpn.FuncDefinitions, p);
-            //}
-
-            node = new(names, parameters, isPrivate, typeExpn, expn, fixity, p);
+            node = new(name, parameters, isPrivate, typeExpn, expn, fixity, p);
             queue = q;
 
             return true;
         }
 
         private static bool ParsePrefix(ref TokenQueue queue,
-                                        out List<string> names,
+                                        out string name,
                                         out List<PsParam> parameters,
                                         out eFixity fixity)
         {
             var q = queue;
-
-            names = new List<string>();
             parameters = new List<PsParam>();
             fixity = eFixity.Prefix;
 
-            // Names
-            if (!Finds(TokenType.Lowercase | TokenType.Symbol, ref q, out string name)) { return false; }
-            names.Add(name);
-            while (Finds(",", ref q))
-            {
-                Expects(TokenType.Lowercase | TokenType.Symbol, ref q, out string nextName);
-                names.Add(nextName);
-            }
+            // Name
+            if (!Finds(TokenType.Lowercase | TokenType.Symbol, ref q, out name)) { return false; }
 
             // Arguments
             var pp = q.Position;
@@ -131,13 +109,13 @@ namespace Transpiler.Parse
         }
 
         private static bool ParseInfix(ref TokenQueue queue,
-                                       out List<string> names,
+                                       out string name,
                                        out List<PsParam> parameters,
                                        out eFixity fixity)
         {
             var q = queue;
 
-            names = new List<string>();
+            name = null;
             parameters = new List<PsParam>();
             fixity = eFixity.Postfix;
 
@@ -146,9 +124,8 @@ namespace Transpiler.Parse
             parameters.Add(new PsParam(param1, Position: p1));
 
             if (!Finds("(", ref q)) { return false; }
-            Expects(TokenType.Lowercase | TokenType.Symbol, ref q, out string fnName);
+            Expects(TokenType.Lowercase | TokenType.Symbol, ref q, out name);
             Expects(")", ref q);
-            names.Add(fnName);
 
             var p2 = q.Position;
             if (Finds(TokenType.Lowercase, ref q, out string param2))
@@ -161,22 +138,19 @@ namespace Transpiler.Parse
             return true;
         }
 
-
         public string PrintSignature(int indent)
         {
             string accessMod = IsPrivate ? "_ " : "";
-            string names = Names.Separate(", ");
             string parameters = Parameters.Select(p => p.Print(0)).Separate(" ", prepend: " ");
-            return string.Format("{0}{1}{2}", accessMod, names, parameters);
+            return string.Format("{0}{1}{2}", accessMod, Name, parameters);
         }
 
         public string Print(int i)
         {
             string accessMod = IsPrivate ? "_ " : "";
-            string names = Names.Separate(", ");
             string parameters = Parameters.Select(p => p.Print(0)).Separate(" ", prepend: " ");
 
-            string s = string.Format("{0}{1}{2}", accessMod, names, parameters);
+            string s = string.Format("{0}{1}{2}", accessMod, Name, parameters);
             if (TypeExpression != null)
             {
                 s += string.Format(" :: {0}", TypeExpression.Print(i + 1));

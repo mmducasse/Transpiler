@@ -11,7 +11,7 @@ namespace Transpiler.Parse
     {
         public string ModuleName { get; set; } = null;
         public List<PsImportNode> ImportedModules { get; } = new();
-        public List<PsFuncDefn> FuncDefns { get; } = new();
+        public List<IPsFuncStmtDefn> FuncDefns { get; } = new();
         public List<IPsTypeDefn> TypeDefns { get; } = new();
         public List<PsClassTypeDefn> ClassDefns { get; } = new();
         public List<PsClassInstDefn> InstDefns { get; } = new();

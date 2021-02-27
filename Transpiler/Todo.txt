@@ -10,6 +10,7 @@ TODO:
 - DataType accessor functions
 - Add core libraries to project
 - Make recursion, mutual recursion type checkable (batch type inference based on dependencies)
+- Make private indicators do something
 
 - Explict type annotations inline
 - Operator associativity

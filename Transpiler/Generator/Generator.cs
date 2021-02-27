@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using Transpiler.Analysis;
 
@@ -48,6 +46,11 @@ namespace Transpiler.Generate
                     funcDefn.Expression != null)
                 {
                     var gnFunc = GnFuncDefn.Prepare(scope, funcDefn);
+                    gnFunc.Generate(0, new("a"), ref g);
+                }
+                else if (func is AzDectorFuncDefn funcDectorDefn)
+                {
+                    var gnFunc = GnDectorFuncDefn.Prepare(scope, funcDectorDefn);
                     gnFunc.Generate(0, new("a"), ref g);
                 }
                 else if (func is Operator op)

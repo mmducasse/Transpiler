@@ -1,16 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Transpiler.Analysis;
-using Transpiler.Parse;
+﻿using Transpiler.Analysis;
 using static Transpiler.Extensions;
 
 namespace Transpiler.Generate
 {
-    // Todo: Add optional Type constraint property.
-    public record GnFuncDefn(string Name,
-                             IGnFuncExpn Expression) : IGnFuncStmtDefn
+    public record GnDectorFuncDefn(string ElementName,
+                                   int ElementIndex,
+                                   IGnFuncExpn Expression) : IGnFuncStmtDefn
     {
-        public static GnFuncDefn Prepare(IScope scope, AzFuncDefn funcDefn)
+        public string Name => ElementName;
+
+        public static GnDectorFuncDefn Prepare(IScope scope, AzDectorFuncDefn funcDefn)
         {
             var expn = IGnFuncExpn.Prepare(scope, funcDefn.Expression);
 
@@ -27,7 +26,7 @@ namespace Transpiler.Generate
                 }
             }
 
-            return new GnFuncDefn(funcDefn.Name, expn);
+            return new GnDectorFuncDefn(funcDefn.ElementName, funcDefn.ElementIndex, expn);
         }
 
         public string Generate(int i, NameProvider names, ref string s)
@@ -38,12 +37,10 @@ namespace Transpiler.Generate
         public string Generate(int i, NameProvider names, string namePrefix, ref string s)
         {
             string name = namePrefix.Generated() + Name.SafeNameGenerated();
-            //string helperName = "c" + namePrefix.Generated() + Name.SafeName();
             s += string.Format("{0}function {1}() {{\n", Indent(i), name);
             string expnRes = Expression.Generate(i + 1, names, ref s);
-            s += string.Format("{0}return {1}\n", Indent(i + 1), expnRes);
+            s += string.Format("{0}return Get({1}, {2})\n", Indent(i + 1), ElementIndex, expnRes);
             s += Indent(i) + "}\n";
-            //s += string.Format("{0}const {1} = {2}()\n", Indent(i), name, helperName);
 
             return name;
         }

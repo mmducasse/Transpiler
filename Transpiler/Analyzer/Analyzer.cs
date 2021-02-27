@@ -91,21 +91,19 @@ namespace Transpiler.Analysis
             }
 
             // Add all top-level function definitions to scope.
-            Dictionary<AzFuncDefn, PsFuncDefn> funcDefnsDict = new();
+            Dictionary<IAzFuncStmtDefn, IPsFuncStmtDefn> funcDefnsDict = new();
             foreach (var psFunc in results.FuncDefns)
             {
-                foreach (var azFunc in AzFuncDefn.Initialize(fileScope, psFunc))
+                foreach (var azFunc in IAzFuncStmtDefn.Initialize(fileScope, psFunc))
                 {
                     funcDefnsDict[azFunc] = psFunc;
                 }
             }
 
             // Analyze functions.
-            //List<AzFuncDefn> newFns = new();
             foreach (var (azFunc, psFunc) in funcDefnsDict)
             {
-                AzFuncDefn.Analyze(fileScope, new("p"), azFunc, psFunc);
-                //newFns.Add(azFunc);
+                IAzFuncStmtDefn.Analyze(fileScope, new("p"), azFunc, psFunc);
             }
 
             foreach (var (psInst, azInst) in instDefnsDict)
@@ -126,24 +124,24 @@ namespace Transpiler.Analysis
             }
         }
 
-        public static IReadOnlyList<AzFuncDefn> AnalyzeFunctions(Scope scope,
-                                                                 IReadOnlyList<PsFuncDefn> psFuncDefns)
+        public static IReadOnlyList<IAzFuncStmtDefn> AnalyzeFunctions(Scope scope,
+                                                                      IReadOnlyList<IPsFuncStmtDefn> psFuncDefns)
         {
             // Add all function definitions at this level to scope.
-            Dictionary<AzFuncDefn, PsFuncDefn> funcDefnsDict = new();
+            Dictionary<IAzFuncStmtDefn, IPsFuncStmtDefn> funcDefnsDict = new();
             foreach (var psFunc in psFuncDefns)
             {
-                foreach (var azFunc in AzFuncDefn.Initialize(scope, psFunc))
+                foreach (var azFunc in IAzFuncStmtDefn.Initialize(scope, psFunc))
                 {
                     funcDefnsDict[azFunc] = psFunc;
                 }
             }
 
             // Analyze functions.
-            List<AzFuncDefn> newFns = new();
+            List<IAzFuncStmtDefn> newFns = new();
             foreach (var (azFunc, psFunc) in funcDefnsDict)
             {
-                AzFuncDefn.Analyze(scope, new("p"), azFunc, psFunc);
+                IAzFuncStmtDefn.Analyze(scope, new("p"), azFunc, psFunc);
                 newFns.Add(azFunc);
             }
 

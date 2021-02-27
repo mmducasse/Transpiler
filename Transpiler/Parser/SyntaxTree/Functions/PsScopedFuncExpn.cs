@@ -5,7 +5,7 @@ using static Transpiler.Parse.ParserUtils;
 namespace Transpiler.Parse
 {
     public record PsScopedFuncExpn(IPsFuncExpn Expression,
-                                   IReadOnlyList<PsFuncDefn> FuncDefinitions,
+                                   IReadOnlyList<IPsFuncStmtDefn> FuncDefinitions,
                                    CodePosition Position) : IPsFuncExpn
     {
         public static bool Parse(ref TokenQueue queue, out IPsFuncExpn node)
@@ -49,7 +49,7 @@ namespace Transpiler.Parse
             var q = queue;
             var p = q.Position;
             int indent = q.Indent;
-            var subDefns = new List<PsFuncDefn>();
+            var subDefns = new List<IPsFuncStmtDefn>();
 
             if (!IPsFuncExpn.Parse(ref q, isInline: false, out var expn)) { return false; }
 
@@ -66,7 +66,10 @@ namespace Transpiler.Parse
             while (Finds(TokenType.NewLine, ref q) &&
                    FindsIndents(ref q, indent + 1))
             {
-                if (!PsFuncDefn.ParseDefn(ref q, out var funcDefnNode))
+                IPsFuncStmtDefn funcDefnNode = null;
+                if (PsDectorFuncDefn.Parse(ref q, out var funcDefn)) { funcDefnNode = funcDefn; }
+                else if (PsFuncDefn.ParseDefn(ref q, out var funcDectorDefn)) { funcDefnNode = funcDectorDefn; }
+                else
                 {
                     throw Error("Expected function definition.", q);
                 }

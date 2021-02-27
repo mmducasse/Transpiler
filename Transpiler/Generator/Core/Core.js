@@ -2,7 +2,7 @@
 
 
 // Gets the ith element from a composite data object.
-function Get(x, i)
+function Get(i, x)
 {
 	return x[i + 1]
 }

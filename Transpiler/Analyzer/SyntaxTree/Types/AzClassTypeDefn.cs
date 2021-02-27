@@ -50,7 +50,7 @@ namespace Transpiler.Analysis
             foreach (var funcNode in node.Functions)
             {
                 var funcDefn = AzFuncDefn.Initialize(scope, funcNode);
-                funcDefns.AddRange(funcDefn);
+                funcDefns.Add(funcDefn);
             }
             foreach (var funcDefn in funcDefns)
             {

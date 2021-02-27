@@ -8,7 +8,7 @@ namespace Transpiler
     {
         string Name { get; }
 
-        IReadOnlyList<AzFuncDefn> AllFunctions();
+        IReadOnlyList<IAzFuncStmtDefn> AllFunctions();
 
         IReadOnlyDictionary<string, IAzFuncDefn> FuncDefinitions { get; }
 
@@ -73,14 +73,14 @@ namespace Transpiler
             Dependencies.AddRange(parentScope.ToArr());
         }
 
-        public IReadOnlyList<AzFuncDefn> AllFunctions()
+        public IReadOnlyList<IAzFuncStmtDefn> AllFunctions()
         {
-            List<AzFuncDefn> all = new();
+            List<IAzFuncStmtDefn> all = new();
             foreach (var (_, func) in FuncDefinitions)
             {
-                if (func is AzFuncDefn funcDefn)
+                if (func is IAzFuncStmtDefn funcStmtDefn)
                 {
-                    all.Add(funcDefn);
+                    all.Add(funcStmtDefn);
                 }
             }
 
@@ -88,9 +88,9 @@ namespace Transpiler
             {
                 foreach (var func in inst.Functions)
                 {
-                    if (func is AzFuncDefn funcDefn)
+                    if (func is IAzFuncStmtDefn funcStmtDefn)
                     {
-                        all.Add(funcDefn);
+                        all.Add(funcStmtDefn);
                     }
                 }
             }

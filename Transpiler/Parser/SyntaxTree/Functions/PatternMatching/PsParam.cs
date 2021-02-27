@@ -1,4 +1,5 @@
-﻿using static Transpiler.Parse.ParserUtils;
+﻿using System.Collections.Generic;
+using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {

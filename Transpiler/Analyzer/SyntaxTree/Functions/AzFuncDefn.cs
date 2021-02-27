@@ -5,15 +5,8 @@ using static Transpiler.UI;
 
 namespace Transpiler.Analysis
 {
-    public interface IAzFuncDefn : IAzDefn, IAzFuncStmt
-    {
-        eFixity Fixity { get; }
-
-        IAzTypeExpn ExplicitType { get; }
-    }
-
     // Todo: Add optional Type constraint property.
-    public class AzFuncDefn : IAzFuncDefn
+    public class AzFuncDefn : IAzFuncStmtDefn
     {
         public string Name { get; }
 
@@ -38,8 +31,8 @@ namespace Transpiler.Analysis
             Position = position;
         }
 
-        public static IReadOnlyList<AzFuncDefn> Initialize(Scope scope,
-                                                           PsFuncDefn node)
+        public static AzFuncDefn Initialize(Scope scope,
+                                            PsFuncDefn node)
         {
             // Analyze the function's explicit type, if it is provided.
             IAzTypeExpn explicitType = null;
@@ -48,23 +41,9 @@ namespace Transpiler.Analysis
                 explicitType = IAzTypeExpn.Analyze(scope, node.TypeExpression);
             }
 
-            if (node.Names.Count == 1)
-            {
-                var funcDefn = new AzFuncDefn(node.Names[0], explicitType, node.Fixity, node.Position);
-                scope.AddFunction(funcDefn);
-                return funcDefn.ToArr();
-            }
-            else
-            {
-                List<AzFuncDefn> dectorFuncDefns = new();
-                for (int i = 0; i < node.Names.Count; i++)
-                {
-                    var funcDefn = new AzDectorFuncDefn(node.Names[i], i, node.Position);
-                    scope.AddFunction(funcDefn);
-                    dectorFuncDefns.Add(funcDefn);
-                }
-                return dectorFuncDefns;
-            }
+            var funcDefn = new AzFuncDefn(node.Name, explicitType, node.Fixity, node.Position);
+            scope.AddFunction(funcDefn);
+            return funcDefn;
         }
 
         public static AzFuncDefn Analyze(Scope parentScope,
@@ -90,16 +69,6 @@ namespace Transpiler.Analysis
                 expn = new AzLambdaExpn(paramDefn, expn, paramDefn.Position);
             }
 
-            //if (funcDefn is AzDectorFuncDefn dectorFuncDefn)
-            //{
-            //    // Todo: take expn and pack it inside getN call.
-
-            //    funcDefn.ScopedExpression = expn;
-
-            //    return funcDefn;
-            //}
-
-            //funcDefn.ScopedExpression = new AzScopedFuncExpn(expn, scopedFuncDefns, scope, innerScopedExpn.Position);
             funcDefn.Expression = expn;
 
             return funcDefn;
@@ -148,25 +117,6 @@ namespace Transpiler.Analysis
         {
             Pr("{0} :: ", Name);
             PrLn(ExplicitType.Print(0), foregroundColor: Yellow);
-        }
-    }
-
-    public class AzDectorFuncDefn : AzFuncDefn
-    {
-        public int TupleIndex { get; }
-
-        public AzDectorFuncDefn(string name,
-                                int tupleIndex,
-                                CodePosition position)
-            : base(name, null, eFixity.Prefix, position)
-        {
-            TupleIndex = tupleIndex;
-        }
-
-        public override string Print(int i)
-        {
-            string type = (ExplicitType == null) ? "" : " :: " + ExplicitType.Print(0);
-            return string.Format("{0}{1} = GET{2} ({3})", Name, type, TupleIndex, Expression.Print(i + 1));
         }
     }
 }

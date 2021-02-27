@@ -1,18 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Analysis;
-using static Transpiler.Extensions;
 
 namespace Transpiler.Generate
 {
     public record GnScopedFuncExpn(IGnFuncExpn Expression,
-                                   IReadOnlyList<GnFuncDefn> FuncDefinitions,
+                                   IReadOnlyList<IGnFuncStmtDefn> FuncDefinitions,
                                    IScope Scope) : IGnFuncExpn
     {
         public static GnScopedFuncExpn Prepare(AzScopedFuncExpn scopedExpn)
         {
             var expn = IGnFuncExpn.Prepare(scopedExpn.Scope, scopedExpn.Expression);
-            var fns = scopedExpn.FuncDefinitions.Select(f => GnFuncDefn.Prepare(scopedExpn.Scope, f)).ToList();
+            var fns = scopedExpn.FuncDefinitions.Select(f => IGnFuncStmtDefn.Prepare(scopedExpn.Scope, f)).ToList();
 
             return new(expn, fns, scopedExpn.Scope);
         }

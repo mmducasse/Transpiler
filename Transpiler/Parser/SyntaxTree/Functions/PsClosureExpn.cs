@@ -24,7 +24,7 @@ namespace Transpiler.Parse
             while (FindsIndents(ref q, indent + 1))
             {
                 if (IPsFuncExpn.Parse(ref q, isInline: true, out var funcExpn)) { lines.Add(funcExpn); }
-                else if (PsFuncDefn.ParseDefn(ref q, out var funcDefn)) { lines.Add(funcDefn); }
+                else if (IPsFuncStmtDefn.Parse(ref q, out var funcStmtDefn)) { lines.Add(funcStmtDefn); }
                 else
                 {
                     throw Error("Expected statement or expression in closure.", q.Position);

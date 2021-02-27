@@ -26,10 +26,10 @@ namespace Transpiler.Generate
             {
                 var instFunc = instDefn.Functions[i];
 
-                if (instFunc is AzFuncDefn funcDefn &&
-                    funcDefn.Expression != null)
+                if (instFunc is IAzFuncStmtDefn funcStmtDefn &&
+                    funcStmtDefn.Expression != null)
                 {
-                    var gnFunc = GnFuncDefn.Prepare(scope, funcDefn);
+                    var gnFunc = IGnFuncStmtDefn.Prepare(scope, funcStmtDefn);
                     string instFuncName = gnFunc.Generate(0, new("a"), instDefn.Implementor.Name, ref s);
                     s += "\n";
 
