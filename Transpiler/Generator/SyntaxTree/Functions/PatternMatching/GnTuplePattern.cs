@@ -42,12 +42,12 @@ namespace Transpiler.Generate
                 if (Elements[idx] is GnParam)
                 {
                     string result = Elements[idx].Generate();
-                    s += string.Format("{0}{1} = Get({2}, {3})\n", Indent(i), result, arg, idx);
+                    s += string.Format("{0}{1} = Get({2}, {3})\n", Indent(i), result, idx, arg);
                 }
                 if (Elements[idx] is IGnDectorPattern dectorPattern)
                 {
                     string name = names.Next;
-                    s += string.Format("{0}{1} = Get({2}, {3})\n", Indent(i), name, arg, idx);
+                    s += string.Format("{0}{1} = Get({2}, {3})\n", Indent(i), name, idx, arg);
                     dectorPattern.GenerateAccessors(i, name, names, ref s);
                 }
             }

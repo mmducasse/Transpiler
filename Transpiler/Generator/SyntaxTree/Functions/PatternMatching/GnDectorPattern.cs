@@ -44,12 +44,12 @@ namespace Transpiler.Generate
                 if (Variables[idx] is GnParam)
                 {
                     string result = Variables[idx].Generate();
-                    s += string.Format("{0}{1} = Get({2}, {3})\n", Indent(i), result, arg, idx);
+                    s += string.Format("{0}{1} = Get({2}, {3})\n", Indent(i), result, idx, arg);
                 }
                 if (Variables[idx] is IGnDectorPattern dectorPattern)
                 {
                     string name = names.Next;
-                    s += string.Format("{0}{1} = Get({2}, {3})\n", Indent(i), name, arg, idx);
+                    s += string.Format("{0}{1} = Get({2}, {3})\n", Indent(i), name, idx, arg);
                     dectorPattern.GenerateAccessors(i, name, names, ref s);
                 }
             }

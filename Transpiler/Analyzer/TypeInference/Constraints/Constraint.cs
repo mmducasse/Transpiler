@@ -138,7 +138,7 @@ namespace Transpiler.Analysis
                 return IConstraint.Unify(scope, cs2, tvProvider);
             }
 
-            string errorMsg = string.Format("Type inference failed ({0} != {1}).",
+            string errorMsg = string.Format("Type inference failed: ({0}) != ({1}).",
                                             c.A.PrintWithRefinements(),
                                             c.B.PrintWithRefinements());
             throw Analyzer.Error(errorMsg, c.Position);

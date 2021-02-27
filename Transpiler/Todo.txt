@@ -1,18 +1,15 @@
 ﻿
 IMPROVEMENTS:
 
-- Az: Move Unify cases into their own methods.
 - Gn: Need to add type parameters to scope in Prepare, do this in functin args all at once
 
 TODO:
 
 - Add vars in REPL
-- GetN method that extracts element from tuple
-- DataType accessor functions
 - Add core libraries to project
 - Make recursion, mutual recursion type checkable (batch type inference based on dependencies)
-- Make private indicators do something
 
+- Make private indicators do something
 - Explict type annotations inline
 - Operator associativity
 - $0, $1, etc to represent lambda inputs

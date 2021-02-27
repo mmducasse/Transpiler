@@ -18,6 +18,7 @@ namespace Transpiler
         public Dictionary<string, Module> mModules = new();
 
         private string mOutput = "";
+        private bool mIsCompiled = false;
 
         public static bool DebugCore { get; } = false;
         public static bool DebugParser { get; } = false;
@@ -76,6 +77,7 @@ namespace Transpiler
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.WriteLine(funcDefn.Print(0));
 
+                        CompileModulesToJs();
                         AddCompiledInputModule(inputModule);
                         ExecOutputFile();
                     }
@@ -93,6 +95,8 @@ namespace Transpiler
             rootFolder = @"C:\Users\matth\Desktop\FunctionalCode\"; // rootFolder.Trim();
             if (Directory.Exists(rootFolder))
             {
+                mIsCompiled = false;
+
                 Console.Write("Loading... ");
                 var files = Directory.GetFiles(rootFolder, "*.hs", SearchOption.AllDirectories);
                 List<Module> newModules = new();
@@ -159,6 +163,7 @@ namespace Transpiler
 
         private void CompileModulesToJs()
         {
+            if (mIsCompiled) { return; }
             var output = new StringBuilder();
             output.Append(Generator.GetCoreJsCode());
             Generator.GenerateModule("Generated Core Functions", Core.Instance.Scope, ref output);
@@ -169,6 +174,7 @@ namespace Transpiler
             }
 
             mOutput = output.ToString();
+            mIsCompiled = true;
         }
 
         private void AddCompiledInputModule(Module inputModule)

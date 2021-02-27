@@ -16,6 +16,13 @@ namespace Transpiler.Parse
             if (Finds("[", ref q))
             {
                 List<IPsFuncExpn> elements = new();
+                if (Finds("]", ref q))
+                {
+                    node = new PsListLiteral(elements, p);
+                    queue = q;
+                    return true;
+                }
+
                 while (!Finds(TokenType.NewLine, ref q))
                 {
                     if (!PsArbExpn.Parse(ref q, isInline: true, out var arbNode))

@@ -47,8 +47,8 @@ function PrintResult(output) {
 
 	}
 	else if (Match(output, ["Node", null, null])) {
-		var a = Get(output, 0)
-		var b = Get(output, 1)
+		var a = Get(0, output)
+		var b = Get(1, output)
 		if (typeof a == 'string') {
 			process.stdout.write(a)
 		}
