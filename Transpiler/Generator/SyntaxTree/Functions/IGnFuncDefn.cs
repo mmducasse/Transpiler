@@ -7,11 +7,11 @@ namespace Transpiler.Generate
     {
     }
 
-    public interface IGnFuncStmtDefn : IGnFuncDefn, IGnFuncStmt
+    public interface IGnFuncStmtDefn : IGnFuncDefn
     {
         string Generate(int i, NameProvider names, string namePrefix, ref string s);
 
-        public static IGnFuncStmtDefn Prepare(IScope scope, IAzFuncStmtDefn defn)
+        public static IGnFuncStmtDefn Prepare(Scope scope, IAzFuncStmtDefn defn)
         {
             return defn switch
             {

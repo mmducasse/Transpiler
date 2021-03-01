@@ -15,14 +15,10 @@ namespace Transpiler.Parse
 
             if (ParseLambda(ref q, out var lambdaNode)) { node = lambdaNode; }
             else if (ParseScopedExpn(ref q, out var scopedNode)) { node = scopedNode; }
+            else { return false; }
 
-            if (node != null)
-            {
-                queue = q;
-                return true;
-            }
-
-            return false;
+            queue = q;
+            return true;
         }
 
         private static bool ParseLambda(ref TokenQueue queue, out IPsFuncExpn node)

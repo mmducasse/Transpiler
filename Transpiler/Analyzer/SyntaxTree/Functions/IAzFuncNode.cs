@@ -4,7 +4,7 @@ namespace Transpiler.Analysis
 {
     public interface IAzFuncNode : IAzNode
     {
-        IAzTypeExpn Type { get; set; }
+        IAzTypeExpn Type { get; }
 
         ConstraintSet Constrain(TvProvider provider, Scope scope);
 

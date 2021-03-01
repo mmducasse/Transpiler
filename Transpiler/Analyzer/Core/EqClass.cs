@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using static Transpiler.Analysis.OperatorUtil;
 using static Transpiler.Extensions;
+using static Transpiler.Analysis.Core;
 
 namespace Transpiler.Analysis
 {
@@ -27,14 +28,14 @@ namespace Transpiler.Analysis
 
             var type = AzTypeLambdaExpn.Make(a, a, @bool.ToCtor());
 
-            var fEq = new AzFuncDefn("==", type, eFixity.Infix, true, CodePosition.Null);
-            var fNeq = new AzFuncDefn("!=", type, eFixity.Infix, true, CodePosition.Null);
+            var fEq = CreateFunction("==", type); // new AzFuncDefn("==", type, eFixity.Infix, true, CodePosition.Null);
+            var fNeq = CreateFunction("!=", type); // new AzFuncDefn("!=", type, eFixity.Infix, true, CodePosition.Null);
 
             eq.Functions = RList(fEq, fNeq);
 
             scope.AddType(eq);
-            scope.AddFunction(fEq, fEq.ExplicitType);
-            scope.AddFunction(fNeq, fNeq.ExplicitType);
+            scope.AddFunction(fEq, fEq.Type);
+            scope.AddFunction(fNeq, fNeq.Type);
             return eq;
         }
 

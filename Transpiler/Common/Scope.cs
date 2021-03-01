@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Transpiler.Analysis;
+using Transpiler.Generate;
 
 namespace Transpiler
 {
@@ -33,6 +34,8 @@ namespace Transpiler
         bool TryGetCommonSupertypeOf(IReadOnlyList<IAzTypeExpn> subtypes,
                                      out HashSet<IAzTypeSetDefn> supertypes);
 
+        bool GetGnFuncTypeParamAlreadyExists(Refinement refinement);
+
         void PrintTypeHeirarchy();
     }
 
@@ -56,6 +59,8 @@ namespace Transpiler
         private List<AzClassInstDefn> mClassInstances = new();
 
         private Dictionary<string, TypeVariable> TypeVariables { get; } = new();
+
+        public HashSet<Refinement> GnFuncTypeParams { get; } = new();
 
         public Scope()
         {
@@ -370,6 +375,29 @@ namespace Transpiler
             {
                 Console.WriteLine(inst.Print(0));
             }
+        }
+
+        public void GnAddTypeParam(Refinement refinement)
+        {
+            GnFuncTypeParams.Add(refinement);
+        }
+
+        public bool GetGnFuncTypeParamAlreadyExists(Refinement refinement)
+        {
+            if (GnFuncTypeParams.Contains(refinement))
+            {
+                return true;
+            }
+
+            foreach (var d in Dependencies)
+            {
+                if (d.GetGnFuncTypeParamAlreadyExists(refinement))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void PrintTypeHeirarchy()

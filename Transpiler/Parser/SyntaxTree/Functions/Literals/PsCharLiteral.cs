@@ -13,11 +13,6 @@ namespace Transpiler.Parse
 
             if (Finds(TokenType.SingleQuoted, ref q, out string value))
             {
-                if (value.Length != 1)
-                {
-                    throw Error("Single quotes must contain a single character.", p);
-                }
-
                 node = new(value, p);
                 queue = q;
                 return true;

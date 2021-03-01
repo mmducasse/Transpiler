@@ -10,17 +10,18 @@ namespace Transpiler.Analysis
         string Value { get; }
 
         public static IAzFuncExpn Analyze(Scope scope,
-                                          NameProvider provider,
+                                          NameProvider names,
+                                          TvProvider tvs,
                                           IPsLiteralExpn node)
         {
             return node switch
             {
-                PsIntLiteral intLit => AzIntLiteral.Analyze(scope, provider, intLit),
-                PsRealLiteral realLit => AzRealLiteral.Analyze(scope, provider, realLit),
-                PsCharLiteral charLit => AzCharLiteral.Analyze(scope, provider, charLit),
-                PsStringLiteral stringLit => AzStringLiteral.Analyze(scope, provider, stringLit),
-                PsListLiteral listLit => AzListLiteral.Analyze(scope, provider, listLit),
-                PsUndefinedLiteral undefLit => AzUndefinedLiteral.Analyze(scope, provider, undefLit),
+                PsIntLiteral intLit => AzIntLiteral.Analyze(intLit),
+                PsRealLiteral realLit => AzRealLiteral.Analyze(realLit),
+                PsCharLiteral charLit => AzCharLiteral.Analyze(charLit),
+                PsUndefinedLiteral undefLit => AzUndefinedLiteral.Analyze(undefLit),
+                PsStringLiteral stringLit => AzStringLiteral.Analyze(scope, names, tvs, stringLit),
+                PsListLiteral listLit => AzListLiteral.Analyze(scope, names, tvs, listLit),
                 _ => throw new ArgumentException(),
             };
         }

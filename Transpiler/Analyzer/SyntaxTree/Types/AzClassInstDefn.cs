@@ -60,8 +60,8 @@ namespace Transpiler.Analysis
                         {
                             throw Analyzer.Error("Duplicate nstance function " + funcDefn.Name + ".", node.Position);
                         }
-                        var explicitType = classFuncDefn.ExplicitType.Substitute(instSub);
-                        funcDefn.ExplicitType = explicitType;
+                        var explicitType = classFuncDefn.Type.Substitute(instSub);
+                        funcDefn.Type = explicitType;
                         funcDefns[classFuncDefn] = funcDefn;
                     }
 
@@ -93,6 +93,7 @@ namespace Transpiler.Analysis
         }
 
         public static AzClassInstDefn Analyze(Scope scope,
+                                              TvProvider tvs,
                                               AzClassInstDefn classInstDefn,
                                               PsClassInstDefn node)
         {
@@ -102,7 +103,7 @@ namespace Transpiler.Analysis
                 {
                     if (funcDefn.Name == funcsNode.Name)
                     {
-                        AzFuncDefn.Analyze(scope, new("p"), funcDefn as AzFuncDefn, funcsNode);
+                        AzFuncDefn.Analyze(scope, new("p"), tvs, funcDefn as AzFuncDefn, funcsNode);
                     }
                 }
             }

@@ -16,7 +16,7 @@ namespace Transpiler.Parse
         public static bool ParseDefn(ref TokenQueue queue, out PsFuncDefn node)
         {
             return Parse(ref queue,
-                         forceExplicitType: false,
+                         forceType: false,
                          forceExpression: true,
                          out node);
         }
@@ -24,13 +24,13 @@ namespace Transpiler.Parse
         public static bool ParseDecl(ref TokenQueue queue, out PsFuncDefn node)
         {
             return Parse(ref queue,
-                         forceExplicitType: true,
+                         forceType: true,
                          forceExpression: false,
                          out node);
         }
 
         private static bool Parse(ref TokenQueue queue,
-                                  bool forceExplicitType,
+                                  bool forceType,
                                   bool forceExpression,
                                   out PsFuncDefn node)
         {
@@ -59,7 +59,7 @@ namespace Transpiler.Parse
                     throw Error("Expected type expression after '::'.", q);
                 }
             }
-            else if (forceExplicitType)
+            else if (forceType)
             {
                 throw Error("Expected explicit type in function declaration.", q);
             }

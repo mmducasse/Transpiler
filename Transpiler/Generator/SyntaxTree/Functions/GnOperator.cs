@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Transpiler.Analysis;
+﻿using Transpiler.Analysis;
 using static Transpiler.Extensions;
 
 namespace Transpiler.Generate

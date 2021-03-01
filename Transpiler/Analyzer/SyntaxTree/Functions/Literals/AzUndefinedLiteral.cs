@@ -11,29 +11,24 @@ namespace Transpiler.Analysis
         private static TypeVariable mCertainType = TypeVariable.Simple(0);
         public IAzTypeDefn CertainType => mCertainType;
 
-        public IAzTypeExpn Type
-        {
-            get => mCertainType;
-            set
-            {
-                if (value != CertainType)
-                {
-                    //throw new Exception();
-                }
-            }
-        }
+        public IAzTypeExpn Type => mCertainType;
 
-        public static AzUndefinedLiteral Analyze(Scope scope,
-                                                 NameProvider provider,
-                                                 PsUndefinedLiteral node)
+        public static AzUndefinedLiteral Analyze(PsUndefinedLiteral psUndefLit)
         {
-            return new(node.Position);
+            return new(psUndefLit.Position);
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope) => ConstraintSet.Empty;
 
+        public IAzFuncExpn SubstituteType(Substitution s) => this;
+
         public IReadOnlyList<IAzFuncNode> GetSubnodes() => this.ToArr();
 
         public string Print(int indent) => "Undefined";
+
+        IAzPattern IAzPattern.SubstituteType(Substitution s)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

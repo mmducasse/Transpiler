@@ -11,15 +11,16 @@ namespace Transpiler.Analysis
             // Create the top-level scope.
             var fileScope = new Scope(Core.Instance.Scope.ToArr());
             module.Scope = fileScope;
+            TvProvider tvs = new();
 
             // Find and analyze usings.
             AnalyzeDependencies(module, dependents);
 
             // Analyze types and functions in module.
-            AnalyzeFile(fileScope, module.ParseResult);
+            AnalyzeFile(fileScope, tvs, module.ParseResult);
 
             // Apply HM type inference alg to functions.
-            SolveFunctions(fileScope);
+            SolveFunctions(fileScope, tvs);
 
             // Perform any more verification needed after type inference is done.
             PostAnalyze(fileScope);
@@ -61,7 +62,7 @@ namespace Transpiler.Analysis
             dependents.Pop();
         }
 
-        private static void AnalyzeFile(Scope fileScope, ParseResult results)
+        private static void AnalyzeFile(Scope fileScope, TvProvider tvs, ParseResult results)
         {
             // Add all top-level data and union definitions to Scope.
             Dictionary<IPsTypeDefn, IAzTypeDefn> typeDefnsDict = new();
@@ -87,7 +88,7 @@ namespace Transpiler.Analysis
             // Analyze expressions of types.
             foreach (var (psType, azType) in typeDefnsDict)
             {
-                IAzTypeDefn.Analyze(fileScope, azType, psType);
+                IAzTypeDefn.Analyze(fileScope, tvs, azType, psType);
             }
 
             // Add all top-level function definitions to scope.
@@ -103,28 +104,29 @@ namespace Transpiler.Analysis
             // Analyze functions.
             foreach (var (azFunc, psFunc) in funcDefnsDict)
             {
-                IAzFuncStmtDefn.Analyze(fileScope, new("p"), azFunc, psFunc);
+                IAzFuncStmtDefn.Analyze(fileScope, new("p"), tvs, azFunc, psFunc);
             }
 
             foreach (var (psInst, azInst) in instDefnsDict)
             {
-                AzClassInstDefn.Analyze(fileScope, azInst, psInst);
+                AzClassInstDefn.Analyze(fileScope, tvs, azInst, psInst);
             }
 
             // Analyze all class functions in file.
             foreach (var (psClass, azClass) in classDefnsDict)
             {
-                IAzTypeDefn.Analyze(fileScope, azClass, psClass);
+                IAzTypeDefn.Analyze(fileScope, tvs, azClass, psClass);
             }
 
             // Analyze all instance functions in file.
             foreach (var (psClass, azClass) in classDefnsDict)
             {
-                IAzTypeDefn.Analyze(fileScope, azClass, psClass);
+                IAzTypeDefn.Analyze(fileScope, tvs, azClass, psClass);
             }
         }
 
         public static IReadOnlyList<IAzFuncStmtDefn> AnalyzeFunctions(Scope scope,
+                                                                      TvProvider tvs,
                                                                       IReadOnlyList<IPsFuncStmtDefn> psFuncDefns)
         {
             // Add all function definitions at this level to scope.
@@ -141,66 +143,64 @@ namespace Transpiler.Analysis
             List<IAzFuncStmtDefn> newFns = new();
             foreach (var (azFunc, psFunc) in funcDefnsDict)
             {
-                IAzFuncStmtDefn.Analyze(scope, new("p"), azFunc, psFunc);
+                IAzFuncStmtDefn.Analyze(scope, new("p"), tvs, azFunc, psFunc);
                 newFns.Add(azFunc);
             }
 
             return newFns;
         }
 
-        //public static void TEMP_PrintFnTypes(Scope scope)
-        //{
-        //    foreach (var fn in scope.FuncDefinitions.Values)
-        //    {
-        //        Console.WriteLine("\n\n {0}\n", fn.Name);
-        //        foreach (var node in fn.GetSubnodes())
-        //        {
-        //            string nodeStr = node.Print(0).Replace("\n", "").Replace("\t", "");
-        //            if (nodeStr.Length > 45)
-        //            {
-        //                nodeStr = nodeStr[..44] + "...";
-        //            }
-        //            Console.Write("{0, 50}", nodeStr);
-        //            Console.ForegroundColor = ConsoleColor.Yellow;
-
-        //            if (node.Type != null)
-        //            {
-        //                Console.WriteLine(" :: {0}", node.Type.Print(0));
-        //                Console.ForegroundColor = ConsoleColor.White;
-        //            }
-        //        }
-        //    }
-        //}
-
-        public static void SolveFunctions(Scope scope)
+        public static void TEMP_PrintFnTypes(Scope scope)
         {
-            var provider = new TvProvider();
+            foreach (var fn in scope.FuncDefinitions.Values)
+            {
+                Console.WriteLine("\n\n {0}\n", fn.Name);
+                foreach (var node in fn.GetSubnodes())
+                {
+                    string nodeStr = node.Print(0).Replace("\n", "").Replace("\t", "");
+                    if (nodeStr.Length > 45)
+                    {
+                        nodeStr = nodeStr[..44] + "...";
+                    }
+                    Console.Write("{0, 50}", nodeStr);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
 
+                    if (node.Type != null)
+                    {
+                        Console.WriteLine(" :: {0}", node.Type.PrintWithRefinements());
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                }
+            }
+        }
+
+        public static void SolveFunctions(Scope scope, TvProvider tvs)
+        {
             // Determine a set of type constraints for the 
             // function ASTs of the file.
             foreach (var funcDefn in scope.AllFunctions())
             {
                 if (funcDefn.IsAutoGenerated) { continue; }
-                var constraints = funcDefn.Constrain(provider, scope);
-                Substitution substitution = IConstraint.Unify(scope, constraints, provider);
+                var constraints = funcDefn.Constrain(tvs, scope);
+                Substitution substitution = IConstraint.Unify(scope, constraints, tvs);
 
-                foreach (var node in funcDefn.GetSubnodes())
-                {
-                    if (node.Type != null)
-                    {
-                        node.Type = node.Type.Substitute(substitution);
-                    }
-                }
-
-                funcDefn.ExplicitType = TvUtils.WithUniqueTvs(funcDefn.Type, new());
+                var solvedFuncDefn = funcDefn.SubstituteType(substitution);
 
                 //Console.ForegroundColor = ConsoleColor.Yellow;
-                //Console.WriteLine("\n\n{0} :: {1}", funcDefn.Name, funcDefn.ExplicitType.PrintWithRefinements());
+                //Console.WriteLine("\n\n{0} :: {1}", funcDefn.Name, funcDefn.Type.PrintWithRefinements());
                 //Console.ForegroundColor = ConsoleColor.White;
                 //Console.WriteLine(funcDefn.Print(0));
 
                 scope.FuncDefnTypes[funcDefn] = funcDefn.Type;
             }
+
+            foreach (var funcDefn in scope.AllFunctions())
+            {
+                var uniqueSub = TvUtils.UniqueTvSubstitution(funcDefn.Type, new());
+                funcDefn.SubstituteType(uniqueSub);
+            }
+
+            //TEMP_PrintFnTypes(scope);
         }
 
         private static void PostAnalyze(Scope scope)

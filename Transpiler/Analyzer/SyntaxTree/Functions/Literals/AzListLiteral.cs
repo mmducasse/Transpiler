@@ -7,45 +7,29 @@ namespace Transpiler.Analysis
     public static class AzListLiteral
     {
         public static IAzFuncExpn Analyze(Scope scope,
-                                          NameProvider provider,
+                                          NameProvider names,
+                                          TvProvider tvs,
                                           PsListLiteral listLiteral)
         {
-            var elements = listLiteral.Elements.Select(e => IAzFuncExpn.Analyze(scope, provider, e)).ToList();
+            var elements = listLiteral.Elements.Select(e => IAzFuncExpn.Analyze(scope, names, tvs, e)).ToList();
 
-            return CreateList(scope, elements);
-
-            //scope.TryGetFuncDefn("Empty", out var emptyCtor);
-            //IAzFuncExpn empty = new AzSymbolExpn(emptyCtor, CodePosition.Null);
-
-            //scope.TryGetFuncDefn("Node", out var nodeCtor);
-            //IAzFuncExpn node = new AzSymbolExpn(nodeCtor, CodePosition.Null);
-
-            //IAzFuncExpn head = empty;
-
-            //foreach (var e in listLiteral.Elements.Reverse())
-            //{
-            //    var p = e.Position;
-            //    var element = IAzFuncExpn.Analyze(scope, e);
-            //    head = new AzAppExpn(new AzAppExpn(node, element, p), head, p);
-            //}
-
-            //return head;
+            return CreateList(scope, tvs, elements);
         }
 
-        public static IAzFuncExpn CreateList(Scope scope, IReadOnlyList<IAzFuncExpn> elements)
+        public static IAzFuncExpn CreateList(Scope scope, TvProvider tvs, IReadOnlyList<IAzFuncExpn> elements)
         {
             scope.TryGetFuncDefn("Empty", out var emptyCtor);
-            IAzFuncExpn empty = new AzSymbolExpn(emptyCtor, CodePosition.Null);
+            IAzFuncExpn empty = new AzSymbolExpn(emptyCtor, tvs.Next, CodePosition.Null);
 
             scope.TryGetFuncDefn("Node", out var nodeCtor);
-            IAzFuncExpn node = new AzSymbolExpn(nodeCtor, CodePosition.Null);
+            IAzFuncExpn node = new AzSymbolExpn(nodeCtor, tvs.Next, CodePosition.Null);
 
             IAzFuncExpn head = empty;
 
             foreach (var e in elements.Reverse())
             {
                 var p = e.Position;
-                head = new AzAppExpn(new AzAppExpn(node, e, p), head, p);
+                head = new AzAppExpn(new AzAppExpn(node, e, tvs.Next, p), head, tvs.Next, p);
             }
 
             return head;

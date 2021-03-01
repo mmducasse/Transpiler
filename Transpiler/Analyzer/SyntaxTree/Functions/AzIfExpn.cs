@@ -8,26 +8,23 @@ namespace Transpiler.Analysis
     public record AzIfExpn(IAzFuncExpn Condition,
                            IAzFuncExpn ThenCase,
                            IAzFuncExpn ElseCase,
+                           IAzTypeExpn Type,
                            CodePosition Position) : IAzFuncExpn
     {
-        public IAzTypeExpn Type { get; set; }
-
         public static AzIfExpn Analyze(Scope scope,
-                                       NameProvider provider,
-                                       PsIfExpn ifExpn)
+                                       NameProvider names,
+                                       TvProvider tvs,
+                                       PsIfExpn psIfExpn)
         {
-            var condition = IAzFuncExpn.Analyze(scope, provider, ifExpn.Condition);
-            var thenCase = IAzFuncExpn.Analyze(scope, provider, ifExpn.ThenCase);
-            var elseCase = IAzFuncExpn.Analyze(scope, provider, ifExpn.ElseCase);
+            var condition = IAzFuncExpn.Analyze(scope, names, tvs, psIfExpn.Condition);
+            var thenCase = IAzFuncExpn.Analyze(scope, names, tvs, psIfExpn.ThenCase);
+            var elseCase = IAzFuncExpn.Analyze(scope, names, tvs, psIfExpn.ElseCase);
 
-            var newIfExpn = new AzIfExpn(condition, thenCase, elseCase, ifExpn.Position);
-            return newIfExpn;
+            return new(condition, thenCase, elseCase, tvs.Next, psIfExpn.Position);
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
-            Type = provider.Next;
-
             var csc = Condition.Constrain(provider, scope);
             var cst = ThenCase.Constrain(provider, scope);
             var cse = ElseCase.Constrain(provider, scope);
@@ -54,6 +51,15 @@ namespace Transpiler.Analysis
             s += string.Format("{0}else {1}\n", Indent(i1), ElseCase.Print(i1));
 
             return s;
+        }
+
+        public IAzFuncExpn SubstituteType(Substitution s)
+        {
+            return new AzIfExpn(Condition.SubstituteType(s),
+                                ThenCase.SubstituteType(s),
+                                ElseCase.SubstituteType(s),
+                                Type.Substitute(s),
+                                Position);
         }
 
         public override string ToString() => Print(0);

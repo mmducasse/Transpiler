@@ -234,9 +234,9 @@ namespace Transpiler.Parse
                 q = q.NextCol;
             }
 
-            literal = ParserUtils.CollapseSpecialCharacters(literal);
+            var collapsed = ParserUtils.CollapseSpecialCharacters(literal);
 
-            if (literal.Length != 1) { Error("Single quotes must contain exactly one character.", position); }
+            if (collapsed.Length != 1) { Error("Single quotes must contain exactly one character.", position); }
 
             tokens.Add(TokenType.SingleQuoted, position, literal);
 

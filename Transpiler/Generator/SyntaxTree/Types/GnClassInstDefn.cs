@@ -7,7 +7,7 @@ namespace Transpiler.Generate
 {
     public static class GnClassInstDefn
     {
-        public static void Generate(IScope scope,
+        public static void Generate(Scope scope,
                                     AzClassInstDefn instDefn,
                                     ref StringBuilder output)
         {

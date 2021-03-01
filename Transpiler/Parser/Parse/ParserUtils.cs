@@ -108,6 +108,8 @@ namespace Transpiler.Parse
         {
             var q = queue;
 
+            if (!q.HasCurrent) { return false; }
+
             int i = 0;
             while (q.Current.Type == TokenType.Indent)
             {

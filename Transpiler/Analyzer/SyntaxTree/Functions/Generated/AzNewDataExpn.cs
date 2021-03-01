@@ -3,26 +3,36 @@ using System.Linq;
 
 namespace Transpiler.Analysis
 {
-    public record AzNewDataExpn(AzDataTypeDefn Definition) : IAzFuncExpn
+    public class AzNewDataExpn : IAzFuncExpn
     {
         public IReadOnlyList<AzSymbolExpn> Arguments { get; set; }
 
         public CodePosition Position => CodePosition.Null;
 
-        public IAzTypeExpn Type { get; set; }
+        public IAzTypeExpn Type { get; }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope scope)
+        public AzDataTypeDefn Definition { get; }
+
+        public AzNewDataExpn(AzDataTypeDefn definition,
+                             TvProvider tvs)
         {
+            Definition = definition;
+
             if (Definition.ParentUnion != null)
             {
-                Type = Definition.ParentUnion.ToCtor().WithUniqueTvs(provider);
+                Type = Definition.ParentUnion.ToCtor().WithUniqueTvs(tvs);
             }
             else
             {
-                Type = Definition.ToCtor().WithUniqueTvs(provider);
+                Type = Definition.ToCtor().WithUniqueTvs(tvs);
             }
+        }
 
-            return ConstraintSet.Empty;
+        public ConstraintSet Constrain(TvProvider provider, Scope scope) => ConstraintSet.Empty;
+
+        public IAzFuncExpn SubstituteType(Substitution s)
+        {
+            throw new System.NotImplementedException();
         }
 
         public IReadOnlyList<IAzFuncNode> GetSubnodes()

@@ -1,10 +1,11 @@
 ﻿
-IMPROVEMENTS:
-
-- Gn: Need to add type parameters to scope in Prepare, do this in functin args all at once
-
 TODO:
 
+- Make type get-only for all nodes. Have substitute routine create a new, solved ast.
+- Revisit Generated Az node private setters for Type
+- Move MatchExpn PostAnalyze into Generator code
+- Add TypeParameters to the types of functions that get determined during Analysis
+- Allow tuple and else patterns as lambda inputs.
 - Add vars in REPL
 - Add core libraries to project
 - Make recursion, mutual recursion type checkable (batch type inference based on dependencies)

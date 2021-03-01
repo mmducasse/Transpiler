@@ -7,13 +7,13 @@ using Transpiler.Analysis;
 
 namespace Transpiler.Generate
 {
-    public record GnClosureExpn(IReadOnlyList<IGnFuncStmt> Statements,
+    public record GnClosureExpn(IReadOnlyList<IGnFuncStmtDefn> Statements,
                                 IGnFuncExpn ReturnExpression,
                                 IScope Scope) : IGnFuncExpn
     {
         public static GnClosureExpn Prepare(AzClosureExpn closeExpn)
         {
-            var stmts = closeExpn.Statements.Select(s => IGnFuncStmt.Prepare(closeExpn.Scope, s)).ToList();
+            var stmts = closeExpn.Statements.Select(s => IGnFuncStmtDefn.Prepare(closeExpn.Scope, s)).ToList();
             var retExpn = IGnFuncExpn.Prepare(closeExpn.Scope, closeExpn.ReturnExpression);
 
             return new(stmts, retExpn, closeExpn.Scope);

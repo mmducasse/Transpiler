@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using static Transpiler.Analysis.OperatorUtil;
 using static Transpiler.Extensions;
+using static Transpiler.Analysis.Core;
 
 namespace Transpiler.Analysis
 {
@@ -25,19 +26,19 @@ namespace Transpiler.Analysis
 
             var type = AzTypeLambdaExpn.Make(a, a, a);
 
-            var fAdd = new AzFuncDefn("+", type, eFixity.Infix, true, CodePosition.Null);
-            var fSub = new AzFuncDefn("-", type, eFixity.Infix, true, CodePosition.Null);
-            var fMul = new AzFuncDefn("*", type, eFixity.Infix, true, CodePosition.Null);
-            var fDiv = new AzFuncDefn("/", type, eFixity.Infix, true, CodePosition.Null);
+            var fAdd = CreateFunction("+", type); // new AzFuncDefn("+", type, eFixity.Infix, true, CodePosition.Null);
+            var fSub = CreateFunction("-", type); // new AzFuncDefn("-", type, eFixity.Infix, true, CodePosition.Null);
+            var fMul = CreateFunction("*", type); // new AzFuncDefn("*", type, eFixity.Infix, true, CodePosition.Null);
+            var fDiv = CreateFunction("/", type); // new AzFuncDefn("/", type, eFixity.Infix, true, CodePosition.Null);
 
             num.Functions = RList(fAdd, fSub, fMul, fDiv);
 
             scope.AddType(num);
             scope.AddSuperType(num, eq);
-            scope.AddFunction(fAdd, fAdd.ExplicitType);
-            scope.AddFunction(fSub, fSub.ExplicitType);
-            scope.AddFunction(fMul, fMul.ExplicitType);
-            scope.AddFunction(fDiv, fDiv.ExplicitType);
+            scope.AddFunction(fAdd, fAdd.Type);
+            scope.AddFunction(fSub, fSub.Type);
+            scope.AddFunction(fMul, fMul.Type);
+            scope.AddFunction(fDiv, fDiv.Type);
             return num;
         }
 

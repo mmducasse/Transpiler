@@ -3,35 +3,38 @@ using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Parse;
 using static Transpiler.Extensions;
+using static Transpiler.CodePosition;
 
 namespace Transpiler.Analysis
 {
-    public record AzClosureExpn(IReadOnlyList<IAzFuncStmt> Statements,
+    public record AzClosureExpn(IReadOnlyList<IAzFuncStmtDefn> Statements,
                                 IAzFuncExpn ReturnExpression,
+                                IAzTypeExpn Type,
                                 Scope Scope,
                                 CodePosition Position) : IAzFuncExpn
     {
-        public IAzTypeExpn Type { get; set; }
-
         public static AzClosureExpn Analyze(Scope parentScope,
-                                            NameProvider provider,
-                                            PsClosureExpn node)
+                                            NameProvider names,
+                                            TvProvider tvs,
+                                            PsClosureExpn psCloseExpn)
         {
-            var scope = new Scope(parentScope, "Closure");
+            var scope = new Scope(parentScope, "<Closure>");
 
-            List<IAzFuncStmt> statements = new();
-            foreach (var s in node.Statements)
+            List<IAzFuncStmtDefn> statements = new();
+            foreach (var s in psCloseExpn.Statements)
             {
                 switch (s)
                 {
                     case IPsFuncExpn funcExpn:
-                        statements.Add(IAzFuncExpn.Analyze(scope, provider, funcExpn));
+                        var expn = IAzFuncExpn.Analyze(scope, names, tvs, funcExpn);
+                        var funcDefn = new AzFuncDefn(names.Next, expn.Type, eFixity.Prefix, true, Null);
+                        statements.Add(funcDefn);
                         break;
                     case IPsFuncStmtDefn psFuncStmtDefn:
                         var azFuncStmtDefns = IAzFuncStmtDefn.Initialize(scope, psFuncStmtDefn);
                         foreach (var fn in azFuncStmtDefns)
                         {
-                            IAzFuncStmtDefn.Analyze(scope, provider, fn, psFuncStmtDefn);
+                            IAzFuncStmtDefn.Analyze(scope, names, tvs, fn, psFuncStmtDefn);
                             statements.Add(fn);
                         }
                         break;
@@ -40,9 +43,8 @@ namespace Transpiler.Analysis
                 }
             }
 
-            var returnExpn = IAzFuncExpn.Analyze(scope, provider, node.ReturnExpression);
-
-            return new(statements, returnExpn, scope, node.Position);
+            var returnExpn = IAzFuncExpn.Analyze(scope, names, tvs, psCloseExpn.ReturnExpression);
+            return new(statements, returnExpn, tvs.Next, scope, psCloseExpn.Position);
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope _)
@@ -56,9 +58,18 @@ namespace Transpiler.Analysis
             }
 
             var csr = ReturnExpression.Constrain(provider, Scope);
-            Type = ReturnExpression.Type;
+            var creturn = new Constraint(Type, ReturnExpression.Type, Position);
 
-            return IConstraintSet.Union(cs, csr);
+            return IConstraintSet.Union(creturn, cs, csr);
+        }
+
+        public IAzFuncExpn SubstituteType(Substitution s)
+        {
+            return new AzClosureExpn(Statements.Select(st => st.SubstituteType(s)).ToList(),
+                                     ReturnExpression.SubstituteType(s),
+                                     Type.Substitute(s),
+                                     Scope,
+                                     Position);
         }
 
         public IReadOnlyList<IAzFuncNode> GetSubnodes()

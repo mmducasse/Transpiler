@@ -6,28 +6,20 @@ using static Transpiler.CodePosition;
 namespace Transpiler.Analysis
 {
     public record AzTupleExpn(IReadOnlyList<IAzFuncExpn> Elements,
+                              IAzTypeExpn Type,
                               CodePosition Position) : IAzFuncExpn
     {
-        public IAzTypeExpn Type { get; set; }
-
         public static AzTupleExpn Analyze(Scope scope,
-                                          NameProvider provider,
-                                          PsTupleExpn node)
+                                          NameProvider names,
+                                          TvProvider tvs,
+                                          PsTupleExpn psTupExpn)
         {
-            List<IAzFuncExpn> elements = new();
-            foreach (var n in node.Elements)
-            {
-                var expn = IAzFuncExpn.Analyze(scope, provider, n);
-                elements.Add(expn);
-            }
-
-            return new(elements, node.Position);
+            var elements = psTupExpn.Elements.Select(e => IAzFuncExpn.Analyze(scope, names, tvs, e)).ToList();
+            return new(elements, tvs.Next, psTupExpn.Position);
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
-            Type = provider.Next;
-
             ConstraintSet cs = new();
             foreach (var e in Elements)
             {
@@ -45,6 +37,13 @@ namespace Transpiler.Analysis
             var ct = new Constraint(Type, tupType, Position);
 
             return IConstraintSet.Union(ct, cs);
+        }
+
+        public IAzFuncExpn SubstituteType(Substitution s)
+        {
+            return new AzTupleExpn(Elements.Select(e => e.SubstituteType(s)).ToList(),
+                                   Type.Substitute(s),
+                                   Position);
         }
 
         public IReadOnlyList<IAzFuncNode> GetSubnodes()

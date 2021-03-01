@@ -7,26 +7,22 @@ namespace Transpiler.Analysis
 {
     public record AzLambdaExpn(AzParam Parameter,
                                IAzFuncExpn Expression,
+                               IAzTypeExpn Type,
                                CodePosition Position) : IAzFuncExpn
     {
-        public IAzTypeExpn Type { get; set; }
-
         public static AzLambdaExpn Analyze(Scope scope,
-                                           NameProvider provider,
-                                           PsLambdaExpn node)
+                                           NameProvider names,
+                                           TvProvider tvs,
+                                           PsLambdaExpn psLamExpn)
         {
-            var arg = AzParam.Analyze(scope, provider, node.Parameter);
-            var expr = IAzFuncExpn.Analyze(scope, provider, node.Expression);
+            var arg = AzParam.Analyze(scope, names, tvs, psLamExpn.Parameter);
+            var expr = IAzFuncExpn.Analyze(scope, names, tvs, psLamExpn.Expression);
 
-            var newLambdaExpr = new AzLambdaExpn(arg, expr, node.Position);
-            return newLambdaExpr;
+            return new(arg, expr, tvs.Next, psLamExpn.Position);
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
-            // Initialize Type to a new Type Variable.
-            Type = provider.Next;
-
             var csp = Parameter.Constrain(provider, scope);
             var cse = Expression.Constrain(provider, scope);
 
@@ -34,6 +30,16 @@ namespace Transpiler.Analysis
             var cf = new Constraint(Type, lamType, Position);
 
             return IConstraintSet.Union(cf, csp, cse);
+        }
+
+
+        IAzFuncExpn IAzFuncExpn.SubstituteType(Substitution s) => SubstituteType(s);
+        public AzLambdaExpn SubstituteType(Substitution s)
+        {
+            return new AzLambdaExpn(Parameter.SubstituteType(s),
+                                    Expression.SubstituteType(s),
+                                    Type.Substitute(s),
+                                    Position);
         }
 
         public IReadOnlyList<IAzFuncNode> GetSubnodes()

@@ -3,22 +3,20 @@ using Transpiler.Parse;
 
 namespace Transpiler.Analysis
 {
-    public record AzElsePattern(CodePosition Position) : IAzPattern
+    public record AzElsePattern(IAzTypeExpn Type,
+                                CodePosition Position) : IAzPattern
     {
-        public IAzTypeExpn Type { get; set; }
-
-        public static AzElsePattern Analyze(Scope scope,
-                                            NameProvider provider,
+        public static AzElsePattern Analyze(TvProvider tvs,
                                             PsAnyPattern node)
         {
-             return new(node.Position);
+             return new(tvs.Next, node.Position);
         }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope scope)
-        {
-            Type = provider.Next;
+        public ConstraintSet Constrain(TvProvider tvs, Scope scope) => ConstraintSet.Empty;
 
-            return ConstraintSet.Empty;
+        public IAzPattern SubstituteType(Substitution s)
+        {
+            return this with { Type = Type.Substitute(s) };
         }
 
         public IReadOnlyList<IAzFuncNode> GetSubnodes() => this.ToArr();

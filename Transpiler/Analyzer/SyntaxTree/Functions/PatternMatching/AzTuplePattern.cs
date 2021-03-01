@@ -6,23 +6,21 @@ using static Transpiler.CodePosition;
 namespace Transpiler.Analysis
 {
     public record AzTuplePattern(IReadOnlyList<IAzPattern> Elements,
+                                 IAzTypeExpn Type,
                                  CodePosition Position) : IAzPattern
     {
-        public IAzTypeExpn Type { get; set; }
-
         public static AzTuplePattern Analyze(Scope scope,
                                              NameProvider provider,
-                                             PsTuplePattern node)
+                                             TvProvider tvs,
+                                             PsTuplePattern psTupPat)
         {
-            var elements = node.Elements.Select(e => IAzPattern.Analyze(scope, provider, e)).ToList();
+            var elements = psTupPat.Elements.Select(e => IAzPattern.Analyze(scope, provider, tvs, e)).ToList();
 
-            return new(elements, node.Position);
+            return new(elements, tvs.Next, psTupPat.Position);
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
-            Type = provider.Next;
-
             var cs = new ConstraintSet();
             List<IAzTypeExpn> elementTypes = new();
             for (int i = 0; i < Elements.Count; i++)
@@ -37,6 +35,13 @@ namespace Transpiler.Analysis
             var ctup = new Constraint(Type, tupleType, Position);
 
             return IConstraintSet.Union(cs, ctup);
+        }
+
+        public IAzPattern SubstituteType(Substitution s)
+        {
+            return new AzTuplePattern(Elements.Select(e => e.SubstituteType(s)).ToList(),
+                                      Type.Substitute(s),
+                                      Position);
         }
 
         public IReadOnlyList<IAzFuncNode> GetSubnodes()

@@ -8,13 +8,10 @@
   <ItemGroup>
     <Compile Remove="Analyzer\SyntaxTree\Functions\PatternMatching\**" />
     <Compile Remove="Analyzer\TypeSystem\**" />
-    <Compile Remove="Generator\SyntaxTree\**" />
     <EmbeddedResource Remove="Analyzer\SyntaxTree\Functions\PatternMatching\**" />
     <EmbeddedResource Remove="Analyzer\TypeSystem\**" />
-    <EmbeddedResource Remove="Generator\SyntaxTree\**" />
     <None Remove="Analyzer\SyntaxTree\Functions\PatternMatching\**" />
     <None Remove="Analyzer\TypeSystem\**" />
-    <None Remove="Generator\SyntaxTree\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,39 +21,6 @@
     <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\IAzPattern.cs" />
     <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\AzMatchCase.cs" />
     <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\AzTuplePattern.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\Generated\GnGetElementExpn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\GnAppExpn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\GnClosureExpn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\GnDectorFuncDefn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\GnFuncDefn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\GnIfExpn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\GnLambdaExpn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\GnMatchExpn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\Generated\GnNewDataExpn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\GnOperator.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\GnScopedFuncExpn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\GnSymbolExpn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\GnTupleExpn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\IGnFuncDefn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\IGnFuncExpn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\IGnFuncNode.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\IGnFuncStmt.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\IGnInlineNode.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\Literals\GnCharLiteral.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\Literals\GnIntLiteral.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\Literals\GnRealLiteral.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\Literals\GnUndefinedLiteral.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\Literals\IGnLiteralExpn.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\PatternMatching\GnDectorPattern.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\PatternMatching\GnElsePattern.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\PatternMatching\GnMatchCase.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\PatternMatching\GnParam.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\PatternMatching\GnTuplePattern.cs" />
-    <Compile Include="Generator\SyntaxTree\Functions\PatternMatching\IGnPattern.cs" />
-    <Compile Include="Generator\SyntaxTree\IGnDefn.cs" />
-    <Compile Include="Generator\SyntaxTree\IGnNode.cs" />
-    <Compile Include="Generator\SyntaxTree\Types\GnClassInstDefn.cs" />
-    <Compile Include="Generator\SyntaxTree\Types\GnClassTypeDefn.cs" />
   </ItemGroup>
 
   <ItemGroup>

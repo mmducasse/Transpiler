@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using static Transpiler.Analysis.OperatorUtil;
 using static Transpiler.Extensions;
+using static Transpiler.Analysis.Core;
 
 namespace Transpiler.Analysis
 {
@@ -27,19 +28,19 @@ namespace Transpiler.Analysis
 
             var type = AzTypeLambdaExpn.Make(a, a, @bool.ToCtor());
 
-            var fLt = new AzFuncDefn("<", type, eFixity.Infix, true, CodePosition.Null);
-            var fLte = new AzFuncDefn("<=", type, eFixity.Infix, true, CodePosition.Null);
-            var fGt = new AzFuncDefn(">", type, eFixity.Infix, true, CodePosition.Null);
-            var fGte = new AzFuncDefn(">=", type, eFixity.Infix, true, CodePosition.Null);
+            var fLt = CreateFunction("<", type); // new AzFuncDefn("<", type, eFixity.Infix, true, CodePosition.Null);
+            var fLte = CreateFunction("<=", type); // new AzFuncDefn("<=", type, eFixity.Infix, true, CodePosition.Null);
+            var fGt = CreateFunction(">", type); // new AzFuncDefn(">", type, eFixity.Infix, true, CodePosition.Null);
+            var fGte = CreateFunction(">=", type); // new AzFuncDefn(">=", type, eFixity.Infix, true, CodePosition.Null);
 
             ord.Functions = RList(fLt, fLte, fGt, fGte);
 
             scope.AddType(ord);
             scope.AddSuperType(ord, eq);
-            scope.AddFunction(fLt, fLt.ExplicitType);
-            scope.AddFunction(fLte, fLte.ExplicitType);
-            scope.AddFunction(fGt, fGt.ExplicitType);
-            scope.AddFunction(fGte, fGte.ExplicitType);
+            scope.AddFunction(fLt, fLt.Type);
+            scope.AddFunction(fLte, fLte.Type);
+            scope.AddFunction(fGt, fGt.Type);
+            scope.AddFunction(fGte, fGte.Type);
             return ord;
         }
 

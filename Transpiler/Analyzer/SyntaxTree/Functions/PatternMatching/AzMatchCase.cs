@@ -7,28 +7,39 @@ namespace Transpiler.Analysis
 {
     public record AzMatchCase(IAzPattern Pattern,
                               IAzFuncExpn Expression,
+                              IAzTypeExpn Type,
                               CodePosition Position) : IAzFuncNode
     {
-        public IAzTypeExpn Type { get; set; }
-
         public static AzMatchCase Analyze(Scope scope,
-                                          NameProvider provider,
+                                          NameProvider names,
+                                          TvProvider tvs,
                                           PsMatchCase node)
         {
-            var pattern = IAzPattern.Analyze(scope, provider, node.Pattern);
-            var expn = IAzFuncExpn.Analyze(scope, provider, node.Expression);
+            var pattern = IAzPattern.Analyze(scope, names, tvs, node.Pattern);
+            var expn = IAzFuncExpn.Analyze(scope, names, tvs, node.Expression);
 
-            return new(pattern, expn, node.Position);
+            var type = new AzTypeLambdaExpn(tvs.Next, tvs.Next, Null);
+            return new(pattern, expn, type, node.Position);
         }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope scope)
+        public ConstraintSet Constrain(TvProvider tvs, Scope scope)
         {
-            var cspatt = Pattern.Constrain(provider, scope);
-            var csexpn = Expression.Constrain(provider, scope);
+            var cspatt = Pattern.Constrain(tvs, scope);
+            var csexpn = Expression.Constrain(tvs, scope);
 
-            Type = new AzTypeLambdaExpn(Pattern.Type, Expression.Type, Null);
+            var lamType = Type as AzTypeLambdaExpn;
+            var cinput = new Constraint(lamType.Input, Pattern.Type, lamType.Input.Position);
+            var coutput = new Constraint(lamType.Output, Expression.Type, lamType.Output.Position);
 
-            return IConstraintSet.Union(cspatt, csexpn);
+            return IConstraintSet.Union(cinput, coutput, cspatt, csexpn);
+        }
+
+        public AzMatchCase SubstituteType(Substitution s)
+        {
+            return new(Pattern.SubstituteType(s),
+                       Expression.SubstituteType(s),
+                       Type.Substitute(s),
+                       Position);
         }
 
         public IReadOnlyList<IAzFuncNode> GetSubnodes()

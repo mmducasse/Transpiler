@@ -22,13 +22,14 @@ namespace Transpiler.Analysis
 
         public Module Module { get; }
 
-        public IScope Scope => Module.Scope;
+        public Scope Scope => Module.Scope;
 
         public static Core Instance { get; private set; }
 
         public Core()
         {
             Instance = this;
+            TvProvider tvs = new();
 
             Module = new Module(" ", "Core");
             Module.Scope = new();
@@ -37,13 +38,13 @@ namespace Transpiler.Analysis
             Real = AzPrimitiveTypeDefn.Make(Module.Scope, "Real");
             Char = AzPrimitiveTypeDefn.Make(Module.Scope, "Char");
 
-            Bool = AzUnionTypeDefn.Make(Module.Scope, "Bool", "True", "False");
+            Bool = AzUnionTypeDefn.Make(Module.Scope, tvs, "Bool", "True", "False");
 
             Eq = CreateEq(Module.Scope);
             Num = CreateNum(Module.Scope);
             Ord = CreateOrd(Module.Scope);
 
-            List = CreateList(Module.Scope);
+            List = CreateList(Module.Scope, tvs);
 
             CreateMiscFunctions(Module.Scope);
 
@@ -68,6 +69,11 @@ namespace Transpiler.Analysis
             var putcharType = new AzTypeLambdaExpn(Char.ToCtor(), @void, Null);
             var putchar = new Operator("putchar", "Putchar", putcharType, Fixity: eFixity.Prefix);
             scope.AddFunction(putchar, putcharType);
+        }
+
+        public static AzFuncDefn CreateFunction(string name, IAzTypeExpn type)
+        {
+            return new(name, type, eFixity.Infix, true, Null);
         }
     }
 }

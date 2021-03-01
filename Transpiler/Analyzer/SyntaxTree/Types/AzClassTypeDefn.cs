@@ -54,7 +54,7 @@ namespace Transpiler.Analysis
             }
             foreach (var funcDefn in funcDefns)
             {
-                fileScope.AddFunction(funcDefn, funcDefn.ExplicitType);
+                fileScope.AddFunction(funcDefn, funcDefn.Type);
             }
 
             classDefn.Functions = funcDefns;
@@ -63,6 +63,7 @@ namespace Transpiler.Analysis
         }
 
         public static AzClassTypeDefn Analyze(Scope scope,
+                                              TvProvider tvs,
                                               AzClassTypeDefn classType,
                                               PsClassTypeDefn node)
         {
@@ -74,7 +75,7 @@ namespace Transpiler.Analysis
                 if (funcNode.Expression != null)
                 {
                     // Analyze the function if it has a default implementation.
-                    AzFuncDefn.Analyze(classType.Scope, new("p"), funcDefn, funcNode);
+                    AzFuncDefn.Analyze(classType.Scope, new("p"), tvs, funcDefn, funcNode);
                 }
             }
 

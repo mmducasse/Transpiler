@@ -9,26 +9,17 @@ namespace Transpiler.Analysis
     {
         public IAzTypeDefn CertainType => Core.Instance.Real;
 
-        public IAzTypeExpn Type
-        {
-            get => Core.Instance.Real.ToCtor();
-            set
-            {
-                if (value != CertainType)
-                {
-                    //throw new Exception();
-                }
-            }
-        }
+        public IAzTypeExpn Type => Core.Instance.Real.ToCtor();
 
-        public static AzRealLiteral Analyze(Scope scope,
-                                            NameProvider provider,
-                                            PsRealLiteral node)
+        public static AzRealLiteral Analyze(PsRealLiteral psRealNode)
         {
-            return new(node.Value, node.Position);
+            return new(psRealNode.Value, psRealNode.Position);
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope) => ConstraintSet.Empty;
+
+        public IAzFuncExpn SubstituteType(Substitution s) => this;
+        IAzPattern IAzPattern.SubstituteType(Substitution s) => this;
 
         public IReadOnlyList<IAzFuncNode> GetSubnodes() => this.ToArr();
 

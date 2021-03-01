@@ -7,40 +7,38 @@ namespace Transpiler.Analysis
 {
     public record AzScopedFuncExpn(IAzFuncExpn Expression,
                                    IReadOnlyList<IAzFuncStmtDefn> FuncDefinitions,
+                                   IAzTypeExpn Type,
                                    Scope Scope,
                                    CodePosition Position) : IAzFuncExpn
     {
-        public IAzTypeExpn Type { get; set; }
-
         //public static AzScopedFuncExpn Make(IAzFuncExpn expression) =>
         //    new(expression, new List<PsFuncDefn>());
 
         public static IAzFuncExpn Analyze(Scope parentScope,
-                                          NameProvider provider,
+                                          NameProvider names,
+                                          TvProvider tvs,
                                           PsScopedFuncExpn scopedExpn)
         {
             var scope = new Scope(parentScope);
 
-            var newSubDefns = Analyzer.AnalyzeFunctions(scope, scopedExpn.FuncDefinitions);
+            var newSubDefns = Analyzer.AnalyzeFunctions(scope, tvs, scopedExpn.FuncDefinitions);
 
             if (scopedExpn.Expression is PsMatchExpn matchExpn &&
                 matchExpn.IsTerse)
             {
                 // This will return a lambda with a scoped expn at it's tail.
-                return IAzFuncExpn.Analyze(scope, provider, scopedExpn.Expression);
+                return IAzFuncExpn.Analyze(scope, names, tvs, scopedExpn.Expression);
             }
             else
             {
-                var newExpn = IAzFuncExpn.Analyze(scope, provider, scopedExpn.Expression);
+                var newExpn = IAzFuncExpn.Analyze(scope, names, tvs, scopedExpn.Expression);
 
-                return new AzScopedFuncExpn(newExpn, newSubDefns, scope, scopedExpn.Position);
+                return new AzScopedFuncExpn(newExpn, newSubDefns, tvs.Next, scope, scopedExpn.Position);
             }
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope _)
         {
-            Type = provider.Next;
-
             var cs = new ConstraintSet();
 
             foreach (var fn in FuncDefinitions)
@@ -70,6 +68,15 @@ namespace Transpiler.Analysis
             }
 
             return s + "]";
+        }
+
+        public IAzFuncExpn SubstituteType(Substitution s)
+        {
+            return new AzScopedFuncExpn(Expression.SubstituteType(s),
+                                        FuncDefinitions.Select(f => f.SubstituteType(s)).ToList(),
+                                        Type.Substitute(s),
+                                        Scope,
+                                        Position);
         }
 
         public override string ToString() => Print(0);

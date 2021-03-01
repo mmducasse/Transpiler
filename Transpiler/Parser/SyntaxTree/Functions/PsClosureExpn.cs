@@ -23,7 +23,7 @@ namespace Transpiler.Parse
             List<IPsFuncStmt> lines = new();
             while (FindsIndents(ref q, indent + 1))
             {
-                if (IPsFuncExpn.Parse(ref q, isInline: true, out var funcExpn)) { lines.Add(funcExpn); }
+                if (IPsFuncExpn.Parse(ref q, isInline: false, out var funcExpn)) { lines.Add(funcExpn); }
                 else if (IPsFuncStmtDefn.Parse(ref q, out var funcStmtDefn)) { lines.Add(funcStmtDefn); }
                 else
                 {

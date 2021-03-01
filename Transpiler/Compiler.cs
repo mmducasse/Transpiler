@@ -28,6 +28,9 @@ namespace Transpiler
 
         public Compiler()
         {
+#pragma warning disable CA1416 // Validate platform compatibility
+            Console.SetWindowSize(64, 30);
+#pragma warning restore CA1416 // Validate platform compatibility
             Console.WriteLine("Transpiler");
             Console.WriteLine("M. Ducasse 2021\n\n");
 
@@ -73,7 +76,7 @@ namespace Transpiler
 
                         var funcDefn = inputModule.Scope.FuncDefinitions.First().Value;
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("\n\n{0} :: {1}", funcDefn.Name, funcDefn.ExplicitType.PrintWithRefinements());
+                        Console.WriteLine("\n\n{0} :: {1}", funcDefn.Name, funcDefn.Type.PrintWithRefinements());
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.WriteLine(funcDefn.Print(0));
 

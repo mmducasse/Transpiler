@@ -57,22 +57,27 @@ namespace Transpiler.Analysis
             return neededRefinements;
         }
 
-        public static string PrintWithRefinements(this IAzTypeExpn type)
+        public static IReadOnlyList<Refinement> GetRefinements(this IAzTypeExpn type)
         {
             var tvs = type.GetTypeVars();
-
-            List<string> refinements = new();
+            List<Refinement> refinements = new();
             foreach (var tv in tvs)
             {
                 if (tv.HasRefinements)
                 {
                     foreach (var r in tv.Refinements)
                     {
-                        refinements.Add(string.Format("{0} {1}", r.Name, tv.Print()));
+                        refinements.Add(new(r, tv));
                     }
                 }
             }
 
+            return refinements;
+        }
+
+        public static string PrintWithRefinements(this IAzTypeExpn type)
+        {
+            var refinements = type.GetRefinements();
             if (refinements.Count == 0)
             {
                 return type.Print(0);

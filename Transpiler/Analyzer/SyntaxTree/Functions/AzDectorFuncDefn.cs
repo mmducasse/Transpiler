@@ -13,8 +13,6 @@ namespace Transpiler.Analysis
 
         public int NumElements { get; }
 
-        public IAzTypeExpn ExplicitType { get; set; }
-
         public IAzTypeExpn Type { get; set; }
 
         public IAzFuncExpn Expression { get; set; }
@@ -26,6 +24,8 @@ namespace Transpiler.Analysis
         public CodePosition Position { get; }
 
         public string Name => ElementName;
+
+        public bool IsSolved { get; private set; }
 
         public AzDectorFuncDefn(string elementName,
                                 int elementIndex,
@@ -55,13 +55,14 @@ namespace Transpiler.Analysis
         }
 
         public static AzDectorFuncDefn Analyze(Scope parentScope,
-                                               NameProvider provider,
+                                               NameProvider names,
+                                               TvProvider tvs,
                                                AzDectorFuncDefn funcDefn,
                                                PsDectorFuncDefn node)
         {
             var scope = new Scope(parentScope, "fn params");
 
-            var expn = IAzFuncExpn.Analyze(scope, provider, node.Expression);
+            var expn = IAzFuncExpn.Analyze(scope, names, tvs, node.Expression);
 
             funcDefn.Expression = expn;
 
@@ -86,6 +87,12 @@ namespace Transpiler.Analysis
             return IConstraintSet.Union(cse, ctup);
         }
 
+        public IAzFuncStmtDefn SubstituteType(Substitution s)
+        {
+            IsSolved = true;
+            throw new System.NotImplementedException();
+        }
+
         public IReadOnlyList<IAzFuncNode> GetSubnodes()
         {
             return this.ToArr().Concat(Expression.GetSubnodes()).ToList();
@@ -94,7 +101,7 @@ namespace Transpiler.Analysis
         public void PrintSignature()
         {
             Pr("{0} :: ", Name);
-            PrLn(ExplicitType.Print(0), foregroundColor: Yellow);
+            PrLn(Type.PrintWithRefinements(), foregroundColor: Yellow);
         }
 
         public string Print(int i)

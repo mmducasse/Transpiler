@@ -19,7 +19,7 @@ namespace Transpiler.Generate
             output.Append(s);
         }
 
-        public static void GenerateModule(string moduleName, IScope scope, ref StringBuilder output)
+        public static void GenerateModule(string moduleName, Scope scope, ref StringBuilder output)
         {
             output.AppendLine(string.Format("////////////////// START OF {0} //////////////////\n", moduleName));
 
@@ -42,24 +42,22 @@ namespace Transpiler.Generate
             foreach (var func in scope.FuncDefinitions.Values)
             {
                 string g = "";
-                if (func is AzFuncDefn funcDefn &&
+                if (func is IAzFuncStmtDefn funcDefn &&
                     funcDefn.Expression != null)
                 {
-                    var gnFunc = GnFuncDefn.Prepare(scope, funcDefn);
+                    var gnFunc = IGnFuncStmtDefn.Prepare(scope, funcDefn);
                     gnFunc.Generate(0, new("a"), ref g);
-                }
-                else if (func is AzDectorFuncDefn funcDectorDefn)
-                {
-                    var gnFunc = GnDectorFuncDefn.Prepare(scope, funcDectorDefn);
-                    gnFunc.Generate(0, new("a"), ref g);
+
+                    output.Append(g);
+                    output.Append("\n\n");
                 }
                 else if (func is Operator op)
                 {
                     GnOperator.Generate(op, 0, ref g);
-                }
 
-                output.Append(g);
-                output.Append("\n\n");
+                    output.Append(g);
+                    output.Append("\n\n");
+                }
             }
 
             output.AppendLine(string.Format("////////////////// END OF {0} //////////////////\n", moduleName));

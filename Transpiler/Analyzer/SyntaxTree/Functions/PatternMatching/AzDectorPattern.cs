@@ -6,51 +6,56 @@ namespace Transpiler.Analysis
 {
     public record AzDectorPattern(AzDataTypeDefn TypeDefn,
                                   IReadOnlyList<IAzPattern> Variables,
+                                  IAzTypeExpn Type,
                                   CodePosition Position) : IAzPattern
     {
-        public IAzTypeExpn Type { get; set; }
-
         public bool IsCompleteMember => (Variables.Count == 0) || Variables.All(v => v is AzParam);
 
+        private Substitution UniqueSubstitution { get; init; }
+
         public static AzDectorPattern Analyze(Scope scope,
-                                              NameProvider provider,
-                                              PsDectorPattern node)
+                                              NameProvider names,
+                                              TvProvider tvs,
+                                              PsDectorPattern psDectorPat)
         {
-            if (!scope.TryGetNamedType(node.TypeName, out var typeDefn))
+            if (!scope.TryGetNamedType(psDectorPat.TypeName, out var typeDefn))
             {
-                throw Analyzer.Error("Type " + node.TypeName + " is undefined.", node.Position);
+                throw Analyzer.Error("Type " + psDectorPat.TypeName + " is undefined.", psDectorPat.Position);
             }
 
-            var dataTypeDefn = typeDefn as AzDataTypeDefn;
+            if (typeDefn is not AzDataTypeDefn dataTypeDefn)
+            {
+                throw Analyzer.Error("Type " + typeDefn.Name + " is not a deconstructable type.", psDectorPat.Position);
+            }
+
+            Substitution uniqueSubstitution;
+            IAzTypeExpn type;
+            if (dataTypeDefn.ParentUnion != null)
+            {
+                uniqueSubstitution = dataTypeDefn.ParentUnion.ToCtor().UniqueTvSubstitution(tvs);
+                type = dataTypeDefn.ParentUnion.ToCtor().Substitute(uniqueSubstitution);
+            }
+            else
+            {
+                uniqueSubstitution = dataTypeDefn.ToCtor().UniqueTvSubstitution(tvs);
+                type = dataTypeDefn.ToCtor().Substitute(uniqueSubstitution);
+            }
 
             int numElements = dataTypeDefn.Expression.Elements.Count;
 
-            var vars = node.Variables.Select(v => IAzPattern.Analyze(scope, provider, v)).ToList();
+            var vars = psDectorPat.Variables.Select(v => IAzPattern.Analyze(scope, names, tvs, v)).ToList();
             if (vars.Count != numElements)
             {
-                throw Analyzer.Error(string.Format("Type {0} has {1} members.", node.TypeName, numElements), node.Position);
+                throw Analyzer.Error(string.Format("Type {0} has {1} members.", psDectorPat.TypeName, numElements), psDectorPat.Position);
             }
 
-            return new(dataTypeDefn, vars, node.Position);
+            return new(dataTypeDefn, vars, type, psDectorPat.Position) { UniqueSubstitution = uniqueSubstitution };
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
-            // Initialize Type.
-            Substitution uniqueSubstitution;
-            if (TypeDefn.ParentUnion != null)
-            {
-                uniqueSubstitution = TypeDefn.ParentUnion.ToCtor().UniqueTvSubstitution(provider);
-                Type = TypeDefn.ParentUnion.ToCtor().Substitute(uniqueSubstitution);
-            }
-            else
-            {
-                uniqueSubstitution = TypeDefn.ToCtor().UniqueTvSubstitution(provider);
-                Type = TypeDefn.ToCtor().Substitute(uniqueSubstitution);
-            }
-
             var cs = new ConstraintSet();
-            var typeExpn = TypeDefn.Expression.Substitute(uniqueSubstitution) as AzTypeTupleExpn;
+            var typeExpn = TypeDefn.Expression.Substitute(UniqueSubstitution);
             for (int i = 0; i < Variables.Count; i++)
             {
                 var csv = Variables[i].Constrain(provider, scope);
@@ -60,6 +65,14 @@ namespace Transpiler.Analysis
             }
 
             return cs;
+        }
+
+        public IAzPattern SubstituteType(Substitution s)
+        {
+            return new AzDectorPattern(TypeDefn,
+                                       Variables.Select(v => v.SubstituteType(s)).ToList(),
+                                       Type.Substitute(s),
+                                       Position);
         }
 
         public IReadOnlyList<IAzFuncNode> GetSubnodes()

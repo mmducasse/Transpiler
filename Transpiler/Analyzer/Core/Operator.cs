@@ -11,9 +11,9 @@ namespace Transpiler.Analysis
     {
         public CodePosition Position => CodePosition.Null;
 
-        public IAzTypeExpn ExplicitType => Type;
+        public bool IsSolved => true;
 
-        IAzTypeExpn IAzFuncNode.Type { get => Type; set => throw new NotImplementedException(); }
+        IAzTypeExpn IAzFuncNode.Type => Type;
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {

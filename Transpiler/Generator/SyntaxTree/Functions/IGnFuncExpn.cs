@@ -3,7 +3,7 @@ using Transpiler.Analysis;
 
 namespace Transpiler.Generate
 {
-    public interface IGnFuncExpn : IGnFuncStmt
+    public interface IGnFuncExpn : IGnFuncNode
     {
         public static IGnFuncExpn Prepare(IScope scope, IAzFuncExpn funcExpn)
         {
