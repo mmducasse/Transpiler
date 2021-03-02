@@ -42,37 +42,102 @@ function Match(x, pattern)
 	return false;
 }
 
-function PrintResult(output) {
-	if (Match(output, ["Empty"])) {
-
+function FormatResult(data) {
+	if (Match(data, ["Empty"])) {
+		return "[]"
 	}
-	else if (Match(output, ["Node", null, null])) {
-		var a = Get(0, output)
-		var b = Get(1, output)
+	else if (Match(data, ["Node", null, null])) {
+		var a = Get(0, data)
 		if (typeof a == 'string') {
-			process.stdout.write(a)
+			return "\"" + FormatString(data) + "\""
 		}
 		else {
-			console.log(a)
+			return "[" + FormatList(data) + "]"
 		}
-		PrintResult(b)
+	}
+	else if (Array.isArray(data)) {
+		if (data[0] == '') {
+			return "(" + FormatTuple(data) + ")"
+		}
+		else {
+			return "(" + FormatData(data) + ")"
+		}
 	}
 	else {
-		console.log(output)
+		return String(data)
 	}
 }
 
-let fs = require('fs')
-function Getchar() {
-	let buffer = Buffer.alloc(1)
-	fs.readSync(0, buffer, 0, 1)
-	return buffer.toString('utf8')
+// The object's type is List.
+function FormatList(data) {
+	var a = Get(0, data)
+	var b = Get(1, data)
+	s = FormatResult(a)
+	if (Match(b, ["Empty"])) {
+		return s
+	}
+	else {
+		return s + ", " + FormatList(b)
+	}
 }
 
-function Putchar(c) {
-	console.log(c)
-	return ['']
+// The object's type is String.
+function FormatString(data) {
+	var a = Get(0, data)
+	var b = Get(1, data)
+	s = a
+	if (Match(b, ["Empty"])) {
+		return s
+	}
+	else {
+		return s + FormatString(b)
+	}
 }
+
+// The object is some ADT.
+function FormatData(data) {
+	var s = data[0]
+	for (var i = 1; i < data.length; i++) {
+		s += " " + FormatResult(data[i])
+	}
+	return s
+}
+
+// The object is a tuple.
+function FormatTuple(data) {
+	var s = data[1]
+	for (var i = 2; i < data.length; i++) {
+		s += ", " + FormatResult(data[i])
+	}
+	return s
+}
+
+function PrintResult(output) {
+	s = FormatResult(output)
+	console.log(s)
+}
+
+//let fs = require('fs')
+//function Getchar(x) {
+//	let buffer = Buffer.alloc(1)
+//	fs.readSync(0, buffer, 0, 1)
+//	return buffer.toString('utf8')
+//}
+
+//function Putchar(c) {
+//	console.log(c)
+//	return ['']
+//}
+
+//let prompt = require('prompt-sync')({ sigint: true });
+//function Readline(x) {
+//	let s = prompt('') ?? '';
+//	var str = ['Empty']
+//	for (var i = s.length - 1; i >= 0; i--) {
+//		str = ['Node', s[i], str];
+//	}
+//	return str
+//}
 
 function Undefined() {
 	throw 'Undefined!'

@@ -27,6 +27,10 @@ namespace Transpiler.Analysis
 
         public bool IsSolved { get; private set; }
 
+        public bool InvokeImmediately { get; init; }
+
+        public AzTypeTupleExpn TupleType { get; private set; }
+
         public AzDectorFuncDefn(string elementName,
                                 int elementIndex,
                                 int numElements,
@@ -62,6 +66,15 @@ namespace Transpiler.Analysis
         {
             var scope = new Scope(parentScope, "fn params");
 
+            List<TypeVariable> elementTvs = new();
+            for (int i = 0; i < funcDefn.NumElements; i++)
+            {
+                elementTvs.Add(tvs.Next);
+            }
+
+            funcDefn.Type = elementTvs[funcDefn.ElementIndex];
+            funcDefn.TupleType = new AzTypeTupleExpn(elementTvs, CodePosition.Null);
+
             var expn = IAzFuncExpn.Analyze(scope, names, tvs, node.Expression);
 
             funcDefn.Expression = expn;
@@ -71,26 +84,19 @@ namespace Transpiler.Analysis
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
         {
-            List<TypeVariable> elementTvs = new();
-            for (int i = 0; i < NumElements; i++)
-            {
-                elementTvs.Add(provider.Next);
-            }
-
-            Type = elementTvs[ElementIndex];
-            var tupType = new AzTypeTupleExpn(elementTvs, CodePosition.Null);
-
             var cse = Expression.Constrain(provider, scope);
 
-            var ctup = new Constraint(tupType, Expression.Type, Position);
+            var ctup = new Constraint(TupleType, Expression.Type, Position);
 
             return IConstraintSet.Union(cse, ctup);
         }
 
         public IAzFuncStmtDefn SubstituteType(Substitution s)
         {
+            Type = Type.Substitute(s);
+            Expression = Expression.SubstituteType(s);
             IsSolved = true;
-            throw new System.NotImplementedException();
+            return this;
         }
 
         public IReadOnlyList<IAzFuncNode> GetSubnodes()

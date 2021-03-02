@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Transpiler.Analysis;
+using static Transpiler.Extensions;
 
 namespace Transpiler.Generate
 {
@@ -23,7 +21,11 @@ namespace Transpiler.Generate
         {
             foreach (var stmt in Statements)
             {
-                stmt.Generate(i, names, ref s);
+                string stmtRes = stmt.Generate(i, names, ref s);
+                if (stmt.InvokeImmediately)
+                {
+                    s += string.Format("{0}{1}()\n", Indent(i), stmtRes);
+                }
             }
             return ReturnExpression.Generate(i, names, ref s);
         }

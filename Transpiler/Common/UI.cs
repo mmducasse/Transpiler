@@ -7,6 +7,7 @@ namespace Transpiler
         public static ConsoleColor White => ConsoleColor.White;
         public static ConsoleColor Black => ConsoleColor.Black;
         public static ConsoleColor Yellow => ConsoleColor.Yellow;
+        public static ConsoleColor Blue => ConsoleColor.Blue;
 
         public static void Pr(string text, params object[] args)
         {

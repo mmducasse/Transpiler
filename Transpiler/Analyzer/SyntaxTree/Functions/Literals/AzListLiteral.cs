@@ -19,10 +19,12 @@ namespace Transpiler.Analysis
         public static IAzFuncExpn CreateList(Scope scope, TvProvider tvs, IReadOnlyList<IAzFuncExpn> elements)
         {
             scope.TryGetFuncDefn("Empty", out var emptyCtor);
-            IAzFuncExpn empty = new AzSymbolExpn(emptyCtor, tvs.Next, CodePosition.Null);
+            var emptyType = emptyCtor.Type.WithUniqueTvs(tvs);
+            IAzFuncExpn empty = new AzSymbolExpn(emptyCtor, emptyType, CodePosition.Null);
 
             scope.TryGetFuncDefn("Node", out var nodeCtor);
-            IAzFuncExpn node = new AzSymbolExpn(nodeCtor, tvs.Next, CodePosition.Null);
+            var nodeType = nodeCtor.Type.WithUniqueTvs(tvs);
+            IAzFuncExpn node = new AzSymbolExpn(nodeCtor, nodeType, CodePosition.Null);
 
             IAzFuncExpn head = empty;
 

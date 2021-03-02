@@ -21,7 +21,7 @@ namespace Transpiler.Analysis
                 PsTupleExpn tupExpn => AzTupleExpn.Analyze(scope, names, tvs, tupExpn),
                 PsSymbolExpn symExpn => AzSymbolExpn.Analyze(scope, names, tvs, symExpn),
                 PsMatchExpn matExpn => AzMatchExpn.Analyze(scope, names, tvs, matExpn),
-                PsClosureExpn closeExpn => AzClosureExpn.Analyze(scope, names, tvs, closeExpn),
+                //PsClosureExpn closeExpn => AzClosureExpn.Analyze(scope, names, tvs, closeExpn),
                 IPsLiteralExpn litExpn => IAzLiteralExpn.Analyze(scope, names, tvs, litExpn),
                 _ => throw new NotImplementedException()
             };

@@ -35,6 +35,17 @@ namespace Transpiler.Analysis
             mTypeSubstitutions[tv] = newType;
         }
 
+        public void Add(Substitution otherSubstitution)
+        {
+            foreach (var kvp in otherSubstitution.TypeSubstitutions)
+            {
+                if (!mTypeSubstitutions.ContainsKey(kvp.Key))
+                {
+                    mTypeSubstitutions.Add(kvp.Key, kvp.Value);
+                }
+            }
+        }
+
         public string Print()
         {
             return TypeSubstitutions.

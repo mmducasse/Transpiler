@@ -9,6 +9,8 @@ namespace Transpiler.Generate
 
     public interface IGnFuncStmtDefn : IGnFuncDefn
     {
+        bool InvokeImmediately { get; }
+
         string Generate(int i, NameProvider names, string namePrefix, ref string s);
 
         public static IGnFuncStmtDefn Prepare(Scope scope, IAzFuncStmtDefn defn)

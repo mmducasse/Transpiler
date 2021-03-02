@@ -27,7 +27,11 @@ namespace Transpiler.Analysis
                 {
                     case IPsFuncExpn funcExpn:
                         var expn = IAzFuncExpn.Analyze(scope, names, tvs, funcExpn);
-                        var funcDefn = new AzFuncDefn(names.Next, expn.Type, eFixity.Prefix, true, Null);
+                        var funcDefn = new AzFuncDefn(names.Next, expn.Type, eFixity.Prefix, true, Null)
+                        {
+                            InvokeImmediately = true
+                        };
+                        funcDefn.Expression = expn;
                         statements.Add(funcDefn);
                         break;
                     case IPsFuncStmtDefn psFuncStmtDefn:

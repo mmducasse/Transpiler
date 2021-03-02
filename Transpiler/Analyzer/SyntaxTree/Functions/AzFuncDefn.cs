@@ -22,6 +22,8 @@ namespace Transpiler.Analysis
 
         public bool IsSolved { get; private set; }
 
+        public bool InvokeImmediately { get; init; }
+
         public AzFuncDefn(string name,
                           IAzTypeExpn typeExpression,
                           eFixity fixity,
@@ -105,7 +107,7 @@ namespace Transpiler.Analysis
         public IAzFuncStmtDefn SubstituteType(Substitution s)
         {
             Type = Type.Substitute(s);
-            Expression = Expression.SubstituteType(s);
+            Expression = Expression?.SubstituteType(s);
             IsSolved = true;
             return this;
         }

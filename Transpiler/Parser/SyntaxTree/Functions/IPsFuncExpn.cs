@@ -9,7 +9,7 @@
 
             if (PsIfExpn.Parse(ref q, isInline, out var ifNode)) { node = ifNode; }
             else if (!isInline && PsMatchExpn.Parse(ref q, out var matchNode)) { node = matchNode; }
-            else if (!isInline && PsClosureExpn.Parse(ref q, out var closeNode)) { node = closeNode; }
+            //else if (!isInline && PsClosureExpn.Parse(ref q, out var closeNode)) { node = closeNode; }
             else if (PsLambdaExpn.Parse(ref q, isInline, out var lambdaNode)) { node = lambdaNode; }
             else if (PsTupleExpn.Parse(ref q, out var tupleNode)) { node = tupleNode; }
             else if (PsArbExpn.Parse(ref q, isInline, out var arbNode)) { node = arbNode; }

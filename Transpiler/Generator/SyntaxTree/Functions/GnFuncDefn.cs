@@ -8,7 +8,8 @@ namespace Transpiler.Generate
     // Todo: Add optional Type constraint property.
     public record GnFuncDefn(string Name,
                              IReadOnlyList<Refinement> Refinements,
-                             IGnFuncExpn Expression) : IGnFuncStmtDefn
+                             IGnFuncExpn Expression,
+                             bool InvokeImmediately) : IGnFuncStmtDefn
     {
         public static GnFuncDefn Prepare(Scope scope, AzFuncDefn azFuncDefn)
         {
@@ -19,7 +20,7 @@ namespace Transpiler.Generate
 
             var expn = IGnFuncExpn.Prepare(scope, azFuncDefn.Expression);
 
-            return new(azFuncDefn.Name, rs, expn);
+            return new(azFuncDefn.Name, rs, expn, azFuncDefn.InvokeImmediately);
         }
 
         public string Generate(int i, NameProvider names, ref string s)

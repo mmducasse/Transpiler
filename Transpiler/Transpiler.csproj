@@ -15,6 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Analyzer\SyntaxTree\Functions\AzClosureExpn.cs" />
+    <Compile Remove="Generator\SyntaxTree\Functions\GnClosureExpn.cs" />
+    <Compile Remove="Parser\SyntaxTree\Functions\PsClosureExpn.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\AzElsePattern.cs" />
     <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\AzParam.cs" />
     <Compile Include="Analyzer\SyntaxTree\Functions\PatternMatching\AzDectorPattern.cs" />

@@ -5,15 +5,16 @@ namespace Transpiler.Generate
 {
     public record GnDectorFuncDefn(string ElementName,
                                    int ElementIndex,
-                                   IGnFuncExpn Expression) : IGnFuncStmtDefn
+                                   IGnFuncExpn Expression,
+                                   bool InvokeImmediately) : IGnFuncStmtDefn
     {
         public string Name => ElementName;
 
-        public static GnDectorFuncDefn Prepare(IScope scope, AzDectorFuncDefn funcDefn)
+        public static GnDectorFuncDefn Prepare(IScope scope, AzDectorFuncDefn azDectorDefn)
         {
-            var expn = IGnFuncExpn.Prepare(scope, funcDefn.Expression);
+            var expn = IGnFuncExpn.Prepare(scope, azDectorDefn.Expression);
 
-            var tvs = funcDefn.Type.GetTypeVars();
+            var tvs = azDectorDefn.Type.GetTypeVars();
             if (tvs.Count > 0)
             {
                 foreach (var tv in tvs)
@@ -26,7 +27,7 @@ namespace Transpiler.Generate
                 }
             }
 
-            return new GnDectorFuncDefn(funcDefn.ElementName, funcDefn.ElementIndex, expn);
+            return new(azDectorDefn.ElementName, azDectorDefn.ElementIndex, expn, azDectorDefn.InvokeImmediately);
         }
 
         public string Generate(int i, NameProvider names, ref string s)

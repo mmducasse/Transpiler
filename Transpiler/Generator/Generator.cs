@@ -6,11 +6,15 @@ namespace Transpiler.Generate
 {
     public static class Generator
     {
-        public static void TEMP_AddFinalLine(ref StringBuilder output)
+        public static void TEMP_AddFinalLine(bool ansIsFunction, ref StringBuilder output)
         {
+            string ansLine = ansIsFunction
+                ? "  console.log('<Function>')\n"
+                : "   PrintResult(_ans())\n";
+
             string s = "\n\n";
             s += "try {\n";
-            s += "   PrintResult(_ans())\n";
+            s += ansLine;
             s += "   console.log(\"\")\n";
             s += "} catch (e) {\n";
             s += "   console.log(e)\n";

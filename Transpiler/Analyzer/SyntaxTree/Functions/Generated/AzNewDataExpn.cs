@@ -9,7 +9,7 @@ namespace Transpiler.Analysis
 
         public CodePosition Position => CodePosition.Null;
 
-        public IAzTypeExpn Type { get; }
+        public IAzTypeExpn Type { get; private set; }
 
         public AzDataTypeDefn Definition { get; }
 
@@ -32,7 +32,9 @@ namespace Transpiler.Analysis
 
         public IAzFuncExpn SubstituteType(Substitution s)
         {
-            throw new System.NotImplementedException();
+            Arguments = Arguments.Select(a => a.SubstituteType(s) as AzSymbolExpn).ToList();
+            Type = Type.Substitute(s);
+            return this;
         }
 
         public IReadOnlyList<IAzFuncNode> GetSubnodes()

@@ -7,6 +7,7 @@ using System.Text;
 using Transpiler.Analysis;
 using Transpiler.Generate;
 using Transpiler.Parse;
+using static Transpiler.UI;
 
 namespace Transpiler
 {
@@ -29,7 +30,7 @@ namespace Transpiler
         public Compiler()
         {
 #pragma warning disable CA1416 // Validate platform compatibility
-            Console.SetWindowSize(64, 30);
+            Console.SetWindowSize(64, 32);
 #pragma warning restore CA1416 // Validate platform compatibility
             Console.WriteLine("Transpiler");
             Console.WriteLine("M. Ducasse 2021\n\n");
@@ -43,9 +44,7 @@ namespace Transpiler
             // REPL Loop.
             while (true)
             {
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.Write("FL1> ");
-                Console.ForegroundColor = ConsoleColor.White;
+                Pr("FL1> ", Blue);
 
                 try
                 {
@@ -75,10 +74,8 @@ namespace Transpiler
                         Analyzer.Analyze(inputModule, new());
 
                         var funcDefn = inputModule.Scope.FuncDefinitions.First().Value;
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("\n\n{0} :: {1}", funcDefn.Name, funcDefn.Type.PrintWithRefinements());
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.WriteLine(funcDefn.Print(0));
+                        string fnString = string.Format("\n\n{0} :: {1}", funcDefn.Name, funcDefn.Type.PrintWithRefinements());
+                        PrLn(fnString, Yellow);
 
                         CompileModulesToJs();
                         AddCompiledInputModule(inputModule);
@@ -186,7 +183,13 @@ namespace Transpiler
 
             Generator.GenerateModule(inputModule.Name, inputModule.Scope, ref output);
 
-            Generator.TEMP_AddFinalLine(ref output);
+            bool ansIsFunction = false;
+            if (inputModule.Scope.TryGetFuncDefn("ans", out var ansDefn))
+            {
+                ansIsFunction = ansDefn.Type.GetRefinements().Count > 0;
+            }
+
+            Generator.TEMP_AddFinalLine(ansIsFunction, ref output);
             File.WriteAllText(DEST_JS_FILE, mOutput);
             File.AppendAllText(DEST_JS_FILE, output.ToString());
         }

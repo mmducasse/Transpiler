@@ -17,7 +17,7 @@ namespace Transpiler.Generate
                 AzTupleExpn tupExpn => GnTupleExpn.Prepare(scope, tupExpn),
                 AzIfExpn ifExpn => GnIfExpn.Prepare(scope, ifExpn),
                 AzMatchExpn matExpn => GnMatchExpn.Prepare(scope, matExpn),
-                AzClosureExpn closeExpn => GnClosureExpn.Prepare(closeExpn),
+                //AzClosureExpn closeExpn => GnClosureExpn.Prepare(closeExpn),
                 AzNewDataExpn newExpn => GnNewDataExpn.Prepare(scope, newExpn),
                 AzGetElementExpn getExpn => GnGetElementExpn.Prepare(scope, getExpn),
                 _ => throw new NotImplementedException(),
