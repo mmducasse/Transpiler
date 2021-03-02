@@ -6,7 +6,8 @@ namespace Transpiler.Analysis
 {
     public record AzSymbolExpn(IAzFuncDefn Definition,
                                IAzTypeExpn Type,
-                               CodePosition Position) : IAzFuncExpn, IAzPattern
+                               CodePosition Position,
+                               eFixity Fixity = eFixity.Prefix) : IAzFuncExpn, IAzPattern
     {
         public static AzSymbolExpn Analyze(Scope scope,
                                            NameProvider _,
@@ -36,10 +37,10 @@ namespace Transpiler.Analysis
                     throw new System.Exception();
                 }
 
-                return new AzSymbolExpn(funcDefn, type, node.Position);
+                return new(funcDefn, type, node.Position, funcDefn.Fixity);
             }
 
-            throw Error("Undefined symbol: " + node.Name, node.Position);
+            throw Error(node.Name + " is not defined in this scope.", node.Position);
         }
 
         public ConstraintSet Constrain(TvProvider tvs, Scope scope) => ConstraintSet.Empty;

@@ -26,6 +26,10 @@ namespace Transpiler.Analysis
             // One subexpression.
             if (subexpns.Count == 1)
             {
+                if (subexpns[0] is AzSymbolExpn symExpn1)
+                {
+                    return symExpn1 with { Fixity = eFixity.Prefix };
+                }
                 return subexpns[0];
             }
 
@@ -45,7 +49,7 @@ namespace Transpiler.Analysis
             // Three subexpressions and the second is an infix operator.
             if ((subexpns.Count == 3) &&
                 subexpns[1] is AzSymbolExpn symExpn &&
-                symExpn.Definition.Fixity == eFixity.Infix)
+                symExpn.Fixity == eFixity.Infix)
             {
                 var op = subexpns[1];
                 var app2 = new AzAppExpn(op, subexpns[0], tvs.Next, op.Position);
@@ -59,7 +63,7 @@ namespace Transpiler.Analysis
             for (int i = 1; i < subexpns.Count; i++)
             {
                 if (subexpns[i] is AzSymbolExpn opi &&
-                    opi.Definition.Fixity != eFixity.Prefix)
+                    opi.Fixity != eFixity.Prefix)
                 {
                     app = new AzAppExpn(subexpns[i], app, tvs.Next, subexpns[i].Position);
                 }

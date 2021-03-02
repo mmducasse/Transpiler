@@ -5,6 +5,7 @@ namespace Transpiler
     public static class UI
     {
         public static ConsoleColor White => ConsoleColor.White;
+        public static ConsoleColor Gray => ConsoleColor.DarkGray;
         public static ConsoleColor Black => ConsoleColor.Black;
         public static ConsoleColor Yellow => ConsoleColor.Yellow;
         public static ConsoleColor Blue => ConsoleColor.Blue;
@@ -25,6 +26,8 @@ namespace Transpiler
             Console.ForegroundColor = White;
             Console.BackgroundColor = Black;
         }
+
+        public static void PrLn() { Console.WriteLine(); }
 
         public static void PrLn(string text, params object[] args)
         {

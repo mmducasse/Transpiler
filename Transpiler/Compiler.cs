@@ -153,8 +153,8 @@ namespace Transpiler
 
         private void ListModule(Module module)
         {
-            Console.WriteLine();
-            Console.WriteLine(module.Name);
+            PrLn();
+            PrLn(module.Name, Gray);
             //module.Scope.PrintTypes();
             module.Scope.PrintFunctions();
         }

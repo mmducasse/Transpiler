@@ -1,6 +1,8 @@
 ﻿
 TODO:
 
+- Add new parameter to analyze to collect dependencies for batch solving.
+- Merge SubstituteType(s) and PostAnalyze into single void function.
 - Make type get-only for all nodes. Have substitute routine create a new, solved ast.
 - Revisit Generated Az node private setters for Type
 - Move MatchExpn PostAnalyze into Generator code

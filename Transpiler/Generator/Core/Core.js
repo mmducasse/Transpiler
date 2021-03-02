@@ -28,7 +28,7 @@ function Match(x, pattern)
 		Array.isArray(pattern) &&
 		x.length == pattern.length)
 	{
-		for (i = 0; i < x.length; i++)
+		for (var i = 0; i < x.length; i++)
 		{
 			if (!Match(x[i], pattern[i]))
 			{
