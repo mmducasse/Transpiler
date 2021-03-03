@@ -30,10 +30,10 @@ namespace Transpiler.Analysis
             return new(arg, expr, psLamExpn.Position);
         }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope scope)
+        public ConstraintSet Constrain()
         {
-            var csp = Parameter.Constrain(provider, scope);
-            var cse = Expression.Constrain(provider, scope);
+            var csp = Parameter.Constrain();
+            var cse = Expression.Constrain();
 
             var lamType = new AzTypeLambdaExpn(Parameter.Type, Expression.Type, Null);
             var cf = new Constraint(Type, lamType, Position);

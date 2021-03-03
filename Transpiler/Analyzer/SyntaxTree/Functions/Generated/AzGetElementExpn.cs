@@ -32,9 +32,9 @@ namespace Transpiler.Analysis
             TupleType = new(elementTvs, Null);
         }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope scope)
+        public ConstraintSet Constrain()
         {
-            var cse = Expression.Constrain(provider, scope);
+            var cse = Expression.Constrain();
 
             var ctup = new Constraint(TupleType, Expression.Type, Position);
 

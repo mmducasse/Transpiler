@@ -57,13 +57,13 @@ namespace Transpiler.Analysis
             };
         }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope scope)
+        public ConstraintSet Constrain()
         {
             var cs = new ConstraintSet();
             var typeExpn = TypeDefn.Expression.Substitute(UniqueSubstitution);
             for (int i = 0; i < Variables.Count; i++)
             {
-                var csv = Variables[i].Constrain(provider, scope);
+                var csv = Variables[i].Constrain();
                 var c = new Constraint(typeExpn.Elements[i], Variables[i].Type, Position);
 
                 cs = IConstraintSet.Union(cs, c, csv);

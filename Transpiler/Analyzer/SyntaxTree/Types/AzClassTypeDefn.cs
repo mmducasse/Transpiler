@@ -63,7 +63,6 @@ namespace Transpiler.Analysis
         }
 
         public static AzClassTypeDefn Analyze(Scope scope,
-                                              TvProvider tvs,
                                               AzClassTypeDefn classType,
                                               PsClassTypeDefn node)
         {

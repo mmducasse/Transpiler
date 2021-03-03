@@ -19,12 +19,12 @@ namespace Transpiler.Analysis
             return new(elements, psTupExpn.Position);
         }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope scope)
+        public ConstraintSet Constrain()
         {
             ConstraintSet cs = new();
             foreach (var e in Elements)
             {
-                var cse = e.Constrain(provider, scope);
+                var cse = e.Constrain();
                 cs = IConstraintSet.Union(cs, cse);
             }
 

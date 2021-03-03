@@ -40,9 +40,9 @@ namespace Transpiler.Analysis
             }
         }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope scope)
+        public ConstraintSet Constrain()
         {
-            var csa = Argument.Constrain(provider, scope);
+            var csa = Argument.Constrain();
 
             var tmatch = Type;
             var targ = Argument.Type;
@@ -50,7 +50,7 @@ namespace Transpiler.Analysis
             var cs = new ConstraintSet();
             foreach (var @case in Cases)
             {
-                var c = @case.Constrain(provider, scope);
+                var c = @case.Constrain();
 
                 var tcase = @case.Type as AzTypeLambdaExpn;
 

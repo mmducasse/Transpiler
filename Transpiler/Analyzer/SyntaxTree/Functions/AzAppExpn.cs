@@ -75,10 +75,10 @@ namespace Transpiler.Analysis
             return app;
         }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope scope)
+        public ConstraintSet Constrain()
         {
-            var csf = Function.Constrain(provider, scope);
-            var csx = Argument.Constrain(provider, scope);
+            var csf = Function.Constrain();
+            var csx = Argument.Constrain();
 
             var p = CodePosition.Null;
             var lamType = new AzTypeLambdaExpn(Argument.Type, Type, p);

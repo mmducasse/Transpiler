@@ -90,12 +90,11 @@ namespace Transpiler.Analysis
             return funcDefn;
         }
 
-        public ConstraintSet Constrain(TvProvider provider,
-                                       Scope scope)
+        public ConstraintSet Constrain()
         {
             if (Expression != null)
             {
-                var cs = Expression.Constrain(provider, scope);
+                var cs = Expression.Constrain();
                 var c = new Constraint(Type, Expression.Type, Position);
 
                 return IConstraintSet.Union(c, cs);

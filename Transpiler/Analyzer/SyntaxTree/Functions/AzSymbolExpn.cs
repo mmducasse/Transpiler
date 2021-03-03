@@ -56,7 +56,7 @@ namespace Transpiler.Analysis
             throw Error(node.Name + " is not defined in this scope.", node.Position);
         }
 
-        public ConstraintSet Constrain(TvProvider tvs, Scope scope) => ConstraintSet.Empty;
+        public ConstraintSet Constrain() => ConstraintSet.Empty;
 
         public void SubstituteType(Substitution s)
         {

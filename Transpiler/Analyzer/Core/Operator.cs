@@ -15,7 +15,7 @@ namespace Transpiler.Analysis
 
         IAzTypeExpn IAzFuncNode.Type => Type;
 
-        public ConstraintSet Constrain(TvProvider provider, Scope scope)
+        public ConstraintSet Constrain()
         {
             throw new System.NotImplementedException();
         }

@@ -102,6 +102,7 @@ namespace Transpiler.Generate
                     '<' => "lcaret",
                     '>' => "rcaret",
                     '?' => "qmark",
+                    '|' => "pipe",
                     _ => symbol[i]
                 };
             }

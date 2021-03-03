@@ -43,17 +43,17 @@ namespace Transpiler.Analysis
             }
         }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope _)
+        public ConstraintSet Constrain()
         {
             var cs = new ConstraintSet();
 
             foreach (var fn in FuncDefinitions)
             {
-                var fcs = fn.Constrain(provider, Scope);
+                var fcs = fn.Constrain();
                 cs = IConstraintSet.Union(fcs, cs);
             }
 
-            var cse = Expression.Constrain(provider, Scope);
+            var cse = Expression.Constrain();
             var ccc = new Constraint(Type, Expression.Type, Position);
 
             return IConstraintSet.Union(cse, cs, ccc);

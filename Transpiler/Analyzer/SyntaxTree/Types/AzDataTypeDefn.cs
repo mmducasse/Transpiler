@@ -41,7 +41,7 @@ namespace Transpiler.Analysis
             Position = position;
         }
 
-        public static AzDataTypeDefn Make(Scope fileScope, TvProvider tvs, string name, AzUnionTypeDefn parentUnion)
+        public static AzDataTypeDefn Make(Scope fileScope, string name, AzUnionTypeDefn parentUnion)
         {
             var ctorFunc = new AzFuncDefn(name, null, eFixity.Prefix, true, Null);
             var typeDefn = new AzDataTypeDefn(name,
@@ -53,7 +53,7 @@ namespace Transpiler.Analysis
                                               Null);
 
             typeDefn.Expression = new AzTypeTupleExpn(new List<IAzTypeExpn>(), Null);
-            CreateConstructor(fileScope, typeDefn, parentUnion, tvs);
+            CreateConstructor(fileScope, typeDefn, parentUnion);
             fileScope.AddType(typeDefn);
             return typeDefn;
         }
@@ -110,7 +110,6 @@ namespace Transpiler.Analysis
         }
 
         public static AzDataTypeDefn Analyze(Scope fileScope,
-                                             TvProvider tvs,
                                              AzDataTypeDefn dataType,
                                              PsDataTypeDefn node)
         {
@@ -127,19 +126,18 @@ namespace Transpiler.Analysis
             {
                 if (node.Elements[i].HasAccessor)
                 {
-                    CreateAccessor(fileScope, tvs, dataType, actualType, i, node.Elements.Count);
+                    CreateAccessor(fileScope, dataType, actualType, i, node.Elements.Count);
                 }
             }
 
-            CreateConstructor(fileScope, dataType, actualType, tvs);
+            CreateConstructor(fileScope, dataType, actualType);
 
             return dataType;
         }
 
         public static void CreateConstructor(Scope fileScope,
                                              AzDataTypeDefn dataType,
-                                             IAzDataTypeDefn returnType,
-                                             TvProvider tvs)
+                                             IAzDataTypeDefn returnType)
         {
             Stack<IAzTypeExpn> argStack;
             if (dataType.Expression is AzTypeTupleExpn tupleType)
@@ -154,7 +152,7 @@ namespace Transpiler.Analysis
 
             AzTypeCtorExpn retType = new (returnType, returnType.Parameters, Null);
             IAzTypeExpn type = retType;
-            AzNewDataExpn newData = new(dataType, tvs);
+            AzNewDataExpn newData = new(dataType);
             IAzFuncExpn expn = new AzScopedFuncExpn(newData, new List<AzFuncDefn>(), fileScope, Null);
 
             int index = 0;
@@ -179,7 +177,6 @@ namespace Transpiler.Analysis
         }
 
         public static void CreateAccessor(Scope fileScope,
-                                          TvProvider tvs,
                                           AzDataTypeDefn dataType,
                                           IAzDataTypeDefn inputType,
                                           int elementIndex,

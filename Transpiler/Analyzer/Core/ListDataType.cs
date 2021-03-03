@@ -6,7 +6,7 @@ namespace Transpiler.Analysis
 {
     public static class ListDataType
     {
-        public static AzUnionTypeDefn CreateList(Scope scope, TvProvider tvs)
+        public static AzUnionTypeDefn CreateList(Scope scope)
         {
             var p = CodePosition.Null;
             var a = TypeVariable.Simple(0);
@@ -15,14 +15,14 @@ namespace Transpiler.Analysis
             var emptyCtor = new AzFuncDefn("Empty", null, eFixity.Prefix, true, p);
             var empty = new AzDataTypeDefn("Empty", Array.Empty<TypeVariable>(), emptyCtor, new List<AzFuncDefn>(), list, scope, p);
             empty.Expression = new AzTypeTupleExpn(Array.Empty<IAzTypeExpn>(), p);
-            AzDataTypeDefn.CreateConstructor(scope, empty, list, tvs);
+            AzDataTypeDefn.CreateConstructor(scope, empty, list);
             scope.AddType(empty);
             scope.AddSuperType(empty, list);
 
             var nodeCtor = new AzFuncDefn("Node", null, eFixity.Prefix, true, p);
             var node = new AzDataTypeDefn("Node", Array.Empty<TypeVariable>(), nodeCtor, new List<AzFuncDefn>(), list, scope, p);
             node.Expression = new AzTypeTupleExpn(RList<IAzTypeExpn>(a, new AzTypeCtorExpn(list, a.ToArr(), p)), p);
-            AzDataTypeDefn.CreateConstructor(scope, node, list, tvs);
+            AzDataTypeDefn.CreateConstructor(scope, node, list);
             scope.AddType(node);
             scope.AddSuperType(node, list);
 

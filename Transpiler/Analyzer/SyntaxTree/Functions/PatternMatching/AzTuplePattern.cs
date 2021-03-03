@@ -20,13 +20,13 @@ namespace Transpiler.Analysis
             return new(elements, psTupPat.Position);
         }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope scope)
+        public ConstraintSet Constrain()
         {
             var cs = new ConstraintSet();
             List<IAzTypeExpn> elementTypes = new();
             for (int i = 0; i < Elements.Count; i++)
             {
-                var c = Elements[i].Constrain(provider, scope);
+                var c = Elements[i].Constrain();
                 elementTypes.Add(Elements[i].Type);
 
                 cs = IConstraintSet.Union(cs, c);

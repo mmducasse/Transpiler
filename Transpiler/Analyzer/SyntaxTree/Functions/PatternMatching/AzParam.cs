@@ -25,7 +25,7 @@ namespace Transpiler.Analysis
             return azParam;
         }
 
-        public ConstraintSet Constrain(TvProvider tvs, Scope  scope) => ConstraintSet.Empty;
+        public ConstraintSet Constrain() => ConstraintSet.Empty;
 
         public void SubstituteType(Substitution s)
         {

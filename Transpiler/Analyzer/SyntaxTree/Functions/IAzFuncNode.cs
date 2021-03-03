@@ -7,7 +7,7 @@ namespace Transpiler.Analysis
     {
         IAzTypeExpn Type { get; }
 
-        ConstraintSet Constrain(TvProvider provider, Scope scope);
+        ConstraintSet Constrain();
 
         void SubstituteType(Substitution s);
 

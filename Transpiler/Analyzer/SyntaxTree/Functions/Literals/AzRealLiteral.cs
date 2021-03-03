@@ -16,7 +16,7 @@ namespace Transpiler.Analysis
             return new(psRealNode.Value, psRealNode.Position);
         }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope scope) => ConstraintSet.Empty;
+        public ConstraintSet Constrain() => ConstraintSet.Empty;
 
         public void SubstituteType(Substitution s) { }
 

@@ -36,7 +36,7 @@ namespace Transpiler.Analysis
             List<AzDataTypeDefn> subtypes = new();
             foreach (string sn in subtypeNames)
             {
-                var data = AzDataTypeDefn.Make(scope, tvs, sn, typeDefn);
+                var data = AzDataTypeDefn.Make(scope, sn, typeDefn);
                 subtypes.Add(data);
             }
 
@@ -72,7 +72,6 @@ namespace Transpiler.Analysis
         }
 
         public static AzUnionTypeDefn Analyze(Scope fileScope,
-                                              TvProvider tvs,
                                               AzUnionTypeDefn unionType,
                                               PsUnionTypeDefn unionNode)
         {
@@ -82,7 +81,7 @@ namespace Transpiler.Analysis
                 var type = unionType.Subtypes[i];
                 var node = unionNode.Subtypes[i];
 
-                IAzTypeDefn.Analyze(fileScope, tvs, type, node);
+                IAzTypeDefn.Analyze(fileScope, type, node);
             }
 
             // Add the subtypes to the type heirarchy.

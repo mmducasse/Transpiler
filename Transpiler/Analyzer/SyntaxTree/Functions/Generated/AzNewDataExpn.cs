@@ -13,22 +13,21 @@ namespace Transpiler.Analysis
 
         public AzDataTypeDefn Definition { get; }
 
-        public AzNewDataExpn(AzDataTypeDefn definition,
-                             TvProvider tvs)
+        public AzNewDataExpn(AzDataTypeDefn definition)
         {
             Definition = definition;
 
             if (Definition.ParentUnion != null)
             {
-                Type = Definition.ParentUnion.ToCtor().WithUniqueTvs(tvs);
+                Type = Definition.ParentUnion.ToCtor().WithUniqueTvs(TypeVariables.Provider);
             }
             else
             {
-                Type = Definition.ToCtor().WithUniqueTvs(tvs);
+                Type = Definition.ToCtor().WithUniqueTvs(TypeVariables.Provider);
             }
         }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope scope) => ConstraintSet.Empty;
+        public ConstraintSet Constrain() => ConstraintSet.Empty;
 
         public void SubstituteType(Substitution s)
         {

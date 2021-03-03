@@ -23,20 +23,19 @@ namespace Transpiler.Analysis
         }
 
         public static IAzTypeDefn Analyze(Scope fileScope,
-                                          TvProvider tvs,
                                           IAzTypeDefn typeDefn,
                                           IPsTypeDefn node)
         {
             return (typeDefn, node) switch
             {
                 (AzDataTypeDefn dataType, PsDataTypeDefn dataNode) =>
-                    AzDataTypeDefn.Analyze(fileScope, tvs, dataType, dataNode),
+                    AzDataTypeDefn.Analyze(fileScope, dataType, dataNode),
 
                 (AzUnionTypeDefn unionType, PsUnionTypeDefn unionNode) =>
-                    AzUnionTypeDefn.Analyze(fileScope, tvs, unionType, unionNode),
+                    AzUnionTypeDefn.Analyze(fileScope, unionType, unionNode),
 
                 (AzClassTypeDefn classType, PsClassTypeDefn classNode) =>
-                    AzClassTypeDefn.Analyze(fileScope, tvs, classType, classNode),
+                    AzClassTypeDefn.Analyze(fileScope, classType, classNode),
 
                 _ => throw new NotImplementedException(),
             };

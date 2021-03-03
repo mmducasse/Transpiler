@@ -95,7 +95,9 @@ namespace Transpiler.Generate
                 }
             }
 
-            throw new Exception();
+            return "";
+
+            //throw new Exception();
         }
 
 

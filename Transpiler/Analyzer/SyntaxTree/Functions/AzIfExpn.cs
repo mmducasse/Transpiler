@@ -24,11 +24,11 @@ namespace Transpiler.Analysis
             return new(condition, thenCase, elseCase, psIfExpn.Position);
         }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope scope)
+        public ConstraintSet Constrain()
         {
-            var csc = Condition.Constrain(provider, scope);
-            var cst = ThenCase.Constrain(provider, scope);
-            var cse = ElseCase.Constrain(provider, scope);
+            var csc = Condition.Constrain();
+            var cst = ThenCase.Constrain();
+            var cse = ElseCase.Constrain();
 
             var cif = new Constraint(Type, ThenCase.Type, Position);
             var cc = new Constraint(Condition.Type, Core.Instance.Bool.ToCtor(), Position);

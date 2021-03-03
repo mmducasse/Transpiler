@@ -44,7 +44,7 @@ namespace Transpiler.Analysis
             Num = CreateNum(Module.Scope);
             Ord = CreateOrd(Module.Scope);
 
-            List = CreateList(Module.Scope, tvs);
+            List = CreateList(Module.Scope);
 
             //CreateMiscFunctions(Module.Scope);
 

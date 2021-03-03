@@ -23,10 +23,10 @@ namespace Transpiler.Analysis
             return new(pattern, expn, node.Position) { Type = type };
         }
 
-        public ConstraintSet Constrain(TvProvider tvs, Scope scope)
+        public ConstraintSet Constrain()
         {
-            var cspatt = Pattern.Constrain(tvs, scope);
-            var csexpn = Expression.Constrain(tvs, scope);
+            var cspatt = Pattern.Constrain();
+            var csexpn = Expression.Constrain();
 
             var lamType = Type as AzTypeLambdaExpn;
             var cinput = new Constraint(lamType.Input, Pattern.Type, lamType.Input.Position);
