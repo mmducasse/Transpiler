@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Parse;
 
@@ -6,16 +7,16 @@ namespace Transpiler.Analysis
 {
     public record AzDectorPattern(AzDataTypeDefn TypeDefn,
                                   IReadOnlyList<IAzPattern> Variables,
-                                  IAzTypeExpn Type,
                                   CodePosition Position) : IAzPattern
     {
+        public IAzTypeExpn Type { get; private set; } = TypeVariables.Next;
+
         public bool IsCompleteMember => (Variables.Count == 0) || Variables.All(v => v is AzParam);
 
         private Substitution UniqueSubstitution { get; init; }
 
         public static AzDectorPattern Analyze(Scope scope,
                                               NameProvider names,
-                                              TvProvider tvs,
                                               PsDectorPattern psDectorPat)
         {
             if (!scope.TryGetNamedType(psDectorPat.TypeName, out var typeDefn))
@@ -32,24 +33,28 @@ namespace Transpiler.Analysis
             IAzTypeExpn type;
             if (dataTypeDefn.ParentUnion != null)
             {
-                uniqueSubstitution = dataTypeDefn.ParentUnion.ToCtor().UniqueTvSubstitution(tvs);
+                uniqueSubstitution = dataTypeDefn.ParentUnion.ToCtor().UniqueTvSubstitution(TypeVariables.Provider);
                 type = dataTypeDefn.ParentUnion.ToCtor().Substitute(uniqueSubstitution);
             }
             else
             {
-                uniqueSubstitution = dataTypeDefn.ToCtor().UniqueTvSubstitution(tvs);
+                uniqueSubstitution = dataTypeDefn.ToCtor().UniqueTvSubstitution(TypeVariables.Provider);
                 type = dataTypeDefn.ToCtor().Substitute(uniqueSubstitution);
             }
 
             int numElements = dataTypeDefn.Expression.Elements.Count;
 
-            var vars = psDectorPat.Variables.Select(v => IAzPattern.Analyze(scope, names, tvs, v)).ToList();
+            var vars = psDectorPat.Variables.Select(v => IAzPattern.Analyze(scope, names, v)).ToList();
             if (vars.Count != numElements)
             {
                 throw Analyzer.Error(string.Format("Type {0} has {1} members.", psDectorPat.TypeName, numElements), psDectorPat.Position);
             }
 
-            return new(dataTypeDefn, vars, type, psDectorPat.Position) { UniqueSubstitution = uniqueSubstitution };
+            return new(dataTypeDefn, vars, psDectorPat.Position)
+            {
+                Type = type,
+                UniqueSubstitution = uniqueSubstitution
+            };
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
@@ -67,18 +72,15 @@ namespace Transpiler.Analysis
             return cs;
         }
 
-        public IAzPattern SubstituteType(Substitution s)
+        public void SubstituteType(Substitution s)
         {
-            return new AzDectorPattern(TypeDefn,
-                                       Variables.Select(v => v.SubstituteType(s)).ToList(),
-                                       Type.Substitute(s),
-                                       Position);
+            Type = Type.Substitute(s);
         }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        public void Recurse(Action<IAzFuncNode> action)
         {
-            var variableNodes = Variables.SelectMany(v => v.GetSubnodes()).ToList();
-            return this.ToArr().Concat(variableNodes).ToList();
+            Variables.Foreach(v => v.Recurse(action));
+            action(this);
         }
 
         public string Print(int i)

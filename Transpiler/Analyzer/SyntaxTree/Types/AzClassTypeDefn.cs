@@ -75,7 +75,7 @@ namespace Transpiler.Analysis
                 if (funcNode.Expression != null)
                 {
                     // Analyze the function if it has a default implementation.
-                    AzFuncDefn.Analyze(classType.Scope, new("p"), tvs, funcDefn, funcNode);
+                    AzFuncDefn.Analyze(classType.Scope, new("p"), funcDefn, funcNode);
                 }
             }
 

@@ -20,8 +20,6 @@ namespace Transpiler.Analysis
 
         bool InvokeImmediately { get; init; }
 
-        IAzFuncStmtDefn SubstituteType(Substitution s);
-
         public static IReadOnlyList<IAzFuncStmtDefn> Initialize(Scope scope,
                                                                 IPsFuncStmtDefn node)
         {
@@ -35,17 +33,16 @@ namespace Transpiler.Analysis
 
         public static IAzFuncDefn Analyze(Scope parentScope,
                                           NameProvider names,
-                                          TvProvider tvs,
                                           IAzFuncStmtDefn funcDefn,
                                           IPsFuncStmtDefn node)
         {
             return (funcDefn, node) switch
             {
                 (AzFuncDefn azFuncDefn, PsFuncDefn psFuncDefn) =>
-                    AzFuncDefn.Analyze(parentScope, names, tvs, azFuncDefn, psFuncDefn),
+                    AzFuncDefn.Analyze(parentScope, names, azFuncDefn, psFuncDefn),
 
                 (AzDectorFuncDefn azDectorFuncDefn, PsDectorFuncDefn psDectorFuncDefn) =>
-                    AzDectorFuncDefn.Analyze(parentScope, names, tvs, azDectorFuncDefn, psDectorFuncDefn),
+                    AzDectorFuncDefn.Analyze(parentScope, names, azDectorFuncDefn, psDectorFuncDefn),
 
                 _ => throw new System.Exception(),
             };

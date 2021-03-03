@@ -88,6 +88,14 @@ namespace Transpiler
             return false;
         }
 
+        public static void Foreach<T>(this IEnumerable<T> items, Action<T> action)
+        {
+            foreach (var item in items)
+            {
+                action(item);
+            }
+        }
+
         public static IReadOnlyList<T> ToArr<T>(this T item)
         {
             return new T[] { item };

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Parse;
 using static Transpiler.CodePosition;
@@ -6,16 +7,16 @@ using static Transpiler.CodePosition;
 namespace Transpiler.Analysis
 {
     public record AzTupleExpn(IReadOnlyList<IAzFuncExpn> Elements,
-                              IAzTypeExpn Type,
                               CodePosition Position) : IAzFuncExpn
     {
+        public IAzTypeExpn Type { get; private set; } = TypeVariables.Next;
+
         public static AzTupleExpn Analyze(Scope scope,
                                           NameProvider names,
-                                          TvProvider tvs,
                                           PsTupleExpn psTupExpn)
         {
-            var elements = psTupExpn.Elements.Select(e => IAzFuncExpn.Analyze(scope, names, tvs, e)).ToList();
-            return new(elements, tvs.Next, psTupExpn.Position);
+            var elements = psTupExpn.Elements.Select(e => IAzFuncExpn.Analyze(scope, names, e)).ToList();
+            return new(elements, psTupExpn.Position);
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
@@ -39,17 +40,15 @@ namespace Transpiler.Analysis
             return IConstraintSet.Union(ct, cs);
         }
 
-        public IAzFuncExpn SubstituteType(Substitution s)
+        public void SubstituteType(Substitution s)
         {
-            return new AzTupleExpn(Elements.Select(e => e.SubstituteType(s)).ToList(),
-                                   Type.Substitute(s),
-                                   Position);
+            Type = Type.Substitute(s);
         }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        public void Recurse(Action<IAzFuncNode> action)
         {
-            var elementNodes = Elements.SelectMany(e => e.GetSubnodes()).ToList();
-            return this.ToArr().Concat(elementNodes).ToList();
+            Elements.Foreach(e => e.Recurse(action));
+            action(this);
         }
 
         public string Print(int i)

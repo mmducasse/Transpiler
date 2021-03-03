@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Transpiler.Analysis
 {
@@ -8,6 +9,8 @@ namespace Transpiler.Analysis
 
         ConstraintSet Constrain(TvProvider provider, Scope scope);
 
-        IReadOnlyList<IAzFuncNode> GetSubnodes();
+        void SubstituteType(Substitution s);
+
+        void Recurse(Action<IAzFuncNode> action);
     }
 }

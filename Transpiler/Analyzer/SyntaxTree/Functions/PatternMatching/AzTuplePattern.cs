@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Parse;
 using static Transpiler.CodePosition;
@@ -6,17 +7,17 @@ using static Transpiler.CodePosition;
 namespace Transpiler.Analysis
 {
     public record AzTuplePattern(IReadOnlyList<IAzPattern> Elements,
-                                 IAzTypeExpn Type,
                                  CodePosition Position) : IAzPattern
     {
+        public IAzTypeExpn Type { get; private set; } = TypeVariables.Next;
+
         public static AzTuplePattern Analyze(Scope scope,
                                              NameProvider provider,
-                                             TvProvider tvs,
                                              PsTuplePattern psTupPat)
         {
-            var elements = psTupPat.Elements.Select(e => IAzPattern.Analyze(scope, provider, tvs, e)).ToList();
+            var elements = psTupPat.Elements.Select(e => IAzPattern.Analyze(scope, provider, e)).ToList();
 
-            return new(elements, tvs.Next, psTupPat.Position);
+            return new(elements, psTupPat.Position);
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
@@ -37,17 +38,15 @@ namespace Transpiler.Analysis
             return IConstraintSet.Union(cs, ctup);
         }
 
-        public IAzPattern SubstituteType(Substitution s)
+        public void SubstituteType(Substitution s)
         {
-            return new AzTuplePattern(Elements.Select(e => e.SubstituteType(s)).ToList(),
-                                      Type.Substitute(s),
-                                      Position);
+            Type = Type.Substitute(s);
         }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        public void Recurse(Action<IAzFuncNode> action)
         {
-            var elementNodes = Elements.SelectMany(e => e.GetSubnodes()).ToList();
-            return this.ToArr().Concat(elementNodes).ToList();
+            Elements.Foreach(e => e.Recurse(action));
+            action(this);
         }
 
         public string Print(int i)

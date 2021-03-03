@@ -20,10 +20,9 @@ namespace Transpiler.Analysis
             throw new System.NotImplementedException();
         }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes()
-        {
-            return this.ToArr();
-        }
+        public void Recurse(Action<IAzFuncNode> action) { }
+
+        public void SubstituteType(Substitution s) { }
 
         public string Print(int i)
         {

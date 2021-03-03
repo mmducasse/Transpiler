@@ -23,7 +23,7 @@ namespace Transpiler.Analysis
             SolveFunctions(fileScope, tvs);
 
             // Perform any more verification needed after type inference is done.
-            PostAnalyze(fileScope);
+            //PostAnalyze(fileScope);
 
             if (Compiler.DebugAnalyzer)
             {
@@ -104,7 +104,7 @@ namespace Transpiler.Analysis
             // Analyze functions.
             foreach (var (azFunc, psFunc) in funcDefnsDict)
             {
-                IAzFuncStmtDefn.Analyze(fileScope, new("p"), tvs, azFunc, psFunc);
+                IAzFuncStmtDefn.Analyze(fileScope, new("p"), azFunc, psFunc);
             }
 
             foreach (var (psInst, azInst) in instDefnsDict)
@@ -126,7 +126,6 @@ namespace Transpiler.Analysis
         }
 
         public static IReadOnlyList<IAzFuncStmtDefn> AnalyzeFunctions(Scope scope,
-                                                                      TvProvider tvs,
                                                                       IReadOnlyList<IPsFuncStmtDefn> psFuncDefns)
         {
             // Add all function definitions at this level to scope.
@@ -143,7 +142,7 @@ namespace Transpiler.Analysis
             List<IAzFuncStmtDefn> newFns = new();
             foreach (var (azFunc, psFunc) in funcDefnsDict)
             {
-                IAzFuncStmtDefn.Analyze(scope, new("p"), tvs, azFunc, psFunc);
+                IAzFuncStmtDefn.Analyze(scope, new("p"), azFunc, psFunc);
                 newFns.Add(azFunc);
             }
 
@@ -155,7 +154,7 @@ namespace Transpiler.Analysis
             foreach (var fn in scope.FuncDefinitions.Values)
             {
                 Console.WriteLine("\n\n {0}\n", fn.Name);
-                foreach (var node in fn.GetSubnodes())
+                fn.Recurse((node) =>
                 {
                     string nodeStr = node.Print(0).Replace("\n", "").Replace("\t", "");
                     if (nodeStr.Length > 45)
@@ -170,7 +169,7 @@ namespace Transpiler.Analysis
                         Console.WriteLine(" :: {0}", node.Type.PrintWithRefinements());
                         Console.ForegroundColor = ConsoleColor.White;
                     }
-                }
+                });
             }
         }
 
@@ -195,31 +194,31 @@ namespace Transpiler.Analysis
 
             foreach (var funcDefn in scope.AllFunctions())
             {
-                funcDefn.SubstituteType(substitution);
+                funcDefn.Recurse(n => n.SubstituteType(substitution));
                 var uniqueSub = TvUtils.UniqueTvSubstitution(funcDefn.Type, new());
-                funcDefn.SubstituteType(uniqueSub);
+                funcDefn.Recurse(n => n.SubstituteType(uniqueSub));
                 scope.FuncDefnTypes[funcDefn] = funcDefn.Type;
             }
 
             //TEMP_PrintFnTypes(scope);
         }
 
-        private static void PostAnalyze(Scope scope)
-        {
-            foreach (var fn in scope.FuncDefinitions.Values)
-            {
-                if (fn is AzFuncDefn funcDefn)
-                {
-                    foreach (var node in funcDefn.GetSubnodes())
-                    {
-                        if (node is AzMatchExpn matchExpn)
-                        {
-                            matchExpn.PostAnalyze();
-                        }
-                    }
-                }
-            }
-        }
+        //private static void PostAnalyze(Scope scope)
+        //{
+        //    foreach (var fn in scope.FuncDefinitions.Values)
+        //    {
+        //        if (fn is AzFuncDefn funcDefn)
+        //        {
+        //            foreach (var node in funcDefn.GetSubnodes())
+        //            {
+        //                if (node is AzMatchExpn matchExpn)
+        //                {
+        //                    matchExpn.ValidateCases();
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         public static void Print(Module module)
         {

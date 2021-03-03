@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Parse;
 using static Transpiler.Extensions;
@@ -8,19 +9,19 @@ namespace Transpiler.Analysis
     public record AzIfExpn(IAzFuncExpn Condition,
                            IAzFuncExpn ThenCase,
                            IAzFuncExpn ElseCase,
-                           IAzTypeExpn Type,
                            CodePosition Position) : IAzFuncExpn
     {
+        public IAzTypeExpn Type { get; private set; } = TypeVariables.Next;
+
         public static AzIfExpn Analyze(Scope scope,
                                        NameProvider names,
-                                       TvProvider tvs,
                                        PsIfExpn psIfExpn)
         {
-            var condition = IAzFuncExpn.Analyze(scope, names, tvs, psIfExpn.Condition);
-            var thenCase = IAzFuncExpn.Analyze(scope, names, tvs, psIfExpn.ThenCase);
-            var elseCase = IAzFuncExpn.Analyze(scope, names, tvs, psIfExpn.ElseCase);
+            var condition = IAzFuncExpn.Analyze(scope, names, psIfExpn.Condition);
+            var thenCase = IAzFuncExpn.Analyze(scope, names, psIfExpn.ThenCase);
+            var elseCase = IAzFuncExpn.Analyze(scope, names, psIfExpn.ElseCase);
 
-            return new(condition, thenCase, elseCase, tvs.Next, psIfExpn.Position);
+            return new(condition, thenCase, elseCase, psIfExpn.Position);
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
@@ -36,13 +37,6 @@ namespace Transpiler.Analysis
             return IConstraintSet.Union(cif, cc, cf, csc, cst, cse);
         }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes()
-        {
-            return this.ToArr().Concat(Condition.GetSubnodes())
-                               .Concat(ThenCase.GetSubnodes())
-                               .Concat(ElseCase.GetSubnodes()).ToList();
-        }
-
         public string Print(int i)
         {
             int i1 = i + 1;
@@ -53,13 +47,17 @@ namespace Transpiler.Analysis
             return s;
         }
 
-        public IAzFuncExpn SubstituteType(Substitution s)
+        public void SubstituteType(Substitution s)
         {
-            return new AzIfExpn(Condition.SubstituteType(s),
-                                ThenCase.SubstituteType(s),
-                                ElseCase.SubstituteType(s),
-                                Type.Substitute(s),
-                                Position);
+            Type = Type.Substitute(s);
+        }
+
+        public void Recurse(Action<IAzFuncNode> action)
+        {
+            Condition.Recurse(action);
+            ThenCase.Recurse(action);
+            ElseCase.Recurse(action);
+            action(this);
         }
 
         public override string ToString() => Print(0);

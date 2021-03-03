@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Parse;
 using static Transpiler.CodePosition;
@@ -7,18 +8,26 @@ namespace Transpiler.Analysis
 {
     public record AzLambdaExpn(AzParam Parameter,
                                IAzFuncExpn Expression,
-                               IAzTypeExpn Type,
                                CodePosition Position) : IAzFuncExpn
     {
+        public IAzTypeExpn Type { get; private set; } = TypeVariables.Next;
+
+        public static AzLambdaExpn Make(AzParam parameter,
+                                        IAzFuncExpn expression,
+                                        IAzTypeExpn type,
+                                        CodePosition position = null)
+        {
+            return new(parameter, expression, position ?? Null) { Type = type };
+        }
+
         public static AzLambdaExpn Analyze(Scope scope,
                                            NameProvider names,
-                                           TvProvider tvs,
                                            PsLambdaExpn psLamExpn)
         {
-            var arg = AzParam.Analyze(scope, names, tvs, psLamExpn.Parameter);
-            var expr = IAzFuncExpn.Analyze(scope, names, tvs, psLamExpn.Expression);
+            var arg = AzParam.Analyze(scope, names, psLamExpn.Parameter);
+            var expr = IAzFuncExpn.Analyze(scope, names, psLamExpn.Expression);
 
-            return new(arg, expr, tvs.Next, psLamExpn.Position);
+            return new(arg, expr, psLamExpn.Position);
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
@@ -32,19 +41,16 @@ namespace Transpiler.Analysis
             return IConstraintSet.Union(cf, csp, cse);
         }
 
-
-        IAzFuncExpn IAzFuncExpn.SubstituteType(Substitution s) => SubstituteType(s);
-        public AzLambdaExpn SubstituteType(Substitution s)
+        public void SubstituteType(Substitution s)
         {
-            return new AzLambdaExpn(Parameter.SubstituteType(s),
-                                    Expression.SubstituteType(s),
-                                    Type.Substitute(s),
-                                    Position);
+            Type = Type.Substitute(s);
         }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        public void Recurse(Action<IAzFuncNode> action)
         {
-            return this.ToArr().Concat(Parameter.GetSubnodes()).Concat(Expression.GetSubnodes()).ToList();
+            Parameter.Recurse(action);
+            Expression.Recurse(action);
+            action(this);
         }
 
         public string Print(int indent)

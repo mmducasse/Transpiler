@@ -1,25 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Transpiler.Parse;
 
 namespace Transpiler.Analysis
 {
-    public record AzElsePattern(IAzTypeExpn Type,
-                                CodePosition Position) : IAzPattern
+    public record AzElsePattern(CodePosition Position) : IAzPattern
     {
-        public static AzElsePattern Analyze(TvProvider tvs,
-                                            PsAnyPattern node)
+        public IAzTypeExpn Type { get; private set; } = TypeVariables.Next;
+
+        public static AzElsePattern Analyze(PsAnyPattern node)
         {
-             return new(tvs.Next, node.Position);
+            return new(node.Position);
         }
 
         public ConstraintSet Constrain(TvProvider tvs, Scope scope) => ConstraintSet.Empty;
 
-        public IAzPattern SubstituteType(Substitution s)
+        public void SubstituteType(Substitution s)
         {
-            return this with { Type = Type.Substitute(s) };
+            Type = Type.Substitute(s);
         }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes() => this.ToArr();
+        public void Recurse(Action<IAzFuncNode> action)
+        {
+            action(this);
+        }
 
         public string Print(int i) => "_";
 

@@ -8,22 +8,21 @@ namespace Transpiler.Analysis
     {
         public static IAzFuncExpn Analyze(Scope scope,
                                           NameProvider names,
-                                          TvProvider tvs,
                                           PsListLiteral listLiteral)
         {
-            var elements = listLiteral.Elements.Select(e => IAzFuncExpn.Analyze(scope, names, tvs, e)).ToList();
+            var elements = listLiteral.Elements.Select(e => IAzFuncExpn.Analyze(scope, names, e)).ToList();
 
-            return CreateList(scope, tvs, elements);
+            return CreateList(scope, elements);
         }
 
-        public static IAzFuncExpn CreateList(Scope scope, TvProvider tvs, IReadOnlyList<IAzFuncExpn> elements)
+        public static IAzFuncExpn CreateList(Scope scope, IReadOnlyList<IAzFuncExpn> elements)
         {
             scope.TryGetFuncDefn("Empty", out var emptyCtor);
-            var emptyType = emptyCtor.Type.WithUniqueTvs(tvs);
+            var emptyType = emptyCtor.Type.WithUniqueTvs(TypeVariables.Provider);
             IAzFuncExpn empty = new AzSymbolExpn(emptyCtor, emptyType, CodePosition.Null);
 
             scope.TryGetFuncDefn("Node", out var nodeCtor);
-            var nodeType = nodeCtor.Type.WithUniqueTvs(tvs);
+            var nodeType = nodeCtor.Type.WithUniqueTvs(TypeVariables.Provider);
             IAzFuncExpn node = new AzSymbolExpn(nodeCtor, nodeType, CodePosition.Null);
 
             IAzFuncExpn head = empty;
@@ -31,7 +30,7 @@ namespace Transpiler.Analysis
             foreach (var e in elements.Reverse())
             {
                 var p = e.Position;
-                head = new AzAppExpn(new AzAppExpn(node, e, tvs.Next, p), head, tvs.Next, p);
+                head = new AzAppExpn(new AzAppExpn(node, e, p), head, p);
             }
 
             return head;

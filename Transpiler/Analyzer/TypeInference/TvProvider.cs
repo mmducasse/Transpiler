@@ -13,4 +13,16 @@ namespace Transpiler.Analysis
 
         public TypeVariable MadeUnique(TypeVariable tv) => tv with { Id = mNextIndex++ };
     }
+
+    public static class TypeVariables
+    {
+        public static void Reset()
+        {
+            Provider = new();
+        }
+
+        public static TvProvider Provider { get; private set; } = new();
+
+        public static TypeVariable Next => Provider.Next;
+    }
 }

@@ -1,33 +1,35 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using static Transpiler.CodePosition;
 
 namespace Transpiler.Analysis
 {
-    public record AzGetElementExpn(int ElementIndex,
-                                   int NumElements,
-                                   IAzFuncExpn Expression,
-                                   IAzTypeExpn Type,
-                                   CodePosition Position) : IAzFuncExpn
+    public class AzGetElementExpn : IAzFuncExpn
     {
+        public int ElementIndex { get; }
+        public int NumElements { get; }
+        public IAzFuncExpn Expression { get; }
+        public CodePosition Position => Null;
+
+        public IAzTypeExpn Type { get; private set; }
         private AzTypeTupleExpn TupleType { get; init; }
 
-        public static AzGetElementExpn Make(int elementIndex,
-                                            int numElements,
-                                            IAzFuncExpn expression,
-                                            TvProvider tvs)
+        public AzGetElementExpn(int elementIndex,
+                                int numElements,
+                                IAzFuncExpn expression)
         {
+            ElementIndex = elementIndex;
+            NumElements = numElements;
+            Expression = expression;
+
             List<TypeVariable> elementTvs = new();
             for (int i = 0; i < numElements; i++)
             {
-                elementTvs.Add(tvs.Next);
+                elementTvs.Add(TypeVariables.Next);
             }
 
-            var type = elementTvs[elementIndex];
-            return new(elementIndex, numElements, expression, type, Null)
-            {
-                TupleType = new(elementTvs, Null)
-            };
+            Type = elementTvs[elementIndex];
+            TupleType = new(elementTvs, Null);
         }
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope)
@@ -39,18 +41,15 @@ namespace Transpiler.Analysis
             return IConstraintSet.Union(cse, ctup);
         }
 
-        public IAzFuncExpn SubstituteType(Substitution s)
+        public void SubstituteType(Substitution s)
         {
-            return this with
-            {
-                Expression = Expression.SubstituteType(s),
-                Type = Type.Substitute(s),
-            };
+            Type = Type.Substitute(s);
         }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        public void Recurse(Action<IAzFuncNode> action)
         {
-            return this.ToArr().Concat(Expression.GetSubnodes()).ToList();
+            Expression.Recurse(action);
+            action(this);
         }
 
         public string Print(int i)

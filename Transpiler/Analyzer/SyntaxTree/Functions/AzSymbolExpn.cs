@@ -1,17 +1,30 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Transpiler.Parse;
 using static Transpiler.Analysis.Analyzer;
 
 namespace Transpiler.Analysis
 {
-    public record AzSymbolExpn(IAzFuncDefn Definition,
-                               IAzTypeExpn Type,
-                               CodePosition Position,
-                               eFixity Fixity = eFixity.Prefix) : IAzFuncExpn, IAzPattern
+    public class AzSymbolExpn : IAzFuncExpn, IAzPattern
     {
+        public IAzFuncDefn Definition { get; }
+        public IAzTypeExpn Type { get; private set; }
+        public CodePosition Position { get; }
+        public eFixity Fixity { get; set; }
+
+        public AzSymbolExpn(IAzFuncDefn definition,
+                            IAzTypeExpn type,
+                            CodePosition position,
+                            eFixity fixity = eFixity.Prefix)
+        {
+            Definition = definition;
+            Type = type;
+            Position = position;
+            Fixity = fixity;
+        }
+
         public static AzSymbolExpn Analyze(Scope scope,
                                            NameProvider _,
-                                           TvProvider tvs,
                                            PsSymbolExpn node)
         {
             if (scope.TryGetFuncDefn(node.Name, out var funcDefn))
@@ -20,7 +33,7 @@ namespace Transpiler.Analysis
                 // Determine the Type.
                 if (funcDefn.IsSolved)
                 {
-                    type = funcDefn.Type.WithUniqueTvs(tvs);
+                    type = funcDefn.Type.WithUniqueTvs(TypeVariables.Provider);
                 }
                 else if (funcDefn.Type != null)
                 {
@@ -28,7 +41,7 @@ namespace Transpiler.Analysis
                 }
                 else if (funcDefn is IAzFuncStmtDefn stmtDefn)
                 {
-                    type = tvs.Next;
+                    type = TypeVariables.Next;
                     stmtDefn.Type = type;
                     //throw Analyzer.Error("Function " + funcDefn.Name + " is not defined.", funcDefn.Position);
                 }
@@ -45,15 +58,14 @@ namespace Transpiler.Analysis
 
         public ConstraintSet Constrain(TvProvider tvs, Scope scope) => ConstraintSet.Empty;
 
-        public IAzFuncExpn SubstituteType(Substitution s) =>
-            this with { Type = Type.Substitute(s) };
-
-        IAzPattern IAzPattern.SubstituteType(Substitution s) =>
-            this with { Type = Type.Substitute(s) };
-
-        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        public void SubstituteType(Substitution s)
         {
-            return this.ToArr();
+            Type = Type.Substitute(s);
+        }
+
+        public void Recurse(Action<IAzFuncNode> action)
+        {
+            action(this);
         }
 
         public string Print(int i) => Definition.Name;

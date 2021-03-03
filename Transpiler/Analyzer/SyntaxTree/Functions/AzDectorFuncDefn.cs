@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Parse;
 using static Transpiler.UI;
@@ -60,7 +61,6 @@ namespace Transpiler.Analysis
 
         public static AzDectorFuncDefn Analyze(Scope parentScope,
                                                NameProvider names,
-                                               TvProvider tvs,
                                                AzDectorFuncDefn funcDefn,
                                                PsDectorFuncDefn node)
         {
@@ -69,13 +69,13 @@ namespace Transpiler.Analysis
             List<TypeVariable> elementTvs = new();
             for (int i = 0; i < funcDefn.NumElements; i++)
             {
-                elementTvs.Add(tvs.Next);
+                elementTvs.Add(TypeVariables.Next);
             }
 
             funcDefn.Type = elementTvs[funcDefn.ElementIndex];
             funcDefn.TupleType = new AzTypeTupleExpn(elementTvs, CodePosition.Null);
 
-            var expn = IAzFuncExpn.Analyze(scope, names, tvs, node.Expression);
+            var expn = IAzFuncExpn.Analyze(scope, names, node.Expression);
 
             funcDefn.Expression = expn;
 
@@ -91,17 +91,16 @@ namespace Transpiler.Analysis
             return IConstraintSet.Union(cse, ctup);
         }
 
-        public IAzFuncStmtDefn SubstituteType(Substitution s)
+        public void SubstituteType(Substitution s)
         {
             Type = Type.Substitute(s);
-            Expression = Expression.SubstituteType(s);
             IsSolved = true;
-            return this;
         }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        public void Recurse(Action<IAzFuncNode> action)
         {
-            return this.ToArr().Concat(Expression.GetSubnodes()).ToList();
+            Expression?.Recurse(action);
+            action(this);
         }
 
         public void PrintSignature()

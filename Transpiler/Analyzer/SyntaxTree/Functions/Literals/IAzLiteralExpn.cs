@@ -11,7 +11,6 @@ namespace Transpiler.Analysis
 
         public static IAzFuncExpn Analyze(Scope scope,
                                           NameProvider names,
-                                          TvProvider tvs,
                                           IPsLiteralExpn node)
         {
             return node switch
@@ -20,8 +19,8 @@ namespace Transpiler.Analysis
                 PsRealLiteral realLit => AzRealLiteral.Analyze(realLit),
                 PsCharLiteral charLit => AzCharLiteral.Analyze(charLit),
                 PsUndefinedLiteral undefLit => AzUndefinedLiteral.Analyze(undefLit),
-                PsStringLiteral stringLit => AzStringLiteral.Analyze(scope, names, tvs, stringLit),
-                PsListLiteral listLit => AzListLiteral.Analyze(scope, names, tvs, listLit),
+                PsStringLiteral stringLit => AzStringLiteral.Analyze(scope, stringLit),
+                PsListLiteral listLit => AzListLiteral.Analyze(scope, names, listLit),
                 _ => throw new ArgumentException(),
             };
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Parse;
 using static Transpiler.CodePosition;
@@ -7,19 +8,19 @@ namespace Transpiler.Analysis
 {
     public record AzMatchCase(IAzPattern Pattern,
                               IAzFuncExpn Expression,
-                              IAzTypeExpn Type,
                               CodePosition Position) : IAzFuncNode
     {
+        public IAzTypeExpn Type { get; private set; }
+
         public static AzMatchCase Analyze(Scope scope,
                                           NameProvider names,
-                                          TvProvider tvs,
                                           PsMatchCase node)
         {
-            var pattern = IAzPattern.Analyze(scope, names, tvs, node.Pattern);
-            var expn = IAzFuncExpn.Analyze(scope, names, tvs, node.Expression);
+            var pattern = IAzPattern.Analyze(scope, names, node.Pattern);
+            var expn = IAzFuncExpn.Analyze(scope, names, node.Expression);
 
-            var type = new AzTypeLambdaExpn(tvs.Next, tvs.Next, Null);
-            return new(pattern, expn, type, node.Position);
+            AzTypeLambdaExpn type = new(TypeVariables.Next, TypeVariables.Next, Null);
+            return new(pattern, expn, node.Position) { Type = type };
         }
 
         public ConstraintSet Constrain(TvProvider tvs, Scope scope)
@@ -34,17 +35,16 @@ namespace Transpiler.Analysis
             return IConstraintSet.Union(cinput, coutput, cspatt, csexpn);
         }
 
-        public AzMatchCase SubstituteType(Substitution s)
+        public void SubstituteType(Substitution s)
         {
-            return new(Pattern.SubstituteType(s),
-                       Expression.SubstituteType(s),
-                       Type.Substitute(s),
-                       Position);
+            Type = Type.Substitute(s);
         }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        public void Recurse(Action<IAzFuncNode> action)
         {
-            return this.ToArr().Concat(Pattern.GetSubnodes()).Concat(Expression.GetSubnodes()).ToList();
+            Pattern.Recurse(action);
+            Expression.Recurse(action);
+            action(this);
         }
 
         public string Print(int i)

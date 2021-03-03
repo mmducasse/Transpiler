@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Parse;
 using static Transpiler.Extensions;
@@ -7,33 +8,38 @@ namespace Transpiler.Analysis
 {
     public record AzScopedFuncExpn(IAzFuncExpn Expression,
                                    IReadOnlyList<IAzFuncStmtDefn> FuncDefinitions,
-                                   IAzTypeExpn Type,
                                    Scope Scope,
                                    CodePosition Position) : IAzFuncExpn
     {
-        //public static AzScopedFuncExpn Make(IAzFuncExpn expression) =>
-        //    new(expression, new List<PsFuncDefn>());
+        public IAzTypeExpn Type { get; private set; } = TypeVariables.Next;
+
+        public static AzScopedFuncExpn Make(IAzFuncExpn expression,
+                                            Scope scope,
+                                            IReadOnlyList<IAzFuncStmtDefn> funcDefinitions = null,
+                                            CodePosition position = null)
+        {
+            return new(expression, funcDefinitions ?? RList<IAzFuncStmtDefn>(), scope, position ?? null);
+        }
 
         public static IAzFuncExpn Analyze(Scope parentScope,
                                           NameProvider names,
-                                          TvProvider tvs,
                                           PsScopedFuncExpn scopedExpn)
         {
             var scope = new Scope(parentScope);
 
-            var newSubDefns = Analyzer.AnalyzeFunctions(scope, tvs, scopedExpn.FuncDefinitions);
+            var newSubDefns = Analyzer.AnalyzeFunctions(scope, scopedExpn.FuncDefinitions);
 
             if (scopedExpn.Expression is PsMatchExpn matchExpn &&
                 matchExpn.IsTerse)
             {
                 // This will return a lambda with a scoped expn at it's tail.
-                return IAzFuncExpn.Analyze(scope, names, tvs, scopedExpn.Expression);
+                return IAzFuncExpn.Analyze(scope, names, scopedExpn.Expression);
             }
             else
             {
-                var newExpn = IAzFuncExpn.Analyze(scope, names, tvs, scopedExpn.Expression);
+                var newExpn = IAzFuncExpn.Analyze(scope, names, scopedExpn.Expression);
 
-                return new AzScopedFuncExpn(newExpn, newSubDefns, tvs.Next, scope, scopedExpn.Position);
+                return new AzScopedFuncExpn(newExpn, newSubDefns, scope, scopedExpn.Position);
             }
         }
 
@@ -53,12 +59,6 @@ namespace Transpiler.Analysis
             return IConstraintSet.Union(cse, cs, ccc);
         }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes()
-        {
-            var elementNodes = FuncDefinitions.SelectMany(f => f.GetSubnodes()).ToList();
-            return this.ToArr().Concat(Expression.GetSubnodes()).Concat(elementNodes).ToList();
-        }
-
         public string Print(int i)
         {
             string s = "[" + Expression.Print(i);
@@ -70,13 +70,16 @@ namespace Transpiler.Analysis
             return s + "]";
         }
 
-        public IAzFuncExpn SubstituteType(Substitution s)
+        public void SubstituteType(Substitution s)
         {
-            return new AzScopedFuncExpn(Expression.SubstituteType(s),
-                                        FuncDefinitions.Select(f => f.SubstituteType(s)).ToList(),
-                                        Type.Substitute(s),
-                                        Scope,
-                                        Position);
+            Type = Type.Substitute(s);
+        }
+
+        public void Recurse(Action<IAzFuncNode> action)
+        {
+            Expression.Recurse(action);
+            FuncDefinitions.Foreach(f => f.Recurse(action));
+            action(this);
         }
 
         public override string ToString() => Print(0);

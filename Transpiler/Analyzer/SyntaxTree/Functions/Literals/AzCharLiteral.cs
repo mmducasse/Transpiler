@@ -18,10 +18,9 @@ namespace Transpiler.Analysis
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope) => ConstraintSet.Empty;
 
-        public IAzFuncExpn SubstituteType(Substitution s) => this;
-        IAzPattern IAzPattern.SubstituteType(Substitution s) => this;
+        public void SubstituteType(Substitution s) { }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes() => this.ToArr();
+        public void Recurse(Action<IAzFuncNode> action) { action(this); }
 
         public string Print(int indent)
         {

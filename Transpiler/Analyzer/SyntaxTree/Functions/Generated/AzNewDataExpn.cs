@@ -30,16 +30,15 @@ namespace Transpiler.Analysis
 
         public ConstraintSet Constrain(TvProvider provider, Scope scope) => ConstraintSet.Empty;
 
-        public IAzFuncExpn SubstituteType(Substitution s)
+        public void SubstituteType(Substitution s)
         {
-            Arguments = Arguments.Select(a => a.SubstituteType(s) as AzSymbolExpn).ToList();
             Type = Type.Substitute(s);
-            return this;
         }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        public void Recurse(System.Action<IAzFuncNode> action)
         {
-            return this.ToArr();
+            Arguments.Foreach(a => a.Recurse(action));
+            action(this);
         }
 
         public string Print(int i)

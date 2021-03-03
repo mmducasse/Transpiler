@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Transpiler.Parse;
 using static Transpiler.UI;
@@ -54,7 +55,6 @@ namespace Transpiler.Analysis
 
         public static AzFuncDefn Analyze(Scope parentScope,
                                          NameProvider names,
-                                         TvProvider tvs,
                                          AzFuncDefn funcDefn,
                                          PsFuncDefn node)
         {
@@ -62,27 +62,27 @@ namespace Transpiler.Analysis
 
             if (funcDefn.Type != null)
             {
-                funcDefn.Type = funcDefn.Type.WithUniqueTvs(tvs);
+                funcDefn.Type = funcDefn.Type.WithUniqueTvs(TypeVariables.Provider);
             }
             else
             {
-                funcDefn.Type = tvs.Next;
+                funcDefn.Type = TypeVariables.Next;
             }
 
             // Turn parameters into lambdas.
             var paramStack = new Stack<AzParam>();
             foreach (var param in node.Parameters)
             {
-                var paramDefn = new AzParam(param.Name, false, tvs.Next, param.Position);
+                var paramDefn = new AzParam(param.Name, false, param.Position);
                 scope.AddFunction(paramDefn);
                 paramStack.Push(paramDefn);
             }
 
-            var expn = IAzFuncExpn.Analyze(scope, names, tvs, node.Expression);
+            var expn = IAzFuncExpn.Analyze(scope, names, node.Expression);
 
             while (paramStack.TryPop(out var paramDefn))
             {
-                expn = new AzLambdaExpn(paramDefn, expn, tvs.Next, paramDefn.Position);
+                expn = new AzLambdaExpn(paramDefn, expn, paramDefn.Position);
             }
 
             funcDefn.Expression = expn;
@@ -104,21 +104,16 @@ namespace Transpiler.Analysis
             return ConstraintSet.Empty;
         }
 
-        public IAzFuncStmtDefn SubstituteType(Substitution s)
+        public void SubstituteType(Substitution s)
         {
             Type = Type.Substitute(s);
-            Expression = Expression?.SubstituteType(s);
             IsSolved = true;
-            return this;
         }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        public void Recurse(Action<IAzFuncNode> action)
         {
-            if (Expression == null)
-            {
-                return this.ToArr();
-            }
-            return this.ToArr().Concat(Expression.GetSubnodes()).ToList();
+            Expression?.Recurse(action);
+            action(this);
         }
 
         public virtual string Print(int i)
