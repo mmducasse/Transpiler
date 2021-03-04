@@ -1,14 +1,12 @@
 ﻿
 TODO:
 
-- Add new parameter to analyze to collect dependencies for batch solving.
-- Revisit Generated Az node private setters for Type
-- Move MatchExpn PostAnalyze into Generator code
 - Add TypeParameters to the types of functions that get determined during Analysis
 - Allow tuple and else patterns as lambda inputs.
 - Add vars in REPL
 - Add core libraries to project
 - Make recursion, mutual recursion type checkable (batch type inference based on dependencies)
+- Tail call recursion optimization
 
 - Make private indicators do something
 - Explict type annotations inline

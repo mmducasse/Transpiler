@@ -31,6 +31,7 @@ namespace Transpiler
         {
 #pragma warning disable CA1416 // Validate platform compatibility
             Console.SetWindowSize(64, 32);
+            Console.SetBufferSize(64, 32);
 #pragma warning restore CA1416 // Validate platform compatibility
             Console.WriteLine("Transpiler");
             Console.WriteLine("M. Ducasse 2021\n\n");

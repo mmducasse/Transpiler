@@ -11,7 +11,7 @@ namespace Transpiler.Analysis
         private static TypeVariable mCertainType = TypeVariable.Simple(0);
         public IAzTypeDefn CertainType => mCertainType;
 
-        public IAzTypeExpn Type => mCertainType;
+        public IAzTypeExpn Type { get; private set; } = TypeVariables.Next;
 
         public static AzUndefinedLiteral Analyze(PsUndefinedLiteral psUndefLit)
         {
@@ -22,7 +22,7 @@ namespace Transpiler.Analysis
 
         public void SubstituteType(Substitution s)
         {
-            throw new NotImplementedException();
+            Type = Type.Substitute(s);
         }
 
         public void Recurse(Action<IAzFuncNode> action) { action(this); }

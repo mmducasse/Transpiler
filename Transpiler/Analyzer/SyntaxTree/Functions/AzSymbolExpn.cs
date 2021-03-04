@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Transpiler.Parse;
 using static Transpiler.Analysis.Analyzer;
 
@@ -56,7 +55,32 @@ namespace Transpiler.Analysis
             throw Error(node.Name + " is not defined in this scope.", node.Position);
         }
 
-        public ConstraintSet Constrain() => ConstraintSet.Empty;
+        public ConstraintSet Constrain()
+        {
+            IAzTypeExpn type;
+            // Determine the Type.
+            if (Definition.IsSolved)
+            {
+                type = Definition.Type.WithUniqueTvs(TypeVariables.Provider);
+            }
+            else if (Definition.Type != null)
+            {
+                type = Definition.Type;
+            }
+            else if (Definition is IAzFuncStmtDefn stmtDefn)
+            {
+                type = TypeVariables.Next;
+                stmtDefn.Type = type;
+                //throw Analyzer.Error("Function " + funcDefn.Name + " is not defined.", funcDefn.Position);
+            }
+            else
+            {
+                throw new System.Exception();
+            }
+
+            var c = new Constraint(type, Type, Position);
+            return IConstraintSet.Union(c);
+        }
 
         public void SubstituteType(Substitution s)
         {
