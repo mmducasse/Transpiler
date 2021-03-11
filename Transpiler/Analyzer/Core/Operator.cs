@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
 using static Transpiler.Extensions;
+using static Transpiler.UI;
 
 namespace Transpiler.Analysis
 {
@@ -31,6 +31,8 @@ namespace Transpiler.Analysis
 
         public void PrintSignature()
         {
+            Pr("{0} :: ", Name);
+            PrLn(Type.PrintWithRefinements(), foregroundColor: Yellow);
         }
 
         public override string ToString() => Print(0);

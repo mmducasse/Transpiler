@@ -5,9 +5,9 @@ TODO:
 - Allow tuple and else patterns as lambda inputs.
 - Add vars in REPL
 - Add core libraries to project
-- Make recursion, mutual recursion type checkable (batch type inference based on dependencies)
-- Tail call recursion optimization
+- Re-add closures
 
+- Tail call recursion optimization
 - Make private indicators do something
 - Explict type annotations inline
 - Operator associativity
@@ -16,5 +16,5 @@ TODO:
 - Pattern aliases
 - Nested unions
 - Arbitrary unions
-- Precicates in match cases
+- Precicates in match cases after 'if'
 

@@ -46,7 +46,7 @@ namespace Transpiler.Analysis
 
             List = CreateList(Module.Scope);
 
-            //CreateMiscFunctions(Module.Scope);
+            CreateMiscFunctions(Module.Scope);
 
             if (Compiler.DebugCore)
             {
@@ -59,22 +59,19 @@ namespace Transpiler.Analysis
             }
         }
 
-        //private void CreateMiscFunctions(Scope scope)
-        //{
-        //    var @void = new AzTypeTupleExpn(new List<IAzTypeExpn>(), Null);
-        //    var getcharType = new AzTypeLambdaExpn(@void, Char.ToCtor(), Null);
-        //    var getchar = new Operator("getchar", "Getchar", getcharType, Fixity: eFixity.Prefix);
-        //    scope.AddFunction(getchar, getcharType);
+        private void CreateMiscFunctions(Scope scope)
+        {
+            var voidType = new AzTypeTupleExpn(new List<IAzTypeExpn>(), Null);
+            var stringType = new AzTypeCtorExpn(List, Char.ToCtor().ToArr(), Null);
 
-        //    var stringType = new AzTypeCtorExpn(List, Char.ToCtor().ToArr(), Null);
-        //    var readlineType = new AzTypeLambdaExpn(@void, stringType, Null);
-        //    var readline = new Operator("readline", "Readline", readlineType, Fixity: eFixity.Prefix);
-        //    scope.AddFunction(readline, readlineType);
+            var promptType = new AzTypeLambdaExpn(stringType, stringType, Null);
+            var prompt = new Operator("prompt", "Prompt", promptType, Fixity: eFixity.Prefix);
+            scope.AddFunction(prompt, promptType);
 
-        //    var putcharType = new AzTypeLambdaExpn(Char.ToCtor(), @void, Null);
-        //    var putchar = new Operator("putchar", "Putchar", putcharType, Fixity: eFixity.Prefix);
-        //    scope.AddFunction(putchar, putcharType);
-        //}
+            var putcharType = new AzTypeLambdaExpn(Char.ToCtor(), voidType, Null);
+            var putchar = new Operator("putchar", "Putchar", putcharType, Fixity: eFixity.Prefix);
+            scope.AddFunction(putchar, putcharType);
+        }
 
         public static AzFuncDefn CreateFunction(string name, IAzTypeExpn type)
         {

@@ -18,18 +18,19 @@ namespace Transpiler.Parse
             int indent = q.Indent;
 
             if (!Finds("{", ref q)) { return false; }
-            Expects(TokenType.NewLine, ref q);
 
             List<IPsFuncStmt> lines = new();
-            while (FindsIndents(ref q, indent + 1))
+            var q2 = q;
+            while (Finds(TokenType.NewLine, ref q2) &&
+                   FindsIndents(ref q2, indent + 1))
             {
-                if (IPsFuncExpn.Parse(ref q, isInline: false, out var funcExpn)) { lines.Add(funcExpn); }
-                else if (IPsFuncStmtDefn.Parse(ref q, out var funcStmtDefn)) { lines.Add(funcStmtDefn); }
+                if (IPsFuncExpn.Parse(ref q2, isInline: false, out var funcExpn)) { lines.Add(funcExpn); }
+                else if (IPsFuncStmtDefn.Parse(ref q2, out var funcStmtDefn)) { lines.Add(funcStmtDefn); }
                 else
                 {
-                    throw Error("Expected statement or expression in closure.", q.Position);
+                    throw Error("Expected statement or expression in closure.", q2.Position);
                 }
-                Expects(TokenType.NewLine, ref q);
+                q = q2;
             }
 
             if (lines.Count == 0)

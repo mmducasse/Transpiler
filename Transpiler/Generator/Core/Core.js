@@ -124,20 +124,35 @@ function PrintResult(output) {
 //	return buffer.toString('utf8')
 //}
 
-//function Putchar(c) {
-//	console.log(c)
-//	return ['']
-//}
+function Putchar(c) {
+	process.stdout.write(c);
+	return ['']
+}
 
-//let prompt = require('prompt-sync')({ sigint: true });
-//function Readline(x) {
-//	let s = prompt('') ?? '';
-//	var str = ['Empty']
-//	for (var i = s.length - 1; i >= 0; i--) {
-//		str = ['Node', s[i], str];
-//	}
-//	return str
-//}
+let prompt = require('prompt-sync')({ sigint: true });
+function Prompt(msg) {
+	msg = ListCharToString(msg)
+	let s = prompt(msg) ?? '';
+	return StringToListChar(s)
+}
+
+function StringToListChar(s) {
+	var str = ['Empty']
+	for (var i = s.length - 1; i >= 0; i--) {
+		str = ['Node', s[i], str];
+	}
+	return str
+}
+
+function ListCharToString(list) {
+	var str = ''
+	while (!Match(list, ['Empty'])) {
+		let ch = Get(0, list)
+		list = Get(1, list)
+		str += ch
+	}
+	return str
+}
 
 function Undefined() {
 	throw 'Undefined!'

@@ -125,7 +125,10 @@ namespace Transpiler.Analysis
         public void PrintSignature()
         {
             Pr("{0} :: ", Name);
-            PrLn(Type.PrintWithRefinements(), foregroundColor: Yellow);
+            if (Type is not null)
+            {
+                PrLn(Type.PrintWithRefinements(), foregroundColor: Yellow);
+            }
         }
     }
 }

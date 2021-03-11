@@ -31,7 +31,7 @@ namespace Transpiler
         {
 #pragma warning disable CA1416 // Validate platform compatibility
             Console.SetWindowSize(64, 32);
-            Console.SetBufferSize(64, 32);
+            Console.SetBufferSize(64, 256);
 #pragma warning restore CA1416 // Validate platform compatibility
             Console.WriteLine("Transpiler");
             Console.WriteLine("M. Ducasse 2021\n\n");
@@ -41,6 +41,8 @@ namespace Transpiler
             new Core();
 
             //string path = @"C:\Users\matth\Desktop\testcode.hs";
+
+            //Process.Start("npm install prompt-sync");
 
             // REPL Loop.
             while (true)
@@ -136,14 +138,15 @@ namespace Transpiler
             moduleName = moduleName.Trim();
             if (string.IsNullOrWhiteSpace(moduleName))
             {
+                ListModule("Core", Core.Instance.Scope);
                 foreach (var module in Modules.Values)
                 {
-                    ListModule(module);
+                    ListModule(module.Name, module.Scope);
                 }
             }
             else if (Modules.TryGetValue(moduleName, out var module))
             {
-                ListModule(module);
+                ListModule(module.Name, module.Scope);
             }
             else
             {
@@ -152,12 +155,12 @@ namespace Transpiler
             Console.WriteLine();
         }
 
-        private void ListModule(Module module)
+        private void ListModule(string moduleName, Scope scope)
         {
             PrLn();
-            PrLn(module.Name, Gray);
+            PrLn(moduleName, Gray);
             //module.Scope.PrintTypes();
-            module.Scope.PrintFunctions();
+            scope.PrintFunctions();
         }
 
         #endregion

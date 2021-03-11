@@ -9,13 +9,13 @@ namespace Transpiler.Analysis
 {
     public record AzClosureExpn(IReadOnlyList<IAzFuncStmtDefn> Statements,
                                 IAzFuncExpn ReturnExpression,
-                                IAzTypeExpn Type,
                                 Scope Scope,
                                 CodePosition Position) : IAzFuncExpn
     {
+        public IAzTypeExpn Type { get; private set; } = TypeVariables.Next;
+
         public static AzClosureExpn Analyze(Scope parentScope,
                                             NameProvider names,
-                                            TvProvider tvs,
                                             PsClosureExpn psCloseExpn)
         {
             var scope = new Scope(parentScope, "<Closure>");
@@ -26,7 +26,7 @@ namespace Transpiler.Analysis
                 switch (s)
                 {
                     case IPsFuncExpn funcExpn:
-                        var expn = IAzFuncExpn.Analyze(scope, names, tvs, funcExpn);
+                        var expn = IAzFuncExpn.Analyze(scope, names, funcExpn);
                         var funcDefn = new AzFuncDefn(names.Next, expn.Type, eFixity.Prefix, true, Null)
                         {
                             InvokeImmediately = true
@@ -38,7 +38,7 @@ namespace Transpiler.Analysis
                         var azFuncStmtDefns = IAzFuncStmtDefn.Initialize(scope, psFuncStmtDefn);
                         foreach (var fn in azFuncStmtDefns)
                         {
-                            IAzFuncStmtDefn.Analyze(scope, names, tvs, fn, psFuncStmtDefn);
+                            IAzFuncStmtDefn.Analyze(scope, names, fn, psFuncStmtDefn);
                             statements.Add(fn);
                         }
                         break;
@@ -47,39 +47,36 @@ namespace Transpiler.Analysis
                 }
             }
 
-            var returnExpn = IAzFuncExpn.Analyze(scope, names, tvs, psCloseExpn.ReturnExpression);
-            return new(statements, returnExpn, tvs.Next, scope, psCloseExpn.Position);
+            var returnExpn = IAzFuncExpn.Analyze(scope, names, psCloseExpn.ReturnExpression);
+            return new(statements, returnExpn, scope, psCloseExpn.Position);
         }
 
-        public ConstraintSet Constrain(TvProvider provider, Scope _)
+        public ConstraintSet Constrain()
         {
             var cs = new ConstraintSet();
 
             foreach (var stmt in Statements)
             {
-                var fcs = stmt.Constrain(provider, Scope);
+                var fcs = stmt.Constrain();
                 cs = IConstraintSet.Union(fcs, cs);
             }
 
-            var csr = ReturnExpression.Constrain(provider, Scope);
+            var csr = ReturnExpression.Constrain();
             var creturn = new Constraint(Type, ReturnExpression.Type, Position);
 
             return IConstraintSet.Union(creturn, cs, csr);
         }
 
-        public IAzFuncExpn SubstituteType(Substitution s)
+        public void SubstituteType(Substitution s)
         {
-            return new AzClosureExpn(Statements.Select(st => st.SubstituteType(s)).ToList(),
-                                     ReturnExpression.SubstituteType(s),
-                                     Type.Substitute(s),
-                                     Scope,
-                                     Position);
+            Type = Type.Substitute(s);
         }
 
-        public IReadOnlyList<IAzFuncNode> GetSubnodes()
+        public void Recurse(Action<IAzFuncNode> action)
         {
-            var statementNodes = Statements.SelectMany(f => f.GetSubnodes()).ToList();
-            return this.ToArr().Concat(statementNodes).Concat(ReturnExpression.ToArr()).ToList();
+            Statements.Foreach(s => s.Recurse(action));
+            ReturnExpression.Recurse(action);
+            action(this);
         }
 
         public string Print(int i)
