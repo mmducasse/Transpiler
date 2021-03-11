@@ -3,12 +3,12 @@ using static Transpiler.Extensions;
 
 namespace Transpiler.Generate
 {
-    public record GnLambdaExpn(GnParam Parameter,
+    public record GnLambdaExpn(IGnPattern Parameter,
                                IGnFuncExpn Expression) : IGnFuncExpn
     {
         public static GnLambdaExpn Prepare(IScope scope, AzLambdaExpn appExpn)
         {
-            var param = GnParam.Prepare(scope, appExpn.Parameter);
+            var param = IGnPattern.Prepare(scope, appExpn.Parameter);
             var expn = IGnFuncExpn.Prepare(scope, appExpn.Expression);
 
             return new(param, expn);
@@ -17,7 +17,11 @@ namespace Transpiler.Generate
         public string Generate(int i, NameProvider names, ref string s)
         {
             string res = names.Next;
-            string param = Parameter.Generate(i, names, ref s);
+            string param = Parameter switch
+            {
+                GnParam => Parameter.Generate(i, names, ref s),
+                _ => names.Next,
+            };
             s += string.Format("{0}var {1} = {2} => {{\n", Indent(i), res, param);
 
             string expnRes = Expression.Generate(i + 1, names, ref s);

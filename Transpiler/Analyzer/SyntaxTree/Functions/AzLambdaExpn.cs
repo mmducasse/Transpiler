@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Transpiler.Parse;
 using static Transpiler.CodePosition;
 
 namespace Transpiler.Analysis
 {
-    public record AzLambdaExpn(AzParam Parameter,
+    public record AzLambdaExpn(IAzPattern Parameter,
                                IAzFuncExpn Expression,
                                CodePosition Position) : IAzFuncExpn
     {
@@ -24,7 +22,7 @@ namespace Transpiler.Analysis
                                            NameProvider names,
                                            PsLambdaExpn psLamExpn)
         {
-            var arg = AzParam.Analyze(scope, names, psLamExpn.Parameter);
+            var arg = IAzPattern.Analyze(scope, names, psLamExpn.Parameter);
             var expr = IAzFuncExpn.Analyze(scope, names, psLamExpn.Expression);
 
             return new(arg, expr, psLamExpn.Position);

@@ -1,8 +1,9 @@
-﻿using static Transpiler.Parse.ParserUtils;
+﻿using System.Collections.Generic;
+using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
-    public record PsLambdaExpn(PsParam Parameter,
+    public record PsLambdaExpn(IPsPattern Parameter,
                                IPsFuncExpn Expression,
                                CodePosition Position) : IPsFuncExpn
     {
@@ -12,7 +13,7 @@ namespace Transpiler.Parse
             var q = queue;
             var p = q.Position;
 
-            if (!PsParam.Parse(ref q, out var paramNode)) { return false; }
+            if (!ParseLambdaInput(ref q, out var paramNode)) { return false; }
             if (!Finds("->", ref q)) { return false; }
             if (!IPsFuncExpn.Parse(ref q, isInline, out var expnNode))
             {
@@ -20,6 +21,26 @@ namespace Transpiler.Parse
             }
 
             node = new PsLambdaExpn(paramNode, expnNode, p);
+            queue = q;
+            return true;
+        }
+
+        private static bool ParseLambdaInput(ref TokenQueue queue, out IPsPattern node)
+        {
+            node = null;
+            var q = queue;
+            var p = q.Position;
+            var q2 = q;
+
+            if (PsAnyPattern.Parse(ref q, out var anyPattern)) { node = anyPattern; }
+            else if (PsParam.Parse(ref q, out var param)) { node = param; }
+            else if (Finds("(", ref q2) && Finds(")", ref q2))
+            {
+                node = new PsTuplePattern(new List<IPsPattern>(), p);
+                q = q2;
+            }
+            else { return false; }
+
             queue = q;
             return true;
         }

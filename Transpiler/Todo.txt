@@ -5,7 +5,6 @@ TODO:
 - Allow tuple and else patterns as lambda inputs.
 - Add vars in REPL
 - Add core libraries to project
-- Re-add closures
 
 - Tail call recursion optimization
 - Make private indicators do something
