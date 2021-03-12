@@ -103,6 +103,13 @@ namespace Transpiler.Generate
                     '>' => "rcaret",
                     '?' => "qmark",
                     '|' => "pipe",
+                    '_' => "under",
+                    '@' => "at",
+                    '#' => "hash",
+                    '&' => "and",
+                    '^' => "caret",
+                    '~' => "tilde",
+                    '`' => "bquote",
                     _ => symbol[i]
                 };
             }

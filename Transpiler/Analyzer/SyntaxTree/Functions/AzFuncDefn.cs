@@ -23,7 +23,7 @@ namespace Transpiler.Analysis
 
         public bool IsSolved { get; private set; }
 
-        public bool InvokeImmediately { get; init; }
+        public bool InvokeImmediately { get; set; }
 
         public AzFuncDefn(string name,
                           IAzTypeExpn typeExpression,

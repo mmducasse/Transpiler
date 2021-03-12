@@ -190,7 +190,7 @@ namespace Transpiler
             bool ansIsFunction = false;
             if (inputModule.Scope.TryGetFuncDefn("ans", out var ansDefn))
             {
-                ansIsFunction = ansDefn.Type.GetRefinements().Count > 0;
+                ansIsFunction = (ansDefn.Type is AzTypeLambdaExpn) || (ansDefn.Type.GetRefinements().Count > 0);
             }
 
             Generator.TEMP_AddFinalLine(ansIsFunction, ref output);
@@ -200,7 +200,7 @@ namespace Transpiler
 
         private void ExecOutputFile()
         {
-            Console.Write("ans = ");
+            //Console.Write("ans = ");
             var nodeJs = Process.Start("node", DEST_JS_FILE);
             nodeJs.WaitForExit();
             nodeJs.Dispose();

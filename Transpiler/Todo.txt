@@ -1,11 +1,12 @@
 ﻿
 TODO:
 
+- BUG: List of lists isnt working (nested data type ctors is also busted)
 - Add TypeParameters to the types of functions that get determined during Analysis
-- Allow tuple and else patterns as lambda inputs.
-- Add vars in REPL
-- Add core libraries to project
+- Clean up generator, maybe eliminate redundant asts
+- Prohibit accessors for union data types
 
+- Add vars in REPL
 - Tail call recursion optimization
 - Make private indicators do something
 - Explict type annotations inline

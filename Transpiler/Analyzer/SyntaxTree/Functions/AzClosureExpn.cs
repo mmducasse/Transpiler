@@ -38,6 +38,7 @@ namespace Transpiler.Analysis
                         var azFuncStmtDefns = IAzFuncStmtDefn.Initialize(scope, psFuncStmtDefn);
                         foreach (var fn in azFuncStmtDefns)
                         {
+                            fn.InvokeImmediately = fn.Expression is not AzLambdaExpn;
                             IAzFuncStmtDefn.Analyze(scope, names, fn, psFuncStmtDefn);
                             statements.Add(fn);
                         }

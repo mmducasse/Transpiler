@@ -55,9 +55,20 @@ namespace Transpiler.Generate
                         MapNext(dLam.Output, eLam.Output);
                         break;
 
-                    // Todo: add ctor and tuple cases.
                     case (AzTypeCtorExpn dCtor, AzTypeCtorExpn eCtor):
                         if (dCtor.TypeDefn != eCtor.TypeDefn) { throw new Exception(); }
+                        for (int i = 0; i < dCtor.Arguments.Count; i++)
+                        {
+                            MapNext(dCtor.Arguments[i], eCtor.Arguments[i]);
+                        }
+                        break;
+
+                    case (AzTypeTupleExpn dTup, AzTypeTupleExpn eTup):
+                        if (dTup.Elements.Count != eTup.Elements.Count) { throw new Exception(); }
+                        for (int i = 0; i < dTup.Elements.Count; i++)
+                        {
+                            MapNext(dTup.Elements[i], eTup.Elements[i]);
+                        }
                         break;
 
                     default:
@@ -88,7 +99,7 @@ namespace Transpiler.Generate
                         for (int i = 1; i < lineage.Count; i++)
                         {
                             string funcName = string.Format("{0}From{1}", lineage[i].Name, lineage[i - 1].Name);
-                            s = string.Format("{0}({1})", funcName, s.Generated());
+                            s = string.Format("{0}({1})", funcName, s);
                         }
                         return s;
                     }

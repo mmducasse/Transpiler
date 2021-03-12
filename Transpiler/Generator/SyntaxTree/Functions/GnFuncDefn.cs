@@ -30,15 +30,33 @@ namespace Transpiler.Generate
 
         public string Generate(int i, NameProvider names, string namePrefix, ref string s)
         {
-            string name = namePrefix.Generated() + Name.SafeNameGenerated();
-            string rs = Refinements.Select(r => GnRefinement.Generate(r)).Separate(", ");
-            s += string.Format("{0}function {1}({2}) {{\n", Indent(i), name, rs);
-            string expnRes = Expression.Generate(i + 1, names, ref s);
-            s += string.Format("{0}return {1}\n", Indent(i + 1), expnRes);
-            s += Indent(i) + "}\n";
+            if (InvokeImmediately)
+            {
+                string name = namePrefix.Generated() + Name.SafeNameGenerated();
+                string res = names.Next;
+                string temp = names.Next;
+                string rs = Refinements.Select(r => GnRefinement.Generate(r)).Separate(", ");
+                s += string.Format("{0}function {1}({2}) {{\n", Indent(i), res, rs);
+                string expnRes = Expression.Generate(i + 1, names, ref s);
+                s += string.Format("{0}return {1}\n", Indent(i + 1), expnRes);
+                s += Indent(i) + "}\n";
+                s += string.Format("{0}let {1} = {2}()\n", Indent(i), temp, res);
+                s += string.Format("{0}const {1} = {2} => {3}\n", Indent(i), name, names.Next, temp);
+                return name;
+            }
+            else
+            {
+                string name = namePrefix.Generated() + Name.SafeNameGenerated();
+                string rs = Refinements.Select(r => GnRefinement.Generate(r)).Separate(", ");
+                s += string.Format("{0}function {1}({2}) {{\n", Indent(i), name, rs);
+                string expnRes = Expression.Generate(i + 1, names, ref s);
+                s += string.Format("{0}return {1}\n", Indent(i + 1), expnRes);
+                s += Indent(i) + "}\n";
+                return name;
+            }
+
             //s += string.Format("{0}const {1} = {2}()\n", Indent(i), name, helperName);
 
-            return name;
         }
     }
 }

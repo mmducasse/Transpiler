@@ -39,7 +39,7 @@ function Match(x, pattern)
 		return true;
 	}
 
-	return false;
+	return x == pattern;
 }
 
 function FormatResult(data) {
@@ -105,6 +105,7 @@ function FormatData(data) {
 
 // The object is a tuple.
 function FormatTuple(data) {
+	if (data.length < 2) { return '' }
 	var s = data[1]
 	for (var i = 2; i < data.length; i++) {
 		s += ", " + FormatResult(data[i])
@@ -116,13 +117,6 @@ function PrintResult(output) {
 	s = FormatResult(output)
 	console.log(s)
 }
-
-//let fs = require('fs')
-//function Getchar(x) {
-//	let buffer = Buffer.alloc(1)
-//	fs.readSync(0, buffer, 0, 1)
-//	return buffer.toString('utf8')
-//}
 
 function Putchar(c) {
 	process.stdout.write(c);
@@ -179,15 +173,47 @@ function MkBool(b) {
 const primEq = a => b => MkBool(a == b)
 const primNeq = a => b => MkBool(a != b)
 
-const primAdd = a => b => a + b
-const primSub = a => b => a - b
-const primMul = a => b => a * b
-const primDiv = a => b => a / b
+const intAdd = a => b => a + b
+const intSub = a => b => a - b
+const intMul = a => b => a * b
+const intDiv = a => b => (a / b >> 0)
+const intMod = a => b => a % b
+
+const realAdd = a => b => a + b
+const realSub = a => b => a - b
+const realMul = a => b => a * b
+const realDiv = a => b => a / b
 
 const primLt = a => b => MkBool(a < b)
 const primLte = a => b => MkBool(a <= b)
 const primGt = a => b => MkBool(a > b)
 const primGte = a => b => MkBool(a >= b)
+
+const primShow = a => StringToListChar(a.toString())
+
+const RawEq = a => b => MkBool(Match(a, b))
+
+function ParseInt(s) {
+	let str = ListCharToString(s)
+	let i = parseInt(str)
+	if (isNaN(i)) {
+		return ['None']
+	}
+	else {
+		return ['Some', i]
+	}
+}
+
+function ParseReal(s) {
+	let str = ListCharToString(s)
+	let f = parseFloat(str)
+	if (isNaN(f)) {
+		return ['None']
+	}
+	else {
+		return ['Some', f]
+	}
+}
 
 ////////////////// END OF CORE.JS //////////////////
 

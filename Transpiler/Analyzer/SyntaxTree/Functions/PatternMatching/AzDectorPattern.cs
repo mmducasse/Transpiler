@@ -11,7 +11,7 @@ namespace Transpiler.Analysis
     {
         public IAzTypeExpn Type { get; private set; } = TypeVariables.Next;
 
-        public bool IsCompleteMember => (Variables.Count == 0) || Variables.All(v => v is AzParam);
+        public bool IsCompleteMember => (Variables.Count == 0) || Variables.All(v => v is AzParam || v is AzElsePattern);
 
         private Substitution UniqueSubstitution { get; init; }
 

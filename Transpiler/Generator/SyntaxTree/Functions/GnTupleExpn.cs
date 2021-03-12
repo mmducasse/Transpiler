@@ -22,8 +22,8 @@ namespace Transpiler.Generate
                 elementVars.Add(v);
             }
 
-            string tupArgs = elementVars.Separate(", ");
-            string tupString = string.Format("[\"\", {0}]", tupArgs);
+            string tupArgs = elementVars.Separate(", ", prepend: ", ");
+            string tupString = string.Format("[\"\"{0}]", tupArgs);
             return tupString;
         }
     }

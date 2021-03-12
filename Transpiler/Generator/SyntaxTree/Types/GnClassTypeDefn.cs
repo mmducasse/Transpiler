@@ -15,19 +15,20 @@ namespace Transpiler.Generate
             for (; i < classDefn.Superclasses.Count(); i++)
             {
                 string fnName = string.Format("{0}From{1}", classDefn.Superclasses[i].Name, classDefn.Name);
-                output.Append(GenerateFunction(fnName, i));
+                output.Append(GenerateFunction(fnName, i, false));
             }
 
             for (int j = 0; j < classDefn.Functions.Count; j++)
             {
                 string fnName = classDefn.Functions[j].Name;
-                output.Append(GenerateFunction(fnName, i + j));
+                output.Append(GenerateFunction(fnName, i + j, true));
             }
         }
 
-        private static string GenerateFunction(string name, int i)
+        private static string GenerateFunction(string name, int i, bool generate)
         {
-            string s = string.Format("function {0}(dict)\n", name.SafeNameGenerated());
+            string genName = generate ? name.SafeNameGenerated() : name.SafeName();
+            string s = string.Format("function {0}(dict)\n", genName);
             s += "{\n";
             s += string.Format("{0}return dict[{1}];\n", Indent(1), i);
             s += "}\n\n";

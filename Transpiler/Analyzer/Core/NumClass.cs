@@ -11,30 +11,30 @@ namespace Transpiler.Analysis
         {
             var num = MakeNum(scope);
 
-            InstNum(scope, num, Core.Instance.Int);
-            InstNum(scope, num, Core.Instance.Real);
+            InstNum(scope, num, Core.Instance.Int, "int");
+            InstNum(scope, num, Core.Instance.Real, "real");
 
             return num;
         }
 
         private static AzClassTypeDefn MakeNum(Scope scope)
         {
-            var eq = Core.Instance.Eq;
-            var num = new AzClassTypeDefn("Num", eq.ToArr(), scope, CodePosition.Null);
+            var ord = Core.Instance.Ord;
+            var num = new AzClassTypeDefn("Num", ord.ToArr(), scope, CodePosition.Null);
             var a = new TypeVariable(0, num.ToArr());
             num.TypeVar = a;
 
             var type = AzTypeLambdaExpn.Make(a, a, a);
 
-            var fAdd = CreateFunction("+", type); // new AzFuncDefn("+", type, eFixity.Infix, true, CodePosition.Null);
-            var fSub = CreateFunction("-", type); // new AzFuncDefn("-", type, eFixity.Infix, true, CodePosition.Null);
-            var fMul = CreateFunction("*", type); // new AzFuncDefn("*", type, eFixity.Infix, true, CodePosition.Null);
-            var fDiv = CreateFunction("/", type); // new AzFuncDefn("/", type, eFixity.Infix, true, CodePosition.Null);
+            var fAdd = CreateFunction("+", type);
+            var fSub = CreateFunction("-", type);
+            var fMul = CreateFunction("*", type);
+            var fDiv = CreateFunction("/", type);
 
             num.Functions = RList(fAdd, fSub, fMul, fDiv);
 
             scope.AddType(num);
-            scope.AddSuperType(num, eq);
+            scope.AddSuperType(num, ord);
             scope.AddFunction(fAdd, fAdd.Type);
             scope.AddFunction(fSub, fSub.Type);
             scope.AddFunction(fMul, fMul.Type);
@@ -44,12 +44,13 @@ namespace Transpiler.Analysis
 
         private static void InstNum(Scope scope,
                                     AzClassTypeDefn num,
-                                    IAzDataTypeDefn implementor)
+                                    IAzDataTypeDefn implementor,
+                                    string prefix)
         {
-            var fadd = Function2("+", "primAdd", implementor);
-            var fsub = Function2("-", "primSub", implementor);
-            var fmul = Function2("*", "primMul", implementor);
-            var fdiv = Function2("/", "primDiv", implementor);
+            var fadd = Function2("+", prefix + "Add", implementor);
+            var fsub = Function2("-", prefix + "Sub", implementor);
+            var fmul = Function2("*", prefix + "Mul", implementor);
+            var fdiv = Function2("/", prefix + "Div", implementor);
             var fns = RList(fadd, fsub, fmul, fdiv);
 
             var instDefn = new AzClassInstDefn(num, implementor, new List<TypeVariable>(), fns, CodePosition.Null);

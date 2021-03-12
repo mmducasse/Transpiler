@@ -22,7 +22,7 @@ namespace Transpiler.Generate
             foreach (var stmt in Statements)
             {
                 string stmtRes = stmt.Generate(i, names, ref s);
-                if (stmt.InvokeImmediately)
+                if ((stmt is IGnFuncExpn) && stmt.InvokeImmediately)
                 {
                     s += string.Format("{0}{1}()\n", Indent(i), stmtRes);
                 }

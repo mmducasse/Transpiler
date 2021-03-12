@@ -24,8 +24,13 @@ namespace Transpiler.Parse
             while (Finds(TokenType.NewLine, ref q2) &&
                    FindsIndents(ref q2, indent + 1))
             {
-                if (IPsFuncExpn.Parse(ref q2, isInline: false, out var funcExpn)) { lines.Add(funcExpn); }
-                else if (IPsFuncStmtDefn.Parse(ref q2, out var funcStmtDefn)) { lines.Add(funcStmtDefn); }
+                var q3 = q2;
+                if (Finds("let", ref q3) && IPsFuncStmtDefn.Parse(ref q3, out var funcStmtDefn))
+                {
+                    q2 = q3;
+                    lines.Add(funcStmtDefn);
+                }
+                else if(IPsFuncExpn.Parse(ref q2, isInline: false, out var funcExpn)) { lines.Add(funcExpn); }
                 else
                 {
                     throw Error("Expected statement or expression in closure.", q2.Position);
