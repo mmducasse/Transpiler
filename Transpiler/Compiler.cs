@@ -37,18 +37,24 @@ namespace Transpiler
 #pragma warning restore CA1416 // Validate platform compatibility
             Console.WriteLine("FL1 Transpiler");
             Console.WriteLine("M. Ducasse 2021\n\n");
-            Console.WriteLine("Type \"help:\" for a list of compiler commands.\n\n");
+            Console.WriteLine("Type \"help:\" for more info.\n\n");
 
             Instance = this;
 
             new Core();
 
-            //string path = @"C:\Users\matth\Desktop\testcode.hs";
-
             //Process.Start("npm install prompt-sync");
 
+            // Try to load stored root directory.
+            if (File.Exists(RootDirStorageFile))
+            {
+                mRootDir = File.ReadAllText(RootDirStorageFile).Trim();
+                PrLn("Root is now {0}", mRootDir);
+            }
+
             // REPL Loop.
-            while (true)
+            bool doContinue = true;
+            while (doContinue)
             {
                 Pr("FL1> ", Blue);
 
@@ -74,6 +80,10 @@ namespace Transpiler
                     else if (input.StartsWith("clear:"))
                     {
                         Clear();
+                    }
+                    else if (input.StartsWith("exit:"))
+                    {
+                        doContinue = false;
                     }
                     else if (input.StartsWith("let "))
                     {
@@ -123,7 +133,16 @@ namespace Transpiler
         private void SetRoot(string rootDir)
         {
             rootDir = rootDir.Trim();
-            if (Directory.Exists(rootDir))
+            if (string.IsNullOrWhiteSpace(rootDir))
+            {
+                mRootDir = null;
+                PrLn("Root is now null");
+                if (File.Exists(RootDirStorageFile))
+                {
+                    File.Delete(RootDirStorageFile);
+                }
+            }
+            else if (Directory.Exists(rootDir))
             {
                 mRootDir = rootDir;
                 if (!mRootDir.EndsWith("\\"))
@@ -131,6 +150,8 @@ namespace Transpiler
                     mRootDir += "\\";
                 }
                 PrLn("Root is now {0}", mRootDir);
+
+                File.WriteAllText(RootDirStorageFile, mRootDir);
             }
             else
             {
@@ -288,6 +309,16 @@ namespace Transpiler
         }
 
         #endregion
+
+        private string RootDirStorageFile
+        {
+            get
+            {
+                string execPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                string outputPath = Directory.GetParent(execPath) + "\\root.txt";
+                return outputPath;
+            }
+        }
 
         private string DestJsFile
         {
