@@ -8,28 +8,28 @@ namespace Transpiler.Analysis
     {
         public static void Analyze(Module module, Stack<Module> dependents)
         {
-            TypeVariables.Reset();
+            if (module.IsAnalyzed) { return; }
 
-            // Create the top-level scope.
-            var fileScope = new Scope(Core.Instance.Scope.ToArr());
-            module.Scope = fileScope;
+            TypeVariables.Reset();
 
             // Find and analyze usings.
             AnalyzeDependencies(module, dependents);
 
             // Analyze types and functions in module.
-            AnalyzeFile(fileScope, module.ParseResult);
+            AnalyzeFile(module.Scope, module.ParseResult);
 
             // Apply HM type inference alg to functions.
-            SolveFunctions(fileScope);
+            SolveFunctions(module.Scope);
 
             // Perform any more verification needed after type inference is done.
-            PostAnalyze(fileScope);
+            PostAnalyze(module.Scope);
 
             if (Compiler.DebugAnalyzer)
             {
                 Print(module);
             }
+
+            module.IsAnalyzed = true;
         }
 
         private static void AnalyzeDependencies(Module module, Stack<Module> dependents)
@@ -51,10 +51,7 @@ namespace Transpiler.Analysis
                                 module.Name + " and " + dependency.Name + ".", import.Position);
                 }
 
-                if (!module.IsAnalyzed)
-                {
-                    Analyze(dependency, dependents);
-                }
+                Analyze(dependency, dependents);
 
                 module.Dependencies.Add(dependency);
                 module.Scope.Dependencies.Add(dependency.Scope);

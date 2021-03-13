@@ -35,8 +35,7 @@ namespace Transpiler.Analysis
             Instance = this;
             TvProvider tvs = new();
 
-            Module = new Module(" ", "Core");
-            Module.Scope = new();
+            Module = Module.CoreModule();
 
             Int = AzPrimitiveTypeDefn.Make(Module.Scope, "Int");
             Real = AzPrimitiveTypeDefn.Make(Module.Scope, "Real");

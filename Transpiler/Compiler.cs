@@ -15,6 +15,8 @@ namespace Transpiler
     {
         public static Compiler Instance { get; private set; }
 
+        private List<IAzFuncStmtDefn> mUserFunctions = new();
+
         public IReadOnlyDictionary<string, Module> Modules => mModules;
         public Dictionary<string, Module> mModules = new();
 
@@ -27,18 +29,15 @@ namespace Transpiler
         public static bool DebugParser { get; } = false;
         public static bool DebugAnalyzer { get; } = false;
 
-        private const string DEST_JS_FILE = @"C:\Users\matth\Desktop\output.js";
-
         public Compiler()
         {
 #pragma warning disable CA1416 // Validate platform compatibility
             Console.SetWindowSize(64, 32);
-            Console.SetBufferSize(64, 256);
+            //Console.SetBufferSize(64, 256);
 #pragma warning restore CA1416 // Validate platform compatibility
-            Console.WriteLine("Transpiler");
+            Console.WriteLine("FL1 Transpiler");
             Console.WriteLine("M. Ducasse 2021\n\n");
-            Console.WriteLine("Enter an FL1 expression in the prompt");
-            Console.WriteLine("or type \"help:\" for a list of compiler commands.\n\n");
+            Console.WriteLine("Type \"help:\" for a list of compiler commands.\n\n");
 
             Instance = this;
 
@@ -76,29 +75,17 @@ namespace Transpiler
                     {
                         Clear();
                     }
+                    else if (input.StartsWith("let "))
+                    {
+                        AddFunction(input[3..]);
+                    }
                     else if (string.IsNullOrWhiteSpace(input))
                     {
                         // Do nothing...
                     }
                     else
                     {
-                        string inputText = "";
-                        foreach (var (moduleName, _) in Modules)
-                        {
-                            inputText += string.Format("use {0}\n", moduleName);
-                        }
-                        inputText += "ans = " + input + "\n";
-                        var inputModule = new Module(inputText, "INPUTMODULE");
-                        Parser.Parse(inputModule);
-                        Analyzer.Analyze(inputModule, new());
-
-                        var funcDefn = inputModule.Scope.FuncDefinitions.First().Value;
-                        string fnString = string.Format("\n\n{0} :: {1}", funcDefn.Name, funcDefn.Type.PrintWithRefinements());
-                        PrLn(fnString, Yellow);
-
-                        CompileModulesToJs();
-                        AddCompiledInputModule(inputModule);
-                        ExecOutputFile();
+                        EvalExpression(input);
                     }
                 }
                 catch (CompilerException ce)
@@ -108,18 +95,26 @@ namespace Transpiler
             }
         }
 
+        #region Commands
+
         private void Help()
         {
+
+            PrLn("\nEnter an expression to evaluate...");
+            PrLn("    example: 1 + 1");
+            PrLn("\nOr type 'let' followed by a function definition to add it to scope...");
+            PrLn("    example: let add a b = a + b");
+
             void PrintCmd(string cmdName, string description)
             {
-                Pr("\"");
+                Pr("    \"");
                 Pr(cmdName, foregroundColor: ConsoleColor.Yellow);
                 PrLn("\"  " + description);
             }
 
-            PrLn("\nCompiler commands:\n");
+            PrLn("\nREPL commands:");
             PrintCmd("root: <rootdir>", "sets the source root directory.");
-            PrintCmd("load:", "recursively searches the source root directory and compiles all FL1 source files (.hs format).");
+            PrintCmd("load:", "loads all modules from source root directory into scope.");
             PrintCmd("list:", "lists all currently loaded symbols");
             PrintCmd("clear:", "unloads all currently loaded symbols.");
             PrLn("\n\n");
@@ -135,6 +130,7 @@ namespace Transpiler
                 {
                     mRootDir += "\\";
                 }
+                PrLn("Root is now {0}", mRootDir);
             }
             else
             {
@@ -144,6 +140,8 @@ namespace Transpiler
 
         private void Load()
         {
+            Clear();
+
             // Load each file in directory
             //rootFolder = @"C:\Users\matth\Desktop\FunctionalCode\"; // rootFolder.Trim();
             if (mRootDir != null)
@@ -165,10 +163,7 @@ namespace Transpiler
 
                     foreach (var module in newModules)
                     {
-                        if (!module.IsAnalyzed)
-                        {
-                            Analyzer.Analyze(module, new());
-                        }
+                        Analyzer.Analyze(module, new());
                     }
 
                     CompileModulesToJs();
@@ -191,10 +186,9 @@ namespace Transpiler
 
         private void Clear()
         {
+            mUserFunctions.Clear();
             mModules.Clear();
         }
-
-        #region List
 
         private void List(string moduleName)
         {
@@ -202,6 +196,10 @@ namespace Transpiler
             if (string.IsNullOrWhiteSpace(moduleName))
             {
                 ListModule("Core", Core.Instance.Scope);
+                if (mUserFunctions.Count > 0)
+                {
+                    ListUserFunctions();
+                }
                 foreach (var module in Modules.Values)
                 {
                     ListModule(module.Name, module.Scope);
@@ -226,7 +224,80 @@ namespace Transpiler
             scope.PrintFunctions();
         }
 
+        private void ListUserFunctions()
+        {
+            PrLn();
+            PrLn("USERINPUT", Gray);
+            //module.Scope.PrintTypes();
+            foreach (var userFunc in mUserFunctions)
+            {
+                userFunc.PrintSignature();
+            }
+        }
+
+        private void AddFunction(string functionCode)
+        {
+            string inputText = "";
+            foreach (var (moduleName, _) in Modules)
+            {
+                inputText += string.Format("use {0}\n", moduleName);
+            }
+            inputText += functionCode + "\n";
+            var inputModule = new Module(inputText, "USERINPUT");
+            foreach (var userFunc in mUserFunctions)
+            {
+                inputModule.Scope.AddFunction(userFunc, userFunc.Type);
+            }
+            Parser.Parse(inputModule);
+            Analyzer.Analyze(inputModule, new());
+
+            foreach (var userFunc in inputModule.Scope.AllFunctions())
+            {
+                if (!mUserFunctions.Contains(userFunc))
+                {
+                    mUserFunctions.Add(userFunc);
+                    string fnString = string.Format("\n{0} :: {1}\n", userFunc.Name, userFunc.Type.PrintWithRefinements());
+                    PrLn(fnString, Yellow);
+                }
+            }
+        }
+
+        private void EvalExpression(string inputExpn)
+        {
+            string inputText = "";
+            foreach (var (moduleName, _) in Modules)
+            {
+                inputText += string.Format("use {0}\n", moduleName);
+            }
+            inputText += "ans = " + inputExpn + "\n";
+            var inputModule = new Module(inputText, "USERINPUT");
+            foreach (var userFunc in mUserFunctions)
+            {
+                inputModule.Scope.AddFunction(userFunc, userFunc.Type);
+            }
+            Parser.Parse(inputModule);
+            Analyzer.Analyze(inputModule, new());
+
+            var funcDefn = inputModule.Scope.AllFunctions().Where(f => !mUserFunctions.Contains(f)).First();
+            string fnString = string.Format("\n{0} :: {1}", funcDefn.Name, funcDefn.Type.PrintWithRefinements());
+            PrLn(fnString, Yellow);
+
+            CompileModulesToJs();
+            AddCompiledInputModule(inputModule);
+            ExecOutputFile();
+        }
+
         #endregion
+
+        private string DestJsFile
+        {
+            get
+            {
+                string execPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                string outputPath = Directory.GetParent(execPath) + "\\output.js";
+                return outputPath;
+            }
+        }
 
         private void CompileModulesToJs()
         {
@@ -257,14 +328,14 @@ namespace Transpiler
             }
 
             Generator.TEMP_AddFinalLine(ansIsFunction, ref output);
-            File.WriteAllText(DEST_JS_FILE, mOutput);
-            File.AppendAllText(DEST_JS_FILE, output.ToString());
+            File.WriteAllText(DestJsFile, mOutput);
+            File.AppendAllText(DestJsFile, output.ToString());
         }
 
         private void ExecOutputFile()
         {
             //Console.Write("ans = ");
-            var nodeJs = Process.Start("node", DEST_JS_FILE);
+            var nodeJs = Process.Start("node", DestJsFile);
             nodeJs.WaitForExit();
             nodeJs.Dispose();
         }

@@ -3,9 +3,8 @@ TODO:
 
 - Add TypeParameters to the types of functions that get determined during Analysis
 - Clean up generator, maybe eliminate redundant asts
-- Prohibit accessors for union data types
 
-- Add vars in REPL
+- Prohibit accessors for union data types
 - Tail call recursion optimization
 - Make private indicators do something
 - Explict type annotations inline
@@ -16,4 +15,5 @@ TODO:
 - Nested unions
 - Arbitrary unions
 - Precicates in match cases after 'if'
+- String interpolation
 

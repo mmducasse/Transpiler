@@ -15,16 +15,21 @@ namespace Transpiler
 
         public ParseResult ParseResult { get; set; }
 
-        public Scope Scope { get; set; }
+        public Scope Scope { get; }
 
-        public string Output { get; set; }
+        public bool IsAnalyzed { get; set; } = false;
 
-        public bool IsAnalyzed { get; set; }
+        public static Module CoreModule() => new Module("", "Core", new());
 
-        public Module(string code, string name)
+        public Module(string code, string name) 
+            : this(code, name, new Scope(Core.Instance.Scope.ToArr()))
+        { }
+
+        private Module(string code, string name, Scope scope)
         {
             Code = code;
             Name = name;
+            Scope = scope;
         }
 
         public static Module Create(string filePath)
@@ -33,5 +38,7 @@ namespace Transpiler
 
             return new Module(code, "");
         }
+
+        public override string ToString() => Name;
     }
 }
