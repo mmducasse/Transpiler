@@ -1,7 +1,6 @@
 ﻿
 TODO:
 
-- BUG: List of lists isnt working (nested data type ctors is also busted)
 - Add TypeParameters to the types of functions that get determined during Analysis
 - Clean up generator, maybe eliminate redundant asts
 - Prohibit accessors for union data types

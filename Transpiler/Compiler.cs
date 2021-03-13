@@ -21,6 +21,8 @@ namespace Transpiler
         private string mOutput = "";
         private bool mIsCompiled = false;
 
+        private string mRootDir = null;
+
         public static bool DebugCore { get; } = false;
         public static bool DebugParser { get; } = false;
         public static bool DebugAnalyzer { get; } = false;
@@ -35,6 +37,8 @@ namespace Transpiler
 #pragma warning restore CA1416 // Validate platform compatibility
             Console.WriteLine("Transpiler");
             Console.WriteLine("M. Ducasse 2021\n\n");
+            Console.WriteLine("Enter an FL1 expression in the prompt");
+            Console.WriteLine("or type \"help:\" for a list of compiler commands.\n\n");
 
             Instance = this;
 
@@ -52,13 +56,25 @@ namespace Transpiler
                 try
                 {
                     string input = Console.ReadLine();
-                    if (input.StartsWith("load:"))
+                    if (input.StartsWith("help:"))
                     {
-                        Load(input[5..]);
+                        Help();
+                    }
+                    else if (input.StartsWith("root:"))
+                    {
+                        SetRoot(input[5..]);
+                    }
+                    else if (input.StartsWith("load:"))
+                    {
+                        Load();
                     }
                     else if (input.StartsWith("list:"))
                     {
                         List(input[5..]);
+                    }
+                    else if (input.StartsWith("clear:"))
+                    {
+                        Clear();
                     }
                     else if (string.IsNullOrWhiteSpace(input))
                     {
@@ -92,18 +108,52 @@ namespace Transpiler
             }
         }
 
-        private void Load(string rootFolder)
+        private void Help()
+        {
+            void PrintCmd(string cmdName, string description)
+            {
+                Pr("\"");
+                Pr(cmdName, foregroundColor: ConsoleColor.Yellow);
+                PrLn("\"  " + description);
+            }
+
+            PrLn("\nCompiler commands:\n");
+            PrintCmd("root: <rootdir>", "sets the source root directory.");
+            PrintCmd("load:", "recursively searches the source root directory and compiles all FL1 source files (.hs format).");
+            PrintCmd("list:", "lists all currently loaded symbols");
+            PrintCmd("clear:", "unloads all currently loaded symbols.");
+            PrLn("\n\n");
+        }
+
+        private void SetRoot(string rootDir)
+        {
+            rootDir = rootDir.Trim();
+            if (Directory.Exists(rootDir))
+            {
+                mRootDir = rootDir;
+                if (!mRootDir.EndsWith("\\"))
+                {
+                    mRootDir += "\\";
+                }
+            }
+            else
+            {
+                PrLn("Unable to find directory: {0}", rootDir);
+            }
+        }
+
+        private void Load()
         {
             // Load each file in directory
-            rootFolder = @"C:\Users\matth\Desktop\FunctionalCode\"; // rootFolder.Trim();
-            if (Directory.Exists(rootFolder))
+            //rootFolder = @"C:\Users\matth\Desktop\FunctionalCode\"; // rootFolder.Trim();
+            if (mRootDir != null)
             {
                 try
                 {
                     mIsCompiled = false;
 
                     Console.Write("Loading... ");
-                    var files = Directory.GetFiles(rootFolder, "*.hs", SearchOption.AllDirectories);
+                    var files = Directory.GetFiles(mRootDir, "*.hs", SearchOption.AllDirectories);
                     List<Module> newModules = new();
                     foreach (var file in files)
                     {
@@ -135,7 +185,7 @@ namespace Transpiler
             }
             else
             {
-                Console.WriteLine(rootFolder + " not found.");
+                Console.WriteLine("Root directory is not set.");
             }
         }
 
