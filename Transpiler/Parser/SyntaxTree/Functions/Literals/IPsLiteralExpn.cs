@@ -1,5 +1,15 @@
-﻿namespace Transpiler.Parse
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+namespace Transpiler.Parse
 {
+    /// <summary>
+    /// A literal. May be used as a pattern in pattern matching.
+    /// </summary>
     public interface IPsLiteralExpn : IPsFuncExpn, IPsPattern
     {
         public static bool Parse(ref TokenQueue queue, out IPsLiteralExpn node)

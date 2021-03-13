@@ -1,9 +1,19 @@
-﻿using System.Collections.Generic;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using System.Collections.Generic;
 using System.Linq;
 using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// A tuple pattern.
+    /// </summary>
     public record PsTuplePattern(IReadOnlyList<IPsPattern> Elements,
                                  CodePosition Position) : IPsPattern
     {

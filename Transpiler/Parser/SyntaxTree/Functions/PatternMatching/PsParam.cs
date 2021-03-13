@@ -1,8 +1,17 @@
-﻿using System.Collections.Generic;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
 using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// A single named parameter.
+    /// </summary>
     public record PsParam(string Name,
                           CodePosition Position = null) : IPsPattern, IPsFuncDefn
     {

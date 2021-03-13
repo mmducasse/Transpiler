@@ -1,8 +1,18 @@
-﻿using static Transpiler.Extensions;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using static Transpiler.Extensions;
 using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// An if-then-else expression.
+    /// </summary>
     public record PsIfExpn(IPsFuncExpn Condition,
                            IPsFuncExpn ThenCase,
                            IPsFuncExpn ElseCase,

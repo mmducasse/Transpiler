@@ -1,7 +1,17 @@
-﻿using static Transpiler.Parse.ParserUtils;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// A single element within a data type.
+    /// </summary>
     public record PsDataTypeElement(string Name,
                                     IPsTypeExpn TypeExpression,
                                     CodePosition Position) : IPsNode

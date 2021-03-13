@@ -1,11 +1,20 @@
-﻿using System.Collections.Generic;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using System.Collections.Generic;
 using System.Linq;
-using static Transpiler.Parse.ParserUtils;
-using static Transpiler.Parse.KeySymbols;
 using static Transpiler.Extensions;
+using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// An imperative expression where each line is executed from top to bottom.
+    /// </summary>
     public record PsClosureExpn(IReadOnlyList<IPsFuncStmt> Statements,
                                 IPsFuncExpn ReturnExpression,
                                 CodePosition Position) : IPsFuncExpn

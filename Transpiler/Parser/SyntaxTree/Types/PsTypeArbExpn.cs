@@ -1,9 +1,20 @@
-﻿using System.Collections.Generic;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using System.Collections.Generic;
 using System.Linq;
 using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// A sequence of type expressions whose application order will
+    /// be determined in the analyzer.
+    /// </summary>
     public record PsTypeArbExpn(string TypeName,
                                 IReadOnlyList<IPsTypeExpn> Children,
                                 CodePosition Position) : IPsTypeExpn

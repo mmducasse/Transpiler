@@ -1,4 +1,10 @@
-﻿using System;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
 using System.Collections.Generic;
 using static Transpiler.UI;
 

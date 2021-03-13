@@ -1,26 +1,14 @@
-﻿using System.Collections.Generic;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using System.Collections.Generic;
 
 namespace Transpiler.Parse
 {
-    //public struct TokenQueue
-    //{
-    //    private IReadOnlyList<LexerToken> mTokens;
-    //    public int Index { get; }
-
-    //    public TokenQueue(IReadOnlyList<LexerToken> tokens, int index = 0)
-    //    {
-    //        mTokens = tokens;
-    //        Index = index;
-    //    }
-
-    //    public LexerToken Current => mTokens[Index];
-
-    //    public bool HasNext => (Index + 1) < mTokens.Count;
-    //    public TokenQueue Next => new TokenQueue(mTokens, Index + 1);
-
-    //    public override string ToString() => Current.Value;
-    //}
-
     public class TokenQueue
     {
         public IReadOnlyList<LexerToken> Tokens { get; private init; }

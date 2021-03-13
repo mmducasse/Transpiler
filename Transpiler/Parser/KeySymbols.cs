@@ -1,4 +1,11 @@
-﻿namespace Transpiler.Parse
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+namespace Transpiler.Parse
 {
     public static class KeySymbols
     {
@@ -12,7 +19,6 @@
         public const string LBrace = "[";
         public const string RBrace = "]";
         public const string Comma = ",";
-        //public const string Dot = ".";
 
         public static readonly string[] All = new[]
         {
@@ -22,7 +28,6 @@
             LBrace,
             RBrace,
             Comma,
-            //Dot,
         };
 
         public const string Equal = "=";

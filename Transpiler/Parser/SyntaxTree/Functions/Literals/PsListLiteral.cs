@@ -1,9 +1,19 @@
-﻿using System.Collections.Generic;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using System.Collections.Generic;
 using System.Linq;
 using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// List literal.
+    /// </summary>
     public record PsListLiteral(IReadOnlyList<IPsFuncExpn> Elements,
                                 CodePosition Position) : IPsLiteralExpn
     {

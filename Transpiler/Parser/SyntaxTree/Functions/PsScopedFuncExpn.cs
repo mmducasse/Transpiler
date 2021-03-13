@@ -1,9 +1,19 @@
-﻿using System.Collections.Generic;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using System.Collections.Generic;
 using static Transpiler.Extensions;
 using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// AST node that introduces a new, nested scope that may add more symbol definitions.
+    /// </summary>
     public record PsScopedFuncExpn(IPsFuncExpn Expression,
                                    IReadOnlyList<IPsFuncStmtDefn> FuncDefinitions,
                                    CodePosition Position) : IPsFuncExpn

@@ -1,9 +1,19 @@
-﻿using System.Collections.Generic;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using System.Collections.Generic;
 using static Transpiler.Extensions;
 using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// A pattern matching expression.
+    /// </summary>
     public record PsMatchExpn(IPsFuncExpn Argument,
                               IReadOnlyList<PsMatchCase> Cases,
                               CodePosition Position) : IPsFuncExpn

@@ -1,4 +1,10 @@
-﻿
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
 namespace Transpiler.Parse
 {
     public enum TokenType

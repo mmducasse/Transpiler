@@ -1,7 +1,17 @@
-﻿using static Transpiler.Parse.ParserUtils;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// String literal.
+    /// </summary>
     public record PsStringLiteral(string Value,
                                   CodePosition Position) : IPsLiteralExpn
     {

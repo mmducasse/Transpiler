@@ -1,10 +1,21 @@
-﻿using System.Collections.Generic;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using System.Collections.Generic;
 using System.Linq;
 using static Transpiler.Parse.ParserUtils;
 using static Transpiler.Keywords;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// A sequence of inline symbols whose application order will
+    /// be determined in the analyzer.
+    /// </summary>
     public record PsArbExpn(IReadOnlyList<IPsFuncExpn> Children,
                             CodePosition Position) : IPsFuncExpn, IPsPattern
     {
@@ -50,11 +61,6 @@ namespace Transpiler.Parse
                 {
                     subExpns.Add(simpleNode);
                 }
-                //else if (IFuncExpnNode.ParseMultiline(ref q2, out var expnNode))
-                //{
-                //    subExpns.Add(expnNode);
-                //    doContinue = false;
-                //}
                 else
                 {
                     doContinue = false;
@@ -80,8 +86,6 @@ namespace Transpiler.Parse
 
             if (IPsLiteralExpn.Parse(ref q, out var litNode)) { node = litNode; }
             else if (PsSymbolExpn.Parse(ref q, out var varNode)) { node = varNode; }
-            // Operator?
-            // Parens?
 
             if (node != null)
             {

@@ -1,10 +1,20 @@
-﻿using System.Collections.Generic;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using System.Collections.Generic;
 using static Transpiler.Extensions;
 using static Transpiler.Parse.ParserUtils;
 using static Transpiler.Keywords;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// A typle class instance definition.
+    /// </summary>
     public record PsClassInstDefn(PsTypeRefinementGroup Refinements,
                                   string ClassName,
                                   string ImplementorName,

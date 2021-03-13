@@ -1,10 +1,19 @@
-﻿using System.Collections.Generic;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using System.Collections.Generic;
 using System.Linq;
 using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
-    // Todo: Add optional Type constraint property.
+    /// <summary>
+    /// A normal function definition.
+    /// </summary>
     public record PsFuncDefn(string Name,
                              IReadOnlyList<PsParam> Parameters,
                              bool IsPrivate,

@@ -1,7 +1,15 @@
-﻿using static Transpiler.Parse.ParserUtils;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// A pattern that may be matched against in a match expression.
+    /// </summary>
     public interface IPsPattern : IPsFuncNode
     {
         public static bool Parse(ref TokenQueue queue,

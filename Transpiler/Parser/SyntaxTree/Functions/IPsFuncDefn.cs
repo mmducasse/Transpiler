@@ -1,9 +1,22 @@
-﻿namespace Transpiler.Parse
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+namespace Transpiler.Parse
 {
+    /// <summary>
+    /// Definition of a function or symbol.
+    /// </summary>
     public interface IPsFuncDefn : IPsDefn
     {
     }
 
+    /// <summary>
+    /// Definition of a function.
+    /// </summary>
     public interface IPsFuncStmtDefn : IPsFuncDefn, IPsFuncStmt
     {
         IPsFuncExpn Expression { get; }

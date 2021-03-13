@@ -1,9 +1,19 @@
-﻿using System.Collections.Generic;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using System.Collections.Generic;
 using static Transpiler.Parse.ParserUtils;
 using static Transpiler.Extensions;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// A union type definition.
+    /// </summary>
     public record PsUnionTypeDefn(string Name,
                                   IReadOnlyList<string> TypeParameters,
                                   IReadOnlyList<PsDataTypeDefn> Subtypes,

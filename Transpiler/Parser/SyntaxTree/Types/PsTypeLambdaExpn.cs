@@ -1,7 +1,17 @@
-﻿using static Transpiler.Parse.ParserUtils;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// A lambda type expression.
+    /// </summary>
     public record PsTypeLambdaExpn(IPsTypeExpn Input,
                                 IPsTypeExpn Output,
                                 CodePosition Position) : IPsTypeExpn

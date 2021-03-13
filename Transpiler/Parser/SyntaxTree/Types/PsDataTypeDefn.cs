@@ -1,8 +1,18 @@
-﻿using System.Collections.Generic;
+﻿// //////////////////////////////////////////// //
+//                                              //
+// Project: Functional Language 1 Transpiler    //
+// Author:  Matthew M. Ducasse 2021             //
+//                                              //
+// //////////////////////////////////////////// //
+
+using System.Collections.Generic;
 using static Transpiler.Parse.ParserUtils;
 
 namespace Transpiler.Parse
 {
+    /// <summary>
+    /// A data type definition.
+    /// </summary>
     public record PsDataTypeDefn(string Name,
                                  IReadOnlyList<string> TypeParameters,
                                  IReadOnlyList<PsDataTypeElement> Elements,
