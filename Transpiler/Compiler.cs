@@ -98,37 +98,50 @@ namespace Transpiler
             rootFolder = @"C:\Users\matth\Desktop\FunctionalCode\"; // rootFolder.Trim();
             if (Directory.Exists(rootFolder))
             {
-                mIsCompiled = false;
-
-                Console.Write("Loading... ");
-                var files = Directory.GetFiles(rootFolder, "*.hs", SearchOption.AllDirectories);
-                List<Module> newModules = new();
-                foreach (var file in files)
+                try
                 {
-                    var module = Module.Create(file);
-                    Parser.Parse(module);
-                    mModules[module.Name] = module;
-                    newModules.Add(module);
-                }
+                    mIsCompiled = false;
 
-                foreach (var module in newModules)
-                {
-                    if (!module.IsAnalyzed)
+                    Console.Write("Loading... ");
+                    var files = Directory.GetFiles(rootFolder, "*.hs", SearchOption.AllDirectories);
+                    List<Module> newModules = new();
+                    foreach (var file in files)
                     {
-                        Analyzer.Analyze(module, new());
+                        var module = Module.Create(file);
+                        Parser.Parse(module);
+                        mModules[module.Name] = module;
+                        newModules.Add(module);
                     }
+
+                    foreach (var module in newModules)
+                    {
+                        if (!module.IsAnalyzed)
+                        {
+                            Analyzer.Analyze(module, new());
+                        }
+                    }
+
+                    CompileModulesToJs();
+
+                    Console.WriteLine("Ok!");
+
+                    newModules.ForEach(m => Console.WriteLine("Loaded " + m.Name));
                 }
-
-                CompileModulesToJs();
-
-                Console.WriteLine("Ok!");
-
-                newModules.ForEach(m => Console.WriteLine("Loaded " + m.Name));
+                catch (Exception)
+                {
+                    Clear();
+                    throw;
+                }
             }
             else
             {
                 Console.WriteLine(rootFolder + " not found.");
             }
+        }
+
+        private void Clear()
+        {
+            mModules.Clear();
         }
 
         #region List

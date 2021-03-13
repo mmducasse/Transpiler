@@ -123,9 +123,9 @@ namespace Transpiler.Analysis
 
             // They are Type Constructors.
             if (c.A is AzTypeCtorExpn ctora &&
-            c.B is AzTypeCtorExpn ctorb &&
-            (ctora.TypeDefn == ctorb.TypeDefn) &&
-            (ctora.Arguments.Count == ctorb.Arguments.Count))
+                c.B is AzTypeCtorExpn ctorb &&
+                (ctora.TypeDefn == ctorb.TypeDefn) &&
+                (ctora.Arguments.Count == ctorb.Arguments.Count))
             {
                 ConstraintSet cargs = new();
                 for (int i = 0; i < ctora.Arguments.Count; i++)

@@ -170,6 +170,7 @@ namespace Transpiler.Analysis
 
             dataType.Constructor.Expression = expn;
             dataType.Constructor.Type = type;
+            dataType.Constructor.ForceSolved();
 
             //Console.WriteLine("CTOR {0} :: {1}", dataType.Constructor.Print(0), type.Print(0));
             fileScope.AddFunction(dataType.Constructor, type);

@@ -20,6 +20,8 @@ namespace Transpiler.Analysis
 
         bool InvokeImmediately { get; set; }
 
+        void ForceSolved();
+
         public static IReadOnlyList<IAzFuncStmtDefn> Initialize(Scope scope,
                                                                 IPsFuncStmtDefn node)
         {

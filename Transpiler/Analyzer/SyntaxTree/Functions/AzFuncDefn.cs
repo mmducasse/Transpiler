@@ -38,6 +38,11 @@ namespace Transpiler.Analysis
             Position = position;
         }
 
+        public void ForceSolved()
+        {
+            IsSolved = true;
+        }
+
         public static AzFuncDefn Initialize(Scope scope,
                                             PsFuncDefn node)
         {

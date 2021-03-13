@@ -205,8 +205,6 @@ namespace Transpiler.Analysis
                     fileScope.FuncDefnTypes[funcDefn] = funcDefn.Type;
                 }
             }
-
-            //TEMP_PrintFnTypes(fileScope);
         }
 
         private static void PostAnalyze(Scope scope)

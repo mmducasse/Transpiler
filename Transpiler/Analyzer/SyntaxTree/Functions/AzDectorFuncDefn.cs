@@ -43,6 +43,11 @@ namespace Transpiler.Analysis
             Position = position;
         }
 
+        public void ForceSolved()
+        {
+            IsSolved = true;
+        }
+
         public static IReadOnlyList<IAzFuncStmtDefn> Initialize(Scope scope,
                                                                 PsDectorFuncDefn node)
         {
